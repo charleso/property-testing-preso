@@ -175,14 +175,14 @@ layout: false
 
 ## Previously
 
-- Declan talked about "why"
+- Declan talked about _why_
 
 ---
 
 ## Today
 
 - Examples of _how_
-- Almost like _patterns_
+- Patterns (Laws?)
 - More motivation for _why_
 
 ---
@@ -196,7 +196,7 @@ import org.scalacheck._
 class MySpec extends Specification with ScalaCheck {
   def is =
 
-  "List reverse" ! prop { (a: String ) =>
+  "List reverse" ! prop { (a: String) =>
     a.reverse.reverse ==== a
   }
 }
@@ -207,7 +207,7 @@ class MySpec extends Specification with ScalaCheck {
 ## Hello World
 
 ```scala
-prop { (a: String ) =>
+prop { (a: String) =>
   a.reverse.reverse ==== a
 }
 ```
@@ -240,7 +240,7 @@ layout: false
 ## Example - JSON
 
 ```scala
-prop { (a: DomainObject ) =>
+prop { (a: User) =>
   fromJson(toJson(a)) ==== a.right
 }
 ```
@@ -250,7 +250,7 @@ prop { (a: DomainObject ) =>
 ## Example - Read/Write
 
 ```scala
-prop { (a: DomainObject) =>
+prop { (a: User) =>
   read(write(a)) ==== a.right
 }
 ```
@@ -260,21 +260,14 @@ prop { (a: DomainObject) =>
 ## Capture
 
 ```scala
-def simple[A, B](a: A, f: A => B, g: B => A): Boolean =
+def hobbit[A, B](a: A, f: A => B, g: B => A): Boolean =
   g(f(a)) == a
 
-prop { (a: DomainObject) =>
-  simple(a, read, write)
+prop { (a: User) =>
+  hobbit(a, read, write)
 }
 ```
 
----
-
-## Capture
-
-def complex[A: Equal, B, F[_]: Functor]
-  (a: A, f: A => B, g: B => F[A]): F[Boolean] =
-    f(a).map(g).map(_ == a)
 ---
 
 ## Examples
@@ -309,7 +302,7 @@ layout: false
 ## Hello World
 
 ```scala
-prop { (a: String ) =>
+prop { (a: String) =>
   TODO(a) ==== TODO2(a)
 }
 ```
@@ -325,7 +318,7 @@ def sortMutable[A](a: List[A]): List[A] = {
   b.result()
 }
 
-prop { (a: List[Int] ) =>
+prop { (a: List[Int]) =>
   sortMutable(a) ==== a.foldLeft(List[A])(_ :: _)
 }
 ```
@@ -335,7 +328,7 @@ prop { (a: List[Int] ) =>
 ## Alternative
 
 ```scala
-prop { (a: List[Int] ) =>
+prop { (a: List[Int]) =>
   sortMutable(a) ==== a.sorted
 }
 ```
@@ -349,7 +342,7 @@ def dayMinus(d: Date, i: Int): Date = {
   ...
 }
 
-prop { (a: Date, i: Int ) =>
+prop { (a: Date, i: Int) =>
   dayMinus(d, i) ==== JodaTime.minusDays(d.toJoda, i)
 }
 ```
@@ -378,7 +371,7 @@ layout: false
 ## TODO
 
 ```scala
-prop { (a: String ) =>
+prop { (a: String) =>
   unique(unique(a)) ==== a.distinct
 }
 ```
@@ -390,7 +383,7 @@ prop { (a: String ) =>
 def idempotent[A](a: A, f: A => A, b: A): Boolean =
   f(a) == b &amp;&amp; f(f(a)) == b
 
-prop { (a: String ) =>
+prop { (a: String) =>
   idempotent(a, unique, a.distinct)
 }
 ```
@@ -417,7 +410,7 @@ layout: false
 ## Example
 
 ```scala
-prop { (a: List[Int] ) =>
+prop { (a: List[Int]) =>
   a.map(foo).size ==== a.size
 }
 ```
@@ -426,7 +419,7 @@ prop { (a: List[Int] ) =>
 ## Real-world example
 
 ```scala
-prop { (a: List[Int] ) =>
+prop { (a: List[Int]) =>
  // TODO
 }
 ```
@@ -445,16 +438,17 @@ template: inverse
 # Functional/Integration
 
 ---
-layout: false
+template: question
 
-> "But it's too slow to run 100 times"
+<i>But it's too slow to run 100 times</i>
 
 ---
+layout: false
 
 ## Limit tests
 
 ```scala
-prop { (input: Input ) =>
+prop { (input: Input) =>
 
   runHadoopOhGodItsSlow(input) ====
     input.groupBy(_.x).sortBy(_.y)
@@ -467,11 +461,15 @@ prop { (input: Input ) =>
 ## Warning
 
 - Yes they can be flakey
+
+---
+
+## But...
+
 - Still better than hard-coded tests
-  - Can increase number locally
-  - Separate build with different sizes
-
-
+- Can increase number locally
+- Separate build with different sizes
+- Need to think harder about your code!
 
 
 
@@ -551,7 +549,8 @@ prop { (a: NonEmptyList[Int]) =>
 ```scala
 case class Dictionary(defs: List[Definition])
 
-case class ConcreteDictionary(conc: ConcreteDefinition, dict: Dictionary) {
+case class ConcreteDictionary(conc: ConcreteDefinition,
+                              dict: Dictionary) {
   def dictionary: Dictionary =
     Dictionary(List(conc :: dict.defs))
 }
