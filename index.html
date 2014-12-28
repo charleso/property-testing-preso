@@ -212,6 +212,20 @@ prop { (a: String) =>
 }
 ```
 
+---
+
+## Even better
+
+```scala
+prop { (a: String) =>
+  a.reverse.reverse ==== a
+}
+
+prop { (a: String, b: String) =>
+  a.reverse ++ b.reverse ==== (b ++ a).reverse
+}
+```
+
 
 
 
@@ -295,17 +309,6 @@ template: inverse
 template: image
 
 <img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" />
-
----
-layout: false
-
-## Hello World
-
-```scala
-prop { (a: String) =>
-  TODO(a) ==== TODO2(a)
-}
-```
 
 ---
 
@@ -611,6 +614,7 @@ prop { (a: Int, b: Int) =>
 
 
 ---
+template: inverse
 
 ## Property based testing changed my life
 
