@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scala, The Good Parts</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: Futura, 'Yanone Kaffeesatz';
+      }
+      li {
+        font-size: 30px;
+        padding-top: 20px;
+      }
+      .remark-code {
+        font-size: 30px;
+      }
+      h1, h2, h3 {
+        font-weight: normal;
+      }
+      .inverse {
+        background: #4795c6;
+        color: white;
+      }
+      .looper {
+        background-image: url(images/looper2.jpg);
+        background-size: 100%;
+        background-color: #83a8ce;
+        background-position: bottom;
+        color: white;
+      }
+      .question {
+        background: #76b242;
+        color: white;
+      }
+      .rule {
+        background: #ee2a24;
+        color: white;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .image {
+        padding: 0px;
+        color: white;
+        background: #272822;
+
+        position: relative;
+      }
+      .image img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        /*height: 100%;*/
+        float: left;
+      }
+      .image h1, .image h2 {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        left: 20px;
+      }
+      .image-white {
+        color: black;
+        background-color: white;
+      }
+      .image-last h1 {
+        right: 0;
+        bottom: 100px;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Ubuntu Mono';
+      }
+      .remark-slide-content {
+        padding: 10px 10px 10px 30px;
+      }
+      .hljs-default .hljs {
+        background-color: transparent;
+      }
+      .ambiata-full {
+        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+      }
+      /*
+      .ambiata-full h2 {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+      */
+      .ambiata {
+        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+        background-position: top right;
+        background-size: 100px;
+        /*-webkit-filter: grayscale(40%);*/
+      }
+      .code-small .remark-code {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <textarea id="source">
+name: looper
+layout: true
+class: looper
+
+---
+name: image
+layout: true
+class: center, middle, image
+
+---
+name: image-white
+layout: true
+class: center, middle, image, image-white
+
+---
+name: image-last
+layout: true
+class: center, middle, image, image-last
+
+---
+name: ambiata
+layout: true
+class: ambiata
+
+---
+name: ambiata-full
+layout: true
+class: center, middle, ambiata-full
+
+---
+name: code-small
+layout: true
+class: code-small
+
+---
+name: question
+layout: true
+class: center, middle, question
+
+---
+name: rule
+layout: true
+class: center, middle, rule
+
+---
+name: inverse
+layout: true
+class: center, middle, inverse
+
+---
+
+class: center, middle
+template: image
+
+<img src="images/scala-good-parts.jpg" />
+
+# Property Based Testing (Part 2)
+
+---
+
+template: ambiata-full
+
+# Ambiata
+
+---
+layout: false
+
+## Previously
+
+- Declan talked about "why"
+
+---
+
+## Today
+
+- Examples of _how_
+- Almost like _patterns_
+- More motivation for _why_
+
+---
+
+## Hello World
+
+```scala
+import org.specs2._
+import org.scalacheck._
+
+class MySpec extends Specification with ScalaCheck {
+  def is =
+
+  "List reverse" ! prop { (a: String ) =>
+    a.reverse.reverse ==== a
+  }
+}
+```
+
+---
+
+## Hello World
+
+```scala
+prop { (a: String ) =>
+  a.reverse.reverse ==== a
+}
+```
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# There and back again
+
+<img src="http://www.fatmovieguy.com/wp-content/uploads/2014/01/The-Hobbit-There-and-Back-Again.jpg" />
+
+---
+template: image
+
+<img src="http://fsharpforfunandprofit.com/assets/img/property_inverse.png" />
+
+---
+layout: false
+
+## Example - JSON
+
+```scala
+prop { (a: DomainObject ) =>
+  fromJson(toJson(a)) ==== a.right
+}
+```
+
+---
+
+## Example - Read/Write
+
+```scala
+prop { (a: DomainObject ) =>
+  read(write(a)) ==== a.right
+}
+```
+
+---
+
+## Capture
+
+```scala
+def simple[A, B](a: A, f: A => B, g: B => A): Boolean =
+  g(f(a)) == a
+
+def complex[A: Equal, B, F[_]: Functor]
+  (a: A, f: A => B, g: B => F[A]): F[Boolean] =
+    f(a).map(g).map(_ == a)
+```
+
+---
+
+## Examples
+
+- read/write
+- json
+- serialization
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Multiple Paths
+
+---
+template: image
+
+<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" />
+
+---
+layout: false
+
+## Hello World
+
+```scala
+prop { (a: String ) =>
+  TODO(a) ==== TODO2(a)
+}
+```
+
+---
+
+## Performance
+
+```scala
+def sortMutable[A](a: List[A]): List[A] = {
+  val b = List.newBuilder[A](a.length)
+  ...
+  b.result()
+}
+
+prop { (a: List[Int] ) =>
+  sortMutable(a) ==== a.foldLeft(List[A])(_ :: _)
+}
+```
+
+---
+
+## Alternative
+
+```scala
+prop { (a: List[Int] ) =>
+  sortMutable(a) ==== a.sorted
+}
+```
+
+---
+
+## Example in the wild
+
+```scala
+def dayMinus(d: Date, i: Int): Date = {
+  ...
+}
+
+prop { (a: Date, i: Int ) =>
+  dayMinus(d, i) ==== JodaTime.minusDays(d.toJoda, i)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Idempotence
+
+---
+layout: false
+
+## TODO
+
+```scala
+prop { (a: String ) =>
+  
+}
+```
+
+---
+## Capture
+
+```scala
+def 
+```
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Invariants
+
+---
+layout: false
+
+## 
+
+```scala
+prop { (a: String ) =>
+  TODO(a) ==== TODO2(a)
+}
+```
+
+
+
+
+
+
+
+
+
+---
+
+NOTES:
+
+- minOkTests
+
+- Arbitraries
+  - Whole section?
+  - frequency
+
+
+
+
+---
+layout: false
+
+# Links
+
+- John Hughes - "Testing the Hard Stuff and Staying Sane"
+  - https://www.youtube.com/watch?v=zi0rHwfiX1Q
+- Jessica Kerr - "Property-Based Testing for Better Code"
+  - https://www.youtube.com/watch?v=shngiiBfD80
+- "Choosing properties for property-based testing"
+  - http://fsharpforfunandprofit.com/posts/property-based-testing-2/
+
+
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>.
