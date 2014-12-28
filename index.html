@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Scala, The Good Parts</title>
+    <title>Real World Property Based Testing</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
       @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -162,7 +162,7 @@ template: image
 
 <img src="images/scala-good-parts.jpg" />
 
-# Property Based Testing (Part 2)
+# Real World Property Based Testing
 
 ---
 
@@ -250,7 +250,7 @@ prop { (a: DomainObject ) =>
 ## Example - Read/Write
 
 ```scala
-prop { (a: DomainObject ) =>
+prop { (a: DomainObject) =>
   read(write(a)) ==== a.right
 }
 ```
@@ -263,11 +263,18 @@ prop { (a: DomainObject ) =>
 def simple[A, B](a: A, f: A => B, g: B => A): Boolean =
   g(f(a)) == a
 
+prop { (a: DomainObject) =>
+  simple(a, read, write)
+}
+```
+
+---
+
+## Capture
+
 def complex[A: Equal, B, F[_]: Functor]
   (a: A, f: A => B, g: B => F[A]): F[Boolean] =
     f(a).map(g).map(_ == a)
-```
-
 ---
 
 ## Examples
@@ -372,7 +379,7 @@ layout: false
 
 ```scala
 prop { (a: String ) =>
-  
+  unique(unique(a)) ==== a.distinct
 }
 ```
 
@@ -380,8 +387,14 @@ prop { (a: String ) =>
 ## Capture
 
 ```scala
-def 
+def idempotent[A](a: A, f: A => A, b: A): Boolean =
+  f(a) == b &amp;&amp; f(f(a)) == b
+
+prop { (a: String ) =>
+  idempotent(a, unique, a.distinct)
+}
 ```
+
 
 
 
@@ -401,13 +414,63 @@ template: inverse
 ---
 layout: false
 
-## 
+## Example
 
 ```scala
-prop { (a: String ) =>
-  TODO(a) ==== TODO2(a)
+prop { (a: List[Int] ) =>
+  a.map(foo).size ==== a.size
 }
 ```
+
+---
+## Real-world example
+
+```scala
+prop { (a: List[Int] ) =>
+ // TODO
+}
+```
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Functional/Integration
+
+---
+layout: false
+
+> "But it's too slow to run 100 times"
+
+---
+
+## Limit tests
+
+```scala
+prop { (input: Input ) =>
+
+  runHadoopOhGodItsSlow(input) ====
+    input.groupBy(_.x).sortBy(_.y)
+
+}.set(minTestsOk = 3)
+```
+
+---
+
+## Warning
+
+- Yes they can be flakey
+- Still better than hard-coded tests
+  - Can increase number locally
+  - Separate build with different sizes
+
 
 
 
@@ -419,16 +482,138 @@ prop { (a: String ) =>
 
 ---
 
-NOTES:
+template: inverse
 
-- minOkTests
+# Arbitrary skillz
 
-- Arbitraries
-  - Whole section?
-  - frequency
+---
+layout: false
+
+- Composable/re-usable
+- TODO
+
+---
+
+## Domain Objects
+
+```scala
+TODO
+```
 
 
 
+
+
+
+
+
+---
+
+# Data (Un)zipper
+
+---
+
+## Ignore inputs
+
+```scala
+prop { (a: List[Int]) => !a.isEmpty ==>
+  first(a) ==== a.head
+}
+```
+
+---
+
+## NonEmptyList
+
+```scala
+prop { (a: Int, b: List[Int]) =>
+  first(a :: b) ==== a
+}
+```
+
+---
+
+## Scalaz NonEmptyList
+
+```scala
+import scalaz._
+import scalaz.scalacheck.ScalazArbitrary._
+
+prop { (a: NonEmptyList[Int]) =>
+  first(a.list) ==== a.head
+}
+```
+
+---
+
+## Real world
+
+```scala
+case class Dictionary(defs: List[Definition])
+
+case class ConcreteDictionary(conc: ConcreteDefinition, dict: Dictionary) {
+  def dictionary: Dictionary =
+    Dictionary(List(conc :: dict.defs))
+}
+
+prop { (a: ConcreteDictionary) =>
+  foo(a.dictionary) ==== a.conc.bar()
+}
+```
+
+
+
+
+
+
+
+---
+
+# Frequency
+
+---
+
+## Instead of
+
+```scala
+Gen.choose(Integer.MAX_VALUE, Integer.MAX_VALUE)
+```
+
+---
+
+## Frequency
+
+```scala
+Gen.frequency(
+  20 -> 0,
+  20 -> Integer.MAX_VALUE,
+  20 -> Integer.MIN_VALUE,
+  10 -> 1,
+  10 -> -1,
+  5  -> Gen.choose(Integer.MAX_VALUE, Integer.MAX_VALUE)
+)
+```
+
+---
+
+## Re-usable
+
+- TODO SHOW OUTPUT WITH DIFFERENT FAILURE RATES (OR SOMETHING)
+
+```scala
+prop { (a: Int, b: Int) =>
+  a + b must beGreaterThan(a)
+}
+```
+
+
+
+
+
+
+---
+
+## Property based testing changed my life
 
 ---
 layout: false
