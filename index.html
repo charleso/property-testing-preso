@@ -887,7 +887,8 @@ template: question
 import com.ambiata.disorder.DistinctPair
 
 property("insert non-empty unique") =
-  forAll { (e1: Entity, e2a: Entity,
+  forAll { (e1: Entity,
+            e2: Entity,
             names: DistinctPair[String]) =>
     for {
       i1 &lt;- EntityDB.insert(e1.copy(name = names.first))
@@ -903,7 +904,7 @@ property("insert non-empty unique") =
 
 ```scala
 property("insert non-empty duplicate") =
-  forAll { (e1: Entity, e2a: Entity, name: String) =>
+  forAll { (e1: Entity, e2: Entity, name: String) =>
     for {
       i1 &lt;- EntityDB.insert(e1.copy(name = name))
       i2 &lt;- EntityDB.insert(e2.copy(name = name))
