@@ -375,8 +375,8 @@ case class User(name: String, postcode: Int)
 object GenUser {
 
   def user: Gen[User] = for {
-    name     &lt;- Gen.string
-    postcode &lt;- Gen.int
+    name     &lt;- arbitrary[String]
+    postcode &lt;- arbitrary[Int]
   } yield User(name, postcode)
 }
 ```
@@ -446,7 +446,7 @@ List(1).headOption = Some(1)
 
 List(1, 2).headOption = Some(1)
 
-List(1, 2, 3).toList.headOption = Some(1)
+List(1, 2, 3).headOption = Some(1)
 
 ...
 ```
@@ -578,7 +578,7 @@ case class UserWithPhone(
 
 def genUserWithPhone: Gen[UserWithPhone] = for {
   user  &lt;- GenUser.user
-  phone &lt;- Gen.string
+  phone &lt;- arbitrary[String]
 } yield UserWithPhone(user, phone)
 
 forAll { user: UserWithPhone =>
@@ -630,7 +630,7 @@ forAll { l: List[Boolean] =>
 
 ```scala
 forAll { (o: Option[Unit], i1: Int, i2: Int) =>
-  o.fold(i1)(i2) = ?
+  o.fold(i1)(i2) =?
     o.map(_ => i2).getOrElse(i1) 
 }
 ```
@@ -661,7 +661,7 @@ forAll { l: List[Int] =>
 }
 
 forAll { l: List[Boolean] =>
-  l.filter(b => b) =? l.filterNot(b => !b)
+  l.filter(b => !b) =? l.filterNot(b => b)
 }
 ```
 
@@ -674,7 +674,7 @@ def dayMinus(d: Date, i: Int): Date = {
   ...
 }
 
-forAll { (a: Date, i: Int) =>
+forAll { (d: Date, i: Int) =>
   dayMinus(d, i) =? JodaTime.minusDays(d.toJoda, i)
 }
 ```
@@ -835,8 +835,8 @@ layout: false
 property("get empty") = 
   forall { id: Int =>
     for {
-      e &lt;- EntityDB.get(id)
-    } yield e =? None
+      u &lt;- UserDB.get(id)
+    } yield u =? None
   }
 ```
 ---
@@ -845,11 +845,11 @@ property("get empty") =
 
 ```scala
 property("insert empty") = 
-  forall { e1: Entity =>
+  forall { u1: User =>
     for {
-      id &lt;- EntityDB.insert(e1)
-      e2 &lt;- EntityDB.get(id)
-    } yield e2 =? Some(e1)
+      id &lt;- UserDB.insert(u1)
+      u2 &lt;- UserDB.get(id)
+    } yield e2 =? Some(u1)
   }
 ```
 
@@ -857,7 +857,7 @@ property("insert empty") =
 template: rule
 
 ```
-Expected Some(User(\NULL)) but got Some(Entity())
+Expected Some(User(\NULL)) but got Some(User())
 ```
 
 ---
@@ -866,19 +866,19 @@ Expected Some(User(\NULL)) but got Some(Entity())
 
 ```scala
 property("insert non-empty") =
-  forAll { (e1: Entity, e2: Entity) =>
+  forAll { (u1: User, u2: User) =>
     for {
-      i1 &lt;- EntityDB.insert(e1)
-      i2 &lt;- EntityDB.insert(e2)
-      e3 &lt;- EntityDB.get(i2)
-    } yield e3 =? Some(e2)
+      i1 &lt;- UserDB.insert(u1)
+      i2 &lt;- UserDB.insert(u2)
+      u3 &lt;- UserDB.get(i2)
+    } yield u3 =? Some(u2)
   }
 ```
 
 ---
 template: question
 
-## What happens if Entity.name has too be unique?
+## What happens if User.name has too be unique?
 
 ---
 ## DB
@@ -887,15 +887,14 @@ template: question
 import com.ambiata.disorder.DistinctPair
 
 property("insert non-empty unique") =
-  forAll { (e1: Entity,
-            e2: Entity,
+  forAll { (u1: User,
             names: DistinctPair[String]) =>
     for {
-      i1 &lt;- EntityDB.insert(e1.copy(name = names.first))
-      i2 &lt;- EntityDB.insert(e2.copy(name = names.second))
-      e3 &lt;- EntityDB.get(i2.get)
+      i1 &lt;- UserDB.insert(u1.copy(name = names.first))
+      i2 &lt;- UserDB.insert(u1.copy(name = names.second))
+      u2 &lt;- UserDB.get(i2.get)
     } yield
-      e3 =? Some(e2.copy(name = names.second))
+      u2 =? Some(u1.copy(name = names.second))
   }
 ```
 
@@ -904,10 +903,10 @@ property("insert non-empty unique") =
 
 ```scala
 property("insert non-empty duplicate") =
-  forAll { (e1: Entity, e2: Entity, name: String) =>
+  forAll { (u1: User, u2: User, name: String) =>
     for {
-      i1 &lt;- EntityDB.insert(e1.copy(name = name))
-      i2 &lt;- EntityDB.insert(e2.copy(name = name))
+      i1 &lt;- UserDB.insert(u1.copy(name = name))
+      i2 &lt;- UserDB.insert(u2.copy(name = name))
     } yield (i1.isDefined, i2.isEmpty) =? (true, true)
   }
 ```
