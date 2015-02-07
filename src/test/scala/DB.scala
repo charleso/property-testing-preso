@@ -8,7 +8,7 @@ object DBTest extends Properties("DB") {
     run(for {
       id <- EntityDB.insert(e1)
       e2 <- EntityDB.get(id)
-    } yield e2 ?= Some(e1))
+    } yield e2 =? Some(e1))
   }
 
   property("insert non-empty") = forAll { (e1: Entity, e2: Entity) =>
@@ -16,7 +16,13 @@ object DBTest extends Properties("DB") {
       id1 <- EntityDB.insert(e1)
       id2 <- EntityDB.insert(e2)
       e3 <- EntityDB.get(id2)
-    } yield e3 ?= Some(e2))
+    } yield e3 =? Some(e2))
+  }
+
+  property("empty") = forAll { (id: Int) =>
+    run(for {
+      e <- EntityDB.get(id)
+    } yield e =? None)
   }
 
   property("insert non-empty unique") = forAll { (e1: Entity, e2a: Entity, names: DistinctPair[Int]) =>
@@ -25,14 +31,14 @@ object DBTest extends Properties("DB") {
       i1 <- EntityDB.insertUnique(e1.copy(name = names.first.toString))
       i2 <- EntityDB.insertUnique(e2b)
       e3 <- i2.map(EntityDB.get).getOrElse(DB.pure(Option.empty[Entity]))
-    } yield e3 ?= Some(e2b))
+    } yield e3 =? Some(e2b))
   }
 
   property("insert non-empty duplicate") = forAll { (e1: Entity, e2: Entity, name: String) =>
     run(for {
       i1 <- EntityDB.insertUnique(e1.copy(name = name))
       i2 <- EntityDB.insertUnique(e2.copy(name = name))
-    } yield (i1.isDefined,i2.isEmpty) ?= (true -> true))
+    } yield (i1.isDefined,i2.isEmpty) =? (true -> true))
   }
 
   def run(db: DB[Prop]): Prop =
@@ -74,5 +80,5 @@ object EntityDB {
     DB(v => if (v.exists(_.name == e.name)) v -> None else (v :+ e) -> Some(v.size))
 
   def get(id: Int): DB[Option[Entity]] =
-    DB(v => v -> (if (id < v.size) Some(v(id)) else None))
+    DB(v => v -> (if (id >=0 && id < v.size) Some(v(id)) else None))
 }

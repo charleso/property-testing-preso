@@ -171,12 +171,13 @@ template: image
 
 <img src="images/love-the-bomb.jpg" height="100%" />
 
-# How I learned to stop unit-testing and love property-based testing
+# How I learned to stop unit testing and love property-based testing
 
 ---
 
 template: ambiata-full
 
+# Charles O'Farrell
 # Ambiata
 
 
@@ -247,11 +248,20 @@ template: image-white
 ## Inverse
 
 ```scala
-val user =
-  User("bob", 7000)
+def inverse(user: User): Boolean =
+  parseJson(toJson(user)) == user
 
-parseJson(toJson(user)) == user
+inverse(User("alice", 1000))
+inverse(User("bob", 2000))
+inverse(User("charles", 3000))
 ```
+
+---
+template: image
+
+<img src="images/there-and-back-again1.jpg" />
+
+# There and back again?
 
 ---
 template: question
@@ -264,17 +274,24 @@ template: question
 
 ```scala
 forAll { user: User =>
-  parseJson(toJson(user)) ?= user
+  parseJson(toJson(user)) == user
 }
 ```
 
 ---
 
-## Scalacheck!
+## ScalaCheck!
 
 ```scala
-forAll { user: User =>
-  parseJson(toJson(user)) ?= user
+import org.scalacheck._
+import org.scalacheck.Gen._
+
+object UserJsonTest extends Properties("UserJson") {
+ 
+  property("User json") =
+    forAll { user: User =>
+      parseJson(toJson(user)) =? user
+    } 
 }
 ```
 
@@ -285,15 +302,8 @@ template: ambiata
 
 ```scala
 property("User json") =
-  CodecJson.codecLaw.encodedecode[User]
+  codecJsonLaw[User]
 ```
-
----
-template: image
-
-<img src="images/there-and-back-again1.jpg" />
-
-# There and back again?
 
 ---
 template: image
@@ -308,39 +318,36 @@ template: image
 
 ```scala
 forAll { s: String =>
-  s.reverse.reverse ?= s
+  s.reverse.reverse =? s
 }
 ```
 
 ---
 
-## File Read/Write
+## Files
+
+```scala
+forAll { a: String =>
+  read(write(a)) =? a
+}
+```
+
+---
+
+## DB
 
 ```scala
 forAll { a: User =>
-  read(write(a)) ?= a.right
+  get(create(a)) =? a
 }
 ```
-
----
-
-## DB Read/Write
-
-```scala
-forAll { a: User =>
-  get(create(a)) ?= a.right
-}
-```
-
----
-template: question
-
-## Look for symmetry
 
 ---
 template: image
 
 <img src="images/golden-ticket.jpg" />
+
+## Symmetry is your golden ticket
 
 
 
@@ -399,7 +406,7 @@ object Arbitraries {
 ```scala
 import Arbitraries._
 
-forAll { (user: User) =>
+forAll { user: User =>
   ...
 }
 ```
@@ -419,119 +426,47 @@ forAll { (user: User) =>
 
 
 
-
 ---
-
 template: inverse
 
-# Multiple Paths
-
----
-template: image-white
-
-<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" style="margin-top: 120px;"/>
+# Training wheels
 
 ---
 
-## TODO TODO 
+## Test this
 
 ```scala
-forAll { l: List[Int] =>
-  l.TODOTODO() == l
-}
-```
-
----
-
-## Performance
-
-```scala
-def sortMutable[A](a: List[A]): List[A] = {
-  val b = List.newBuilder[A](a.length)
-  ...
-  b.result()
-}
-
-prop { (a: List[Int]) =>
-  sortMutable(a) ?= a.sorted
-}
-```
-
----
-
-## Alternative
-
-- TODO
-
-```scala
-prop { (a: List[Int]) =>
-  sortMutable(a) ?= a.sorted
-}
-```
-
----
-
-## Example in the wild
-
-```scala
-def dayMinus(d: Date, i: Int): Date = {
-  ...
-}
-
-forAll { (a: Date, i: Int) =>
-  dayMinus(d, i) ?= JodaTime.minusDays(d.toJoda, i)
-}
-```
-
-- Break leap year every 400 years:
-
-```scala
-A counter-example is [Date(2004,8,7), 0] (after 1 try)
-'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
-```
-
-
-
-
-
-
-
-
-
-
-
----
-
-# Data (Un)zipper
-- TODO NAME
- - peek?
-
-
----
-
-## Simple Example
-
-```scala
-class List[A] {
+trait List[A] {
   def headOption: Option[A]
 }
 ```
 
 ---
 
-## When you first start
+## Bleh
 
 ```scala
-forAll { (l: List[Int]) =>
-  l.headOption ?=
-    (if (l.isEmpty) None else Some(l.head))
-}
+Nil.headOption = None
+
+List(1).headOption = Some(1)
+
+List(1, 2).headOption = Some(1)
+
+List(1, 2, 3).toList.headOption = Some(1)
+
+...
 ```
 
 ---
-template: question
 
-## Isn't that just the implementation?!?
+## Rookie mistake
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+```
 
 ---
 
@@ -544,8 +479,8 @@ template: image-white
 ## Take 2 - Ignore inputs
 
 ```scala
-forAll { (l: List[Int]) => !l.isEmpty ==> {
-  l.headOption ?= Some(l.head)
+forAll { l: List[Int] => !l.isEmpty ==> {
+  l.headOption =? Some(l.head)
 }}
 ```
 
@@ -555,7 +490,7 @@ forAll { (l: List[Int]) => !l.isEmpty ==> {
 
 ```scala
 forAll { l: List[Int] => l.isEmpty ==> {
-  true
+  ...
 }}
 ```
 
@@ -567,21 +502,29 @@ template: rule
 
 ---
 
-## Secret
+template: image
+
+<img src="images/onion.jpg" style="width: 140%; left: -100px" />
+
+## Data is like an onion
+
+---
+
+## Layers
 
 ```scala
 forAll { (h: Int, t: List[Int]) =>
-  (h :: t).headOption ?= Some(h)
+  (h :: t).headOption =? Some(h)
 }
 
 forAll {
-  Nil.headOption ?= None
+  Nil.headOption =? None
 }
 ```
 
 ---
 
-## Scalaz NonEmptyList
+## NonEmptyList
 
 ```scala
 import scalaz._
@@ -595,7 +538,7 @@ case class NonEmptyList[A](head: A, tail: List[A]) {
 import scalaz.scalacheck.ScalazArbitrary._
 
 forAll { l: NonEmptyList[Int] =>
-   l.list.headOption ?= Some(l.head)
+   l.list.headOption =? Some(l.head)
 }
 ```
 
@@ -640,7 +583,7 @@ case class UserWithPhone(
 }
 
 def genUserWithPhone: Gen[UserWithPhone] = for {
-  user &lt;- GenUser.user
+  user  &lt;- GenUser.user
   phone &lt;- Gen.string
 } yield UserWithPhone(user, phone)
 
@@ -649,6 +592,105 @@ forAll { user: UserWithPhone =>
 }
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Multiple Paths
+
+---
+template: image-white
+
+<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" style="margin-top: 120px;"/>
+
+---
+
+## List
+
+```scala
+trait List[A] {
+  def partition(f: A => Boolean): (List[A], List[A])
+}
+
+forAll { l: List[Boolean] =>
+  l.partition(identity) =?
+    (l.filter(identity), l.filterNot(identity))
+}
+```
+
+---
+
+## Option
+
+```scala
+forAll { (o: Option[Unit], i1: Int, i2: Int) =>
+  o.fold(i1)(i2) = ?
+    o.map(_ => i2).getOrElse(i1) 
+}
+```
+
+---
+
+## Performance
+
+```scala
+def sortMutable[A](a: List[A]): List[A] = {
+  val b = List.newBuilder[A](a.length)
+  ...
+  b.result()
+}
+
+prop { (a: List[Int]) =>
+  sortMutable(a) =? a.sorted
+}
+```
+
+---
+
+## Intuition
+
+```scala
+forAll { l: List[Int] =>
+  l.size =? l.length
+}
+
+forAll { l: List[Boolean] =>
+  l.filter(b => b) =? l.filterNot(b => !b)
+}
+```
+
+---
+
+## Example in the wild
+
+```scala
+def dayMinus(d: Date, i: Int): Date = {
+  ...
+}
+
+forAll { (a: Date, i: Int) =>
+  dayMinus(d, i) =? JodaTime.minusDays(d.toJoda, i)
+}
+```
+
+- Break leap year every 400 years:
+
+```scala
+A counter-example is [Date(2004,8,7), 0] (after 1 try)
+'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
+```
 
 
 
@@ -739,16 +781,17 @@ template: inverse
 ```scala
 def genPostcode: Gen[Postcode] =
   Gen.choose(1, 9999).map(Postcode)
-```
 
-```scala
 def genUser: Gen[User] = for {
   n &lt;- arbitrary[String]
-  p &lt;- arbitrary[Postcode]
+  p &lt;- genPostcode
 } yield User(n, p)
-```
 
-```scala
+def genUser: Gen[Suburb] = for {
+  n &lt;- arbitrary[String]
+  p &lt;- genPostcode
+} yield Suburb(n, p)
+
 forAll { postcode: Postcode =>
   ...
 }
@@ -783,13 +826,25 @@ template: image
 
 
 
-
 ---
 
 template: inverse
 
-# IO
+# Real World ™
 
+---
+layout: false
+
+## DB
+
+```scala
+property("get empty") = 
+  forall { id: Int =>
+    for {
+      e &lt;- EntityDB.get(id)
+    } yield e =? None
+  }
+```
 ---
 layout: false
 
@@ -801,7 +856,7 @@ property("insert empty") =
     for {
       id &lt;- EntityDB.insert(e1)
       e2 &lt;- EntityDB.get(id)
-    } yield e2 ?= Some(e1)
+    } yield e2 =? Some(e1)
   }
 ```
 
@@ -816,7 +871,7 @@ property("insert non-empty") =
       i1 &lt;- EntityDB.insert(e1)
       i2 &lt;- EntityDB.insert(e2)
       e3 &lt;- EntityDB.get(i2)
-    } yield e3 ?= Some(e2)
+    } yield e3 =? Some(e2)
   }
 ```
 
@@ -839,7 +894,7 @@ property("insert non-empty unique") =
       i2 &lt;- EntityDB.insert(e2.copy(name = names.second))
       e3 &lt;- EntityDB.get(i2.get)
     } yield
-      e3 ?= Some(e2.copy(name = names.second))
+      e3 =? Some(e2.copy(name = names.second))
   }
 ```
 
@@ -852,14 +907,14 @@ property("insert non-empty duplicate") =
     for {
       i1 &lt;- EntityDB.insert(e1.copy(name = name))
       i2 &lt;- EntityDB.insert(e2.copy(name = name))
-    } yield (i1.isDefined, i2.isEmpty) ?= (true, true)
+    } yield (i1.isDefined, i2.isEmpty) =? (true, true)
   }
 ```
 
 ---
 template: ambiata
 
-## [Disorder](https://github.com/ambiata/disorder/tree/master/src/main/scala/com/ambiata/disorder)
+## [Shameless Plug - Disorder](https://github.com/ambiata/disorder/tree/master/src/main/scala/com/ambiata/disorder)
 
 - DistinctList
 - DistinctPair
@@ -872,12 +927,11 @@ template: ambiata
 ---
 template: question
 
-## <i>But is it too slow to run 100 times?</i>
+## But is it too slow to run 100 times?
 
 ---
-layout: false
 
-## Limit tests
+## Minimum tests
 
 ```scala
 prop { (input: Input) =>
@@ -931,24 +985,29 @@ def genInt: Gen[Int] =
 ```scala
 def genInt: Gen[Int] =
   Gen.frequency(
-    20 -> 0,
-    20 -> Int.MaxValue,
-    20 -> Int.MinValue,
-    10 -> 1,
-    10 -> -1,
-    5  -> Gen.choose(Int.MinValue, Int.MaxValue)
+    10 -> 0,
+    10 -> Int.MaxValue,
+    10 -> Int.MinValue,
+    5  -> 1,
+    5  -> -1,
+    50 -> Gen.choose(Int.MinValue + 1, Int.MaxValue - 1)
   )
 ```
 
 ---
 
-## Re-usable
+template: inverse
 
-- TODO SHOW OUTPUT WITH DIFFERENT FAILURE RATES (OR SOMETHING)
+# Invariants
+
+---
+layout: false
+
+## List
 
 ```scala
-prop { (a: Int, b: Int) =>
-  a + b must beGreaterThan(a)
+forAll { l: List[Int] =>
+  l.map(foo).size =? a.size
 }
 ```
 
@@ -965,61 +1024,8 @@ layout: false
 
 ```scala
 prop { (a: String) =>
-  a.distinct.distinct ?= a.distinct
+  a.distinct.distinct =? a.distinct
 }
-```
-
----
-
-template: inverse
-
-# Invariants
-
----
-layout: false
-
-## Example
-
-```scala
-prop { (a: List[Int]) =>
-  a.map(foo).size ?= a.size
-}
-```
-
----
-
-template: inverse
-
-# Laws
-
----
-
-## Laws - Equal
-
-```scala
-import scalaz.scalacheck.ScalazProperties._
-
-object equal {
-  def laws[A: Equal : Arbitrary]: Properties = ...
-}
-
-property("user equal") =
-  equal.laws[User]
-```
-
----
-
-## Laws - Order
-
-```scala
-import scalaz.scalacheck.ScalazProperties._
-
-object equal {
-  def laws[A: Equal : Arbitrary]: Properties = ...
-}
-
-property("user order") =
-  order.laws[User]
 ```
 
 

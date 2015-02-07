@@ -36,6 +36,6 @@ object JsonProp extends Properties("JSON") {
     json[BadUser]
 
   def json[A: Arbitrary: DecodeJson: EncodeJson]: Prop = forAll { a: A =>
-    Parse.decode[A](a.asJson.spaces2) ?= a.right
+    Parse.decode[A](a.asJson.spaces2) =? a.right
   }
 }
