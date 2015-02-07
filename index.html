@@ -25,6 +25,14 @@
         background: #4795c6;
         color: white;
       }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .starwars {
+        background: black;
+        color: #07ffff;
+      }
       .looper {
         background-image: url(images/looper2.jpg);
         background-size: 100%;
@@ -39,10 +47,6 @@
       .rule {
         background: #ee2a24;
         color: white;
-      }
-      .inverse h1, .inverse h2 {
-        color: #f3f3f3;
-        line-height: 0.8em;
       }
       .image {
         padding: 0px;
@@ -156,6 +160,11 @@ layout: true
 class: center, middle, inverse
 
 ---
+name: starwars
+layout: true
+class: center, middle, starwars
+
+---
 
 class: center, middle
 template: image
@@ -170,45 +179,8 @@ template: ambiata-full
 
 # Ambiata
 
----
-layout: false
 
-## Previously
 
-- Declan talked about _why_
-
----
-
-## Today
-
-- Examples of _how_
-- Patterns
-- Laws!
-- More motivation for _why_
-
----
-
-## Hello World
-
-```scala
-forAll { (a: String) =>
-  a.reverse.reverse ?= a
-}
-```
-
----
-
-## Even better
-
-```scala
-forAll { (a: String) =>
-  a.reverse.reverse ?= a
-}
-
-forAll { (a: String, b: String) =>
-  a.reverse ++ b.reverse ?= (b ++ a).reverse
-}
-```
 
 
 
@@ -220,55 +192,10 @@ forAll { (a: String, b: String) =>
 
 ---
 
-template: inverse
+template: starwars
 
-# Generators 101
-
----
-layout: false
-
-## Arbitrary
-
-```scala
-case class User(name: String, age: Int)
-
-object User {
-
-  implicit def UserArbitrary: Arbitrary[User] =
-    Arbitrary(GenUser.user)
-
-  def user: Gen[User] = for {
-    name &lt;- arbitrary[String]
-    age  &lt;- arbitrary[Int]
-  } yield User(name, age)
-}
-
-forAll { (user: User) =>
-  ...
-}
-```
-
-
-
-
-
-
-
----
-
-template: image
-
-<img src="images/there-and-back-again1.jpg" />
-
-# There and back again?
-
----
-
-template: image
-
-<img src="images/there-and-back-again3.jpg" />
-
-# There and back again!
+# A long time ago in a unit test far,
+# far away
 
 ---
 layout: false
@@ -288,62 +215,112 @@ parseJson(json) == user
 
 ---
 
-## Once upon a time 2
+## Tedious
 
 ```scala
-val user1 =
+parseJson(read("example1.json")) == user1
+
+parseJson(read("example2.json")) == user2
+
+parseJson(read("example2.json")) == user2
+```
+
+---
+template: image
+
+<img src="images/manual-labour.jpg" />
+
+# Manual labour
+
+---
+template: question
+
+## There's gotta be a better way?
+
+---
+
+## Inverse
+
+```scala
+val user =
   User("foo", 10)
 
-val user2 =
-  User("bar", 20)
+parseJson(toJson(user)) == user
+```
 
-parseJson(toJson(user1)) == user1
-parseJson(toJson(user2)) == user2
-...
+---
+template: question
+
+## What if we could generate a User?
+
+---
+
+## Magic
+
+```scala
+forAll { user: User =>
+  parseJson(toJson(user)) ?= user
+}
 ```
 
 ---
 template: image-white
-class: middle
 
-<img src="http://fsharpforfunandprofit.com/assets/img/property_inverse.png" height="100%" />
-
----
-layout: false
-
-## Example - JSON
-
-```scala
-forAll { (a: User) =>
-  Parse.decode[User](a.asJson.spaces2) ?= a.right
-}
-```
+<img src="images/property-inverse.png" style="margin-top: 150px" />
 
 ---
+template: image
 
-## [Argonaut Codec Laws](https://github.com/argonaut-io/argonaut/blob/master/src/main/scala/argonaut/CodecJson.scala)
+<img src="images/there-and-back-again1.jpg" />
 
-```scala
-forAll { a: User =>
-  CodecJson.derived[User].codecLaw.encodedecode(a)
-}
-```
+# There and back again?
 
 ---
+template: ambiata
 
-## [Law School](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
-
-```scala
-def encodedecode[A: EncodeJson: DecodeJson:
-                    Arbitrary: Equal]: Prop =
-  Prop.forAll(
-    CodecJson.derived[A].codecLaw.encodedecode _
-  )
-```
+## [Argonaut Codec Laws](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
 
 ```scala
 property("User json") =
-  ArgonautProperties.encodedecode[User]
+  CodecJson.codecLaw.encodedecode[User]
+```
+
+---
+
+template: image
+
+<img src="images/there-and-back-again3.jpg" />
+
+# There and back again!
+
+---
+
+## Hello World
+
+```scala
+forAll { s: String =>
+  s.reverse.reverse ?= s
+}
+```
+
+---
+
+## Example - File Read/Write
+
+```scala
+forAll { a: User =>
+  read(write(a)) ?= a.right
+}
+```
+
+---
+
+## Example - DB Read/Write
+
+```scala
+forAll { a: User =>
+  get(create(a)) ?= a.right
+}
 ```
 
 ---
@@ -351,33 +328,73 @@ template: image
 
 <img src="images/golden-ticket.jpg" />
 
+
+
+
+
+
+
+
+
+
+
 ---
 
-## Example - List
+template: inverse
+
+# Generators 101
+
+---
+
+## Step 1 - Data
 
 ```scala
-TODO TODO TODO
+case class User(name: String, age: Int)
 ```
 
 ---
 
-## Example - Read/Write
-
-- TODO THIS SUCKS
+## Step 2 - Just add Gen
 
 ```scala
-prop { (a: User) =>
-  read(write(a)) ?= a.right
+object GenUser {
+
+  def user: Gen[User] = for {
+    name &lt;- arbitrary[String]
+    age  &lt;- arbitrary[Int]
+  } yield User(name, age)
+}
+
+def arbitrary[T: Arbitrary]: Gen[T] =
+   ...
+```
+
+---
+
+## Step 3 - Arbitrary
+
+```scala
+object Arbitraries {
+
+  implicit def UserArbitrary: Arbitrary[User] =
+    Arbitrary(GenUser.user)
 }
 ```
 
 ---
 
-## Examples
+## Step 4 - Profit
 
-- read/write
-- json
-- serialization
+```scala
+import Arbitraries._
+
+forAll { (user: User) =>
+  ...
+}
+```
+
+
+
 
 
 
@@ -397,21 +414,29 @@ template: inverse
 
 ---
 
-## Laws FTW
+## Laws - Equal
 
 ```scala
-
-object equal {
-  def laws[A : Equal : Arbitrary]: Properties = ...
-}
-
-object order {
-  def laws[A : Order : Arbitrary]: Properties = ...
-}
-
 import scalaz.scalacheck.ScalazProperties._
 
+object equal {
+  def laws[A: Equal : Arbitrary]: Properties = ...
+}
+
 property("user equal") = equal.laws[User]
+```
+
+---
+
+## Laws - Order
+
+```scala
+import scalaz.scalacheck.ScalazProperties._
+
+object equal {
+  def laws[A: Equal : Arbitrary]: Properties = ...
+}
+
 property("user order") = order.laws[User]
 ```
 
@@ -429,7 +454,17 @@ template: inverse
 ---
 template: image-white
 
-<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" height="100%" />
+<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" style="margin-top: 120px;"/>
+
+---
+
+## TODO TODO 
+
+```scala
+forAll { l: List[Int] =>
+  l.TODOTODO() == l
+}
+```
 
 ---
 
