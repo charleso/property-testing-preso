@@ -506,9 +506,7 @@ forAll { (h: Int, t: List[Int]) =>
   (h :: t).headOption =? Some(h)
 }
 
-forAll {
-  Nil.headOption =? None
-}
+Nil.headOption =? None
 ```
 
 ---

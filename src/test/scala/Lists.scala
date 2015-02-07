@@ -11,9 +11,8 @@ object Lists extends Properties("Lists") {
     l.headOption =? Some(l.head)
   }}
 
-  property("step 3 - empty") = forAll { (_: Unit) =>
+  property("step 3 - empty") =
     Nil.headOption =? None
-  }
 
   property("step 3 - non-empty") = forAll { (h: Int, t: List[Int]) =>
     (h :: t).headOption =? Some(h)
