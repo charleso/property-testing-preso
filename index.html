@@ -248,13 +248,6 @@ inverse(User("charles", 3000))
 ```
 
 ---
-template: image
-
-<img src="images/there-and-back-again1.jpg" />
-
-# There and back again?
-
----
 template: question
 
 ## What if we could generate a User?
@@ -301,7 +294,7 @@ template: image
 
 <img src="images/there-and-back-again3.jpg" />
 
-# There and back again!
+# There and back again
 
 ---
 
@@ -318,8 +311,10 @@ forAll { s: String =>
 ## Files
 
 ```scala
-forAll { a: String =>
-  read(write(a)) =? a
+forAll { s: String =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s)
+  read(f) =? s
 }
 ```
 
