@@ -356,6 +356,21 @@ class: middle, relative
 
 ---
 
+## Gen
+
+```scala
+def forAll(gen: Gen[A])(p: A => Prop): Prop
+
+object Gen {
+  def string: Gen[String]
+}
+
+forAll(Gen.string) { s: String =>
+  ...
+}
+```
+---
+
 ## Step 1 - Data
 
 ```scala
@@ -367,6 +382,67 @@ case class User(name: String, postcode: Int)
 ## Step 2 - Just add Gen
 
 ```scala
+object GenUser {
+
+  def user: Gen[User] = for {
+    name     &lt;- Gen.string
+    postcode &lt;- Gen.int
+  } yield User(name, postcode)
+}
+```
+
+---
+
+## So far so good
+
+```scala
+forAll(GenUser.user) { user: User =>
+  ...
+}
+```
+
+---
+
+## Painful
+
+```scala
+forAll(???) { users: List[(Int, User)] =>
+  ...
+}
+
+??? =
+  Gen.list(
+    Gen.tuple(
+      Gen.Int,
+      GenUser.user
+    ))
+```
+
+---
+
+## Arbitrary
+
+```scala
+case class Arbitrary[A](arbitrary: Gen[A])
+
+object Arbitrary {
+
+  def arbitrary[T](implicit a: Arbitrary[T]): Gen[T] =
+    a.arbitrary
+}
+
+def forAll(p: A => Prop)
+          (implicit a: Arbitrary[A]): Prop =
+  forAll(a.arbitrary)(p)
+```
+
+---
+
+## Arbitrary
+
+```scala
+import org.scalacheck.Arbitrary._
+
 object GenUser {
 
   def user: Gen[User] = for {
@@ -396,6 +472,18 @@ object Arbitraries {
 import Arbitraries._
 
 forAll { user: User =>
+  ...
+}
+```
+
+---
+
+## Step 4 - Profit
+
+```scala
+import Arbitraries._
+
+forAll { users: List[(Int, User)] =>
   ...
 }
 ```
