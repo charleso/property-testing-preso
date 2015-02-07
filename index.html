@@ -623,7 +623,7 @@ forAll { l: List[Boolean] =>
 
 ```scala
 forAll { (o: Option[Unit], i1: Int, i2: Int) =>
-  o.fold(i1)(i2) =?
+  o.fold(i1)(_ => i2) =?
     o.map(_ => i2).getOrElse(i1) 
 }
 ```
@@ -726,9 +726,32 @@ Invalid postcode
 ```
 
 ---
-template: question
 
-## Postcode has business rules
+## Business Rules
+
+```scala
+def genUser: Gen[User] = for {
+  n &lt;- arbitrary[String]
+  p &lt;- Gen.choose(1, 9999)
+} yield User(n, p)
+```
+
+---
+
+## But what about?
+
+```scala
+object UserService {
+  def findByPostcode(postcode: Int): Option[User]
+  def updatePostcode(id: UserId, postcode: Int): Boolean
+}
+```
+
+```scala
+forAll { p: Int =>
+  UserService.findByPostcode(p)
+}
+```
 
 ---
 
@@ -763,7 +786,7 @@ template: inverse
 
 ---
 
-## Generators compose
+## Reuse
 
 ```scala
 def genPostcode: Gen[Postcode] =
