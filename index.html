@@ -840,7 +840,6 @@ property("get empty") =
   }
 ```
 ---
-layout: false
 
 ## DB
 
@@ -852,6 +851,13 @@ property("insert empty") =
       e2 &lt;- EntityDB.get(id)
     } yield e2 =? Some(e1)
   }
+```
+
+---
+template: rule
+
+```
+Expected Some(User(\NULL)) but got Some(Entity())
 ```
 
 ---
