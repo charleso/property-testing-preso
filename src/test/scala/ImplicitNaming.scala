@@ -1,7 +1,7 @@
 import org.scalacheck._
 import org.scalacheck.Prop.forAll
 
-object ImplicitNaming extends Properties("ImplicitNamgin") {
+object ImplicitNaming extends Properties("ImplicitNaming") {
 
   case class User(name: String)
 

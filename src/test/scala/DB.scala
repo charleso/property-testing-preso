@@ -1,6 +1,6 @@
 import com.ambiata.disorder.DistinctPair
-import org.scalacheck.{Arbitrary, Properties}
-import org.scalacheck.Prop.forAll
+import org.scalacheck._
+import org.scalacheck.Prop._
 
 object DBTest extends Properties("DB") {
 
@@ -8,7 +8,7 @@ object DBTest extends Properties("DB") {
     run(for {
       id <- EntityDB.insert(e1)
       e2 <- EntityDB.get(id)
-    } yield e2 == Some(e1))
+    } yield e2 ?= Some(e1))
   }
 
   property("insert non-empty") = forAll { (e1: Entity, e2: Entity) =>
@@ -16,7 +16,7 @@ object DBTest extends Properties("DB") {
       id1 <- EntityDB.insert(e1)
       id2 <- EntityDB.insert(e2)
       e3 <- EntityDB.get(id2)
-    } yield e3 == Some(e2))
+    } yield e3 ?= Some(e2))
   }
 
   property("insert non-empty unique") = forAll { (e1: Entity, e2a: Entity, names: DistinctPair[Int]) =>
@@ -24,18 +24,18 @@ object DBTest extends Properties("DB") {
     run(for {
       i1 <- EntityDB.insertUnique(e1.copy(name = names.first.toString))
       i2 <- EntityDB.insertUnique(e2b)
-      e3 <- i2.map(EntityDB.get).getOrElse(DB.pure(None))
-    } yield e3 == Some(e2b))
+      e3 <- i2.map(EntityDB.get).getOrElse(DB.pure(Option.empty[Entity]))
+    } yield e3 ?= Some(e2b))
   }
 
   property("insert non-empty duplicate") = forAll { (e1: Entity, e2: Entity, name: String) =>
     run(for {
       i1 <- EntityDB.insertUnique(e1.copy(name = name))
       i2 <- EntityDB.insertUnique(e2.copy(name = name))
-    } yield i1.isDefined && i2.isEmpty)
+    } yield (i1.isDefined,i2.isEmpty) ?= (true -> true))
   }
 
-  def run(db: DB[Boolean]): Boolean =
+  def run(db: DB[Prop]): Prop =
     db.run(Vector.empty)._2
 }
 
@@ -56,13 +56,13 @@ case class DB[A](run: Vector[Entity] => (Vector[Entity], A)) {
     DB(v => v -> f(run(v)._2))
 
   def flatMap[B](f: A => DB[B]): DB[B] =
-    DB { v => val v2 = run(v); f(v2._2).run(v2._1) }
+    DB { v => val v2 = run(v); f(v2._2).run(v2._1)}
 }
 
 object DB {
 
   def pure[A](a: A): DB[A]
-    = DB(_ -> a)
+  = DB(_ -> a)
 }
 
 object EntityDB {

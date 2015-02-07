@@ -1,7 +1,7 @@
 import argonaut._, Argonaut._
 
 import org.scalacheck._
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 import scalaz._, Scalaz._
 
 object JsonProp extends Properties("JSON") {
@@ -28,14 +28,14 @@ object JsonProp extends Properties("JSON") {
   property("user json") =
     json[User]
 
-  property("user json 2") = forAll { a: User =>
-    implicitly[CodecJson[User]].codecLaw.encodedecode(a)
+  property("user json law") = forAll { a: User =>
+    CodecJson.derived[User].codecLaw.encodedecode(a)
   }
 
   property("baduser json") =
     json[BadUser]
 
   def json[A: Arbitrary: DecodeJson: EncodeJson]: Prop = forAll { a: A =>
-    Parse.decode[A](a.asJson.spaces2).toOption.isDefined
+    Parse.decode[A](a.asJson.spaces2) ?= a.right
   }
 }

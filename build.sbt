@@ -21,6 +21,7 @@ scalacOptions := Seq(
 
 libraryDependencies ++= Seq(
    "org.scalaz"              %% "scalaz-core"                  % "7.1.0"
+ , "org.scalaz"              %% "scalaz-scalacheck-binding"    % "7.1.0"   % "test"
  , "io.argonaut"             %% "argonaut"                     % "6.1-M4"
  , "org.specs2"              %% "specs2-core"                  % "2.4.8"   % "test"
  , "org.specs2"              %% "specs2-scalacheck"            % "2.4.8"   % "test"

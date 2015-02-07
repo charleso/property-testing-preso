@@ -47,7 +47,7 @@
       .image {
         padding: 0px;
         color: white;
-        background: #272822;
+        background-color: black;
 
         position: relative;
       }
@@ -191,25 +191,8 @@ layout: false
 ## Hello World
 
 ```scala
-import org.specs2._
-import org.scalacheck._
-
-class MySpec extends Specification with ScalaCheck {
-  def is =
-
-  "List reverse" ! prop { (a: String) =>
-    a.reverse.reverse ==== a
-  }
-}
-```
-
----
-
-## Hello World
-
-```scala
-prop { (a: String) =>
-  a.reverse.reverse ==== a
+forAll { (a: String) =>
+  a.reverse.reverse ?= a
 }
 ```
 
@@ -218,12 +201,12 @@ prop { (a: String) =>
 ## Even better
 
 ```scala
-prop { (a: String) =>
-  a.reverse.reverse ==== a
+forAll { (a: String) =>
+  a.reverse.reverse ?= a
 }
 
-prop { (a: String, b: String) =>
-  a.reverse ++ b.reverse ==== (b ++ a).reverse
+forAll { (a: String, b: String) =>
+  a.reverse ++ b.reverse ?= (b ++ a).reverse
 }
 ```
 
@@ -239,7 +222,7 @@ prop { (a: String, b: String) =>
 
 template: inverse
 
-# Quick Tutorial
+# Generators 101
 
 ---
 layout: false
@@ -247,9 +230,22 @@ layout: false
 ## Arbitrary
 
 ```scala
-case class User(name: String)
+case class User(name: String, age: Int)
 
-implicit User
+object User {
+
+  implicit def UserArbitrary: Arbitrary[User] =
+    Arbitrary(GenUser.user)
+
+  def user: Gen[User] = for {
+    name &lt;- arbitrary[String]
+    age  &lt;- arbitrary[Int]
+  } yield User(name, age)
+}
+
+forAll { (user: User) =>
+  ...
+}
 ```
 
 
@@ -260,16 +256,57 @@ implicit User
 
 ---
 
-template: inverse
-
-# There and back again
-
-<img src="http://www.fatmovieguy.com/wp-content/uploads/2014/01/The-Hobbit-There-and-Back-Again.jpg" />
-
----
 template: image
 
-<img src="http://fsharpforfunandprofit.com/assets/img/property_inverse.png" />
+<img src="images/there-and-back-again1.jpg" />
+
+# There and back again?
+
+---
+
+template: image
+
+<img src="images/there-and-back-again3.jpg" />
+
+# There and back again!
+
+---
+layout: false
+
+## Once upon a time
+
+```scala
+val json = """
+  { "name": "hello", "age": 10 }
+  """
+
+val user =
+  User("hello", 10)
+
+parseJson(json) == user
+```
+
+---
+
+## Once upon a time 2
+
+```scala
+val user1 =
+  User("foo", 10)
+
+val user2 =
+  User("bar", 20)
+
+parseJson(toJson(user1)) == user1
+parseJson(toJson(user2)) == user2
+...
+```
+
+---
+template: image-white
+class: middle
+
+<img src="http://fsharpforfunandprofit.com/assets/img/property_inverse.png" height="100%" />
 
 ---
 layout: false
@@ -277,47 +314,61 @@ layout: false
 ## Example - JSON
 
 ```scala
-prop { (a: User) =>
-  fromJson(toJson(a)) ==== a.right
+forAll { (a: User) =>
+  Parse.decode[User](a.asJson.spaces2) ?= a.right
 }
+```
+
+---
+
+## [Argonaut Codec Laws](https://github.com/argonaut-io/argonaut/blob/master/src/main/scala/argonaut/CodecJson.scala)
+
+```scala
+forAll { a: User =>
+  CodecJson.derived[User].codecLaw.encodedecode(a)
+}
+```
+
+---
+
+## [Law School](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
+
+```scala
+def encodedecode[A: EncodeJson: DecodeJson:
+                    Arbitrary: Equal]: Prop =
+  Prop.forAll(
+    CodecJson.derived[A].codecLaw.encodedecode _
+  )
+```
+
+```scala
+property("User json") =
+  ArgonautProperties.encodedecode[User]
+```
+
+---
+template: image
+
+<img src="images/golden-ticket.jpg" />
+
+---
+
+## Example - List
+
+```scala
+TODO TODO TODO
 ```
 
 ---
 
 ## Example - Read/Write
 
+- TODO THIS SUCKS
+
 ```scala
 prop { (a: User) =>
-  read(write(a)) ==== a.right
+  read(write(a)) ?= a.right
 }
-```
-
----
-
-## Codec Laws
-
-```scala
-forAll { a: User =>
-  implicitly[CodecJson[User]].codecLaw.encodedecode(a)
-}
-```
-
----
-
-## Laws FTW
-
-```scala
-object equal {
-  def laws[A : Equal : Arbitrary]: Properties = ...
-}
-
-scalaz.scalacheck.ScalazProperties.equal.laws[User]
-
-object order {
-  def laws[A : Order : Arbitrary]: Properties = ...
-}
-
-scalaz.scalacheck.ScalazProperties.order.laws[User]
 ```
 
 ---
@@ -337,6 +388,38 @@ scalaz.scalacheck.ScalazProperties.order.laws[User]
 
 
 
+
+---
+
+template: inverse
+
+# Laws
+
+---
+
+## Laws FTW
+
+```scala
+
+object equal {
+  def laws[A : Equal : Arbitrary]: Properties = ...
+}
+
+object order {
+  def laws[A : Order : Arbitrary]: Properties = ...
+}
+
+import scalaz.scalacheck.ScalazProperties._
+
+property("user equal") = equal.laws[User]
+property("user order") = order.laws[User]
+```
+
+
+
+
+
+
 ---
 
 template: inverse
@@ -344,9 +427,9 @@ template: inverse
 # Multiple Paths
 
 ---
-template: image
+template: image-white
 
-<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" />
+<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" height="100%" />
 
 ---
 
@@ -360,7 +443,7 @@ def sortMutable[A](a: List[A]): List[A] = {
 }
 
 prop { (a: List[Int]) =>
-  sortMutable(a) ==== a.foldLeft(List[A])(_ :: _)
+  sortMutable(a) ?= a.foldLeft(List[A])(_ :: _)
 }
 ```
 
@@ -368,9 +451,11 @@ prop { (a: List[Int]) =>
 
 ## Alternative
 
+- TODO
+
 ```scala
 prop { (a: List[Int]) =>
-  sortMutable(a) ==== a.sorted
+  sortMutable(a) ?= a.sorted
 }
 ```
 
@@ -384,7 +469,7 @@ def dayMinus(d: Date, i: Int): Date = {
 }
 
 prop { (a: Date, i: Int) =>
-  dayMinus(d, i) ==== JodaTime.minusDays(d.toJoda, i)
+  dayMinus(d, i) ?= JodaTime.minusDays(d.toJoda, i)
 }
 ```
 
@@ -409,25 +494,15 @@ template: inverse
 ---
 layout: false
 
-## TODO
+## Idempotence
 
 ```scala
 prop { (a: String) =>
-  unique(unique(a)) ==== a.distinct
+  a.distinct.distinct ?= a.distinct
 }
 ```
 
----
-## Capture
 
-```scala
-def idempotent[A](a: A, f: A => A, b: A): Boolean =
-  f(a) == b &amp;&amp; f(f(a)) == b
-
-prop { (a: String) =>
-  idempotent(a, unique, a.distinct)
-}
-```
 
 
 
@@ -452,7 +527,7 @@ layout: false
 
 ```scala
 prop { (a: List[Int]) =>
-  a.map(foo).size ==== a.size
+  a.map(foo).size ?= a.size
 }
 ```
 
@@ -489,7 +564,7 @@ property("insert empty") =
     for {
       id &lt;- EntityDB.insert(e1)
       e2 &lt;- EntityDB.get(id)
-    } yield e2 == Some(e1)
+    } yield e2 ?= Some(e1)
   }
 ```
 
@@ -504,7 +579,7 @@ property("insert non-empty") =
       i1 &lt;- EntityDB.insert(e1)
       i2 &lt;- EntityDB.insert(e2)
       e3 &lt;- EntityDB.get(i2)
-    } yield e3 == Some(e2)
+    } yield e3 ?= Some(e2)
   }
 ```
 
@@ -522,12 +597,13 @@ import com.ambiata.disorder.DistinctPair
 property("insert non-empty unique") =
   forAll { (e1: Entity, e2a: Entity,
             names: DistinctPair[String]) =>
-    run(for {
+    for {
       i1 &lt;- EntityDB.insert(e1.copy(name = names.first))
       i2 &lt;- EntityDB.insert(e2.copy(name = names.second))
-      e3 &lt;- i2.map(EntityDB.get).getOrElse(DB.pure(None))
+      e3 &lt;- i2.map(EntityDB.get)
+        .getOrElse(DB.pure(Option.empty[Entity]))
     } yield
-      e3 == Some(e2.copy(name = names.second)))
+      e3 ?= Some(e2.copy(name = names.second))
   }
 ```
 
@@ -537,10 +613,10 @@ property("insert non-empty unique") =
 ```scala
 property("insert non-empty duplicate") =
   forAll { (e1: Entity, e2a: Entity, name: String) =>
-    run(for {
+    for {
       i1 &lt;- EntityDB.insert(e1.copy(name = name))
       i2 &lt;- EntityDB.insert(e2.copy(name = name))
-    } yield i1.isDefined &amp;&amp; i2.isEmpty)
+    } yield (i1.isDefined, i2.isEmpty) ?= (true, true)
   }
 ```
 
@@ -578,13 +654,7 @@ prop { (input: Input) =>
 
 ---
 
-## Warning
-
-- Yes they can be flakey
-
----
-
-## But...
+## Not perfect but...
 
 - Still better than hard-coded tests
 - Can increase number locally
@@ -618,6 +688,44 @@ layout: false
 TODO
 ```
 
+---
+
+template: image
+
+<img src="images/dividends.jpg" height="100%" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# TDD
+
+---
+
+template: inverse
+
+# Type Driven Development
+
+---
+
+- TODO 
+
+
+
+
 
 
 
@@ -634,21 +742,68 @@ TODO
 
 ---
 
-## Ignore inputs
+## Simple Example
 
 ```scala
-prop { (a: List[Int]) => !a.isEmpty ==>
-  first(a) ==== a.head
+class List[A] {
+  def headOption: Option[A]
 }
 ```
+
+---
+
+## When you first start
+
+```scala
+forAll { (a: List[Int]) =>
+  a.headOption ?= (if (a.isEmpty) None else a.head)
+}
+```
+
+---
+template: question
+
+<i>Isn't that just the implementation?!?</i>
+
+---
+
+template: image-white
+
+<img src="images/pulling-hair-out.jpg" />
+
+---
+
+## Take 2 - Ignore inputs
+
+```scala
+forAll { (l: List[Int]) => !l.isEmpty ==> {
+  l.headOption ?= Some(l.head)
+}}
+```
+
+---
+
+## Beware...
+
+```scala
+forAll { l: List[Int] => l.isEmpty ==> {
+  true
+}}
+```
+
+---
+
+template: rule
+
+<i>Gave up after only 5 passed tests. 96 tests were discarded.</i>
 
 ---
 
 ## NonEmptyList
 
 ```scala
-prop { (a: Int, b: List[Int]) =>
-  first(a :: b) ==== a
+forAll { (h: Int, t: List[Int]) =>
+  (h :: t).headOption ?= Some(h)
 }
 ```
 
@@ -660,26 +815,14 @@ prop { (a: Int, b: List[Int]) =>
 import scalaz._
 import scalaz.scalacheck.ScalazArbitrary._
 
-prop { (a: NonEmptyList[Int]) =>
-  first(a.list) ==== a.head
-}
-```
-
----
-
-## Real world
-
-```scala
-case class Dictionary(defs: List[Definition])
-
-case class ConcreteDictionary(conc: ConcreteDefinition,
-                              dict: Dictionary) {
-  def dictionary: Dictionary =
-    Dictionary(List(conc :: dict.defs))
+case class NonEmptyList(head: A, tail: List[A]) {
+  
+  def list: List[A] =
+    a :: tail
 }
 
-prop { (a: ConcreteDictionary) =>
-  foo(a.dictionary) ==== a.conc.bar()
+forAll { l: NonEmptyList[Int] =>
+   l.list.headOption ?= Some(a.head)
 }
 ```
 
@@ -689,31 +832,40 @@ prop { (a: ConcreteDictionary) =>
 
 
 
+
+
+
+
+
 ---
+
+template: inverse
 
 # Frequency
 
 ---
 
-## Instead of
+## Naive
 
 ```scala
-Gen.choose(Integer.MAX_VALUE, Integer.MAX_VALUE)
+def genInt: Gen[Int] =
+  Gen.choose(Int.MinValue, Int.MaxValue)
 ```
 
 ---
 
-## Frequency
+## More Frequent
 
 ```scala
-Gen.frequency(
-  20 -> 0,
-  20 -> Integer.MAX_VALUE,
-  20 -> Integer.MIN_VALUE,
-  10 -> 1,
-  10 -> -1,
-  5  -> Gen.choose(Integer.MAX_VALUE, Integer.MAX_VALUE)
-)
+def genInt: Gen[Int] =
+  Gen.frequency(
+    20 -> 0,
+    20 -> Int.MaxValue,
+    20 -> Int.MinValue,
+    10 -> 1,
+    10 -> -1,
+    5  -> Gen.choose(Int.MinValue, Int.MaxValue)
+  )
 ```
 
 ---
@@ -733,6 +885,9 @@ prop { (a: Int, b: Int) =>
 
 
 
+
+
+
 ---
 template: inverse
 
@@ -741,11 +896,29 @@ template: inverse
 ---
 template: inverse
 
-## It even works for Javascript!
+## It even works for Java!
 
 ---
 
-## Polyglot
+## Java
+
+```java
+@Theory public void testTruncate(
+  @ForAll String input,
+  @ForAll int length) {
+
+  assertEquals(StringUtils.truncate(input, length), "");
+}
+```
+
+---
+template: inverse
+
+## It even works for Javascript!!!
+
+---
+
+## Javascript
 
 ```js
 check.it('Can handle negative lengths',
@@ -757,14 +930,10 @@ check.it('Can handle negative lengths',
 })
 ```
 
-```java
-@Theory public void testTruncate(
-  @ForAll String input,
-  @ForAll int length) {
+---
+template: image
 
-  assertEquals(StringUtils.truncate(input, length), "");
-}
-```
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
 
 ---
 template: image
