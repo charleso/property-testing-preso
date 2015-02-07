@@ -1023,11 +1023,17 @@ template: inverse
 ---
 layout: false
 
-## List
+## As many as you can
 
 ```scala
 forAll { l: List[Int] =>
-  l.map(foo).size =? a.size
+  l.map(identity).size =? l.size
+}
+```
+
+```scala
+forAll { l: List[Int] =>
+  l.sorted =? l.size
 }
 ```
 
