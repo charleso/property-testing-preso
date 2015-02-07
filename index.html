@@ -194,8 +194,8 @@ template: ambiata-full
 
 template: starwars
 
-# A long time ago in a unit test far,
-# far away
+# A long time ago in a unit test
+# far, far away
 
 ---
 layout: false
@@ -204,11 +204,11 @@ layout: false
 
 ```scala
 val json = """
-  { "name": "hello", "age": 10 }
+  { "name": "bob", "postcode": 7000 }
   """
 
 val user =
-  User("hello", 10)
+  User("bob", 7000)
 
 parseJson(json) == user
 ```
@@ -238,12 +238,17 @@ template: question
 ## There's gotta be a better way?
 
 ---
+template: image-white
+
+<img src="images/property-inverse.png" style="margin-top: 150px" />
+
+---
 
 ## Inverse
 
 ```scala
 val user =
-  User("foo", 10)
+  User("bob", 7000)
 
 parseJson(toJson(user)) == user
 ```
@@ -255,7 +260,7 @@ template: question
 
 ---
 
-## Magic
+## Magic?
 
 ```scala
 forAll { user: User =>
@@ -264,16 +269,14 @@ forAll { user: User =>
 ```
 
 ---
-template: image-white
 
-<img src="images/property-inverse.png" style="margin-top: 150px" />
+## Scalacheck!
 
----
-template: image
-
-<img src="images/there-and-back-again1.jpg" />
-
-# There and back again?
+```scala
+forAll { user: User =>
+  parseJson(toJson(user)) ?= user
+}
+```
 
 ---
 template: ambiata
@@ -286,7 +289,13 @@ property("User json") =
 ```
 
 ---
+template: image
 
+<img src="images/there-and-back-again1.jpg" />
+
+# There and back again?
+
+---
 template: image
 
 <img src="images/there-and-back-again3.jpg" />
@@ -305,7 +314,7 @@ forAll { s: String =>
 
 ---
 
-## Example - File Read/Write
+## File Read/Write
 
 ```scala
 forAll { a: User =>
@@ -315,13 +324,18 @@ forAll { a: User =>
 
 ---
 
-## Example - DB Read/Write
+## DB Read/Write
 
 ```scala
 forAll { a: User =>
   get(create(a)) ?= a.right
 }
 ```
+
+---
+template: question
+
+## Look for symmetry
 
 ---
 template: image
@@ -349,7 +363,7 @@ template: inverse
 ## Step 1 - Data
 
 ```scala
-case class User(name: String, age: Int)
+case class User(name: String, postcode: Int)
 ```
 
 ---
@@ -360,13 +374,10 @@ case class User(name: String, age: Int)
 object GenUser {
 
   def user: Gen[User] = for {
-    name &lt;- arbitrary[String]
-    age  &lt;- arbitrary[Int]
-  } yield User(name, age)
+    name     &lt;- Gen.string
+    postcode &lt;- Gen.int
+  } yield User(name, postcode)
 }
-
-def arbitrary[T: Arbitrary]: Gen[T] =
-   ...
 ```
 
 ---
@@ -406,42 +417,6 @@ forAll { (user: User) =>
 
 
 
----
-
-template: inverse
-
-# Laws
-
----
-
-## Laws - Equal
-
-```scala
-import scalaz.scalacheck.ScalazProperties._
-
-object equal {
-  def laws[A: Equal : Arbitrary]: Properties = ...
-}
-
-property("user equal") = equal.laws[User]
-```
-
----
-
-## Laws - Order
-
-```scala
-import scalaz.scalacheck.ScalazProperties._
-
-object equal {
-  def laws[A: Equal : Arbitrary]: Properties = ...
-}
-
-property("user order") = order.laws[User]
-```
-
-
-
 
 
 
@@ -478,7 +453,7 @@ def sortMutable[A](a: List[A]): List[A] = {
 }
 
 prop { (a: List[Int]) =>
-  sortMutable(a) ?= a.foldLeft(List[A])(_ :: _)
+  sortMutable(a) ?= a.sorted
 }
 ```
 
@@ -503,38 +478,16 @@ def dayMinus(d: Date, i: Int): Date = {
   ...
 }
 
-prop { (a: Date, i: Int) =>
+forAll { (a: Date, i: Int) =>
   dayMinus(d, i) ?= JodaTime.minusDays(d.toJoda, i)
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-template: inverse
-
-# Idempotence
-
----
-layout: false
-
-## Idempotence
+- Break leap year every 400 years:
 
 ```scala
-prop { (a: String) =>
-  a.distinct.distinct ?= a.distinct
-}
+A counter-example is [Date(2004,8,7), 0] (after 1 try)
+'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
 ```
 
 
@@ -547,33 +500,282 @@ prop { (a: String) =>
 
 
 
+---
+
+# Data (Un)zipper
+- TODO NAME
+ - peek?
 
 
 ---
 
-template: inverse
+## Simple Example
 
-# Invariants
+```scala
+class List[A] {
+  def headOption: Option[A]
+}
+```
 
 ---
-layout: false
+
+## When you first start
+
+```scala
+forAll { (l: List[Int]) =>
+  l.headOption ?=
+    (if (l.isEmpty) None else Some(l.head))
+}
+```
+
+---
+template: question
+
+## Isn't that just the implementation?!?
+
+---
+
+template: image-white
+
+<img src="images/pulling-hair-out.jpg" />
+
+---
+
+## Take 2 - Ignore inputs
+
+```scala
+forAll { (l: List[Int]) => !l.isEmpty ==> {
+  l.headOption ?= Some(l.head)
+}}
+```
+
+---
+
+## Beware...
+
+```scala
+forAll { l: List[Int] => l.isEmpty ==> {
+  true
+}}
+```
+
+---
+template: rule
+
+### Gave up after only 5 passed tests.
+### 96 tests were discarded.
+
+---
+
+## Secret
+
+```scala
+forAll { (h: Int, t: List[Int]) =>
+  (h :: t).headOption ?= Some(h)
+}
+
+forAll {
+  Nil.headOption ?= None
+}
+```
+
+---
+
+## Scalaz NonEmptyList
+
+```scala
+import scalaz._
+
+case class NonEmptyList[A](head: A, tail: List[A]) {
+  
+  def list: List[A] =
+    a :: tail
+}
+
+import scalaz.scalacheck.ScalazArbitrary._
+
+forAll { l: NonEmptyList[Int] =>
+   l.list.headOption ?= Some(l.head)
+}
+```
+
+---
+template: image
+
+<img src="images/lets-see-that-again.jpg" style="width: 1400px; left: -400px" />
+
+# Let's see that in instant replay...
+
+---
 
 ## Example
 
 ```scala
-prop { (a: List[Int]) =>
-  a.map(foo).size ?= a.size
+case class User(
+  name: String,
+  phone: Option[String])
+
+forAll { (user: User, phone: String) =>
+  val userWithPhone = user.copy(phone = Some(phone))
+  ...
+}
+
+forAll { user: User =>
+  val userWithoutPhone = user.copy(phone = None)
+  ...
 }
 ```
 
 ---
-## Real-world example
+
+## Re-use
 
 ```scala
-prop { (a: List[Int]) =>
- // TODO
+case class UserWithPhone(
+  user: User[A],
+  phone: String) {
+  
+  def userWithPhone: User =
+    user.copy(phone = Some(phone))
+}
+
+def genUserWithPhone: Gen[UserWithPhone] = for {
+  user &lt;- GenUser.user
+  phone &lt;- Gen.string
+} yield UserWithPhone(user, phone)
+
+forAll { user: UserWithPhone =>
+  ...
 }
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+---
+template: inverse
+
+# Types are a thing
+
+---
+
+## Seems legit
+
+```scala
+case class User(
+  name: String,
+  postcode: Int)
+```
+
+```scala
+def genUser: Gen[User] = for {
+  n &lt;- arbitrary[String]
+  p &lt;- arbitrary[Int]
+} yield User(n, p)
+```
+
+```scala
+forAll { u: User =>
+  UserService.get(UserService.add(u)) == u
+}
+```
+
+---
+template: rule
+
+```
+Invalid postcode
+> ARG_0: User("bob", -1)
+```
+
+---
+template: question
+
+## Postcode has business rules
+
+---
+
+## Be Precise
+
+```scala
+class Postcode private(val value: Int) extends AnyVal
+
+object Postcode {
+  
+  def fromInt(i: Int): Option[Postcode] =
+    if (i > 0 || i &lt; 10000) Some(new Postcode(i))
+    else None
+}
+
+case class User(
+  name: String,
+  postcode: Postcode)
+```
+
+---
+
+template: inverse
+
+## TDD
+
+---
+
+template: inverse
+
+## Type Driven Development
+
+---
+
+## Generators compose
+
+```scala
+def genPostcode: Gen[Postcode] =
+  Gen.choose(1, 9999).map(Postcode)
+```
+
+```scala
+def genUser: Gen[User] = for {
+  n &lt;- arbitrary[String]
+  p &lt;- arbitrary[Postcode]
+} yield User(n, p)
+```
+
+```scala
+forAll { postcode: Postcode =>
+  ...
+}
+```
+
+---
+
+template: image
+
+<img src="images/dividends.jpg" height="100%" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -595,7 +797,7 @@ layout: false
 
 ```scala
 property("insert empty") = 
-  forall { (e1: Entity) =>
+  forall { e1: Entity =>
     for {
       id &lt;- EntityDB.insert(e1)
       e2 &lt;- EntityDB.get(id)
@@ -621,7 +823,7 @@ property("insert non-empty") =
 ---
 template: question
 
-What happens if Entity.name has too be unique?
+## What happens if Entity.name has too be unique?
 
 ---
 ## DB
@@ -635,8 +837,7 @@ property("insert non-empty unique") =
     for {
       i1 &lt;- EntityDB.insert(e1.copy(name = names.first))
       i2 &lt;- EntityDB.insert(e2.copy(name = names.second))
-      e3 &lt;- i2.map(EntityDB.get)
-        .getOrElse(DB.pure(Option.empty[Entity]))
+      e3 &lt;- EntityDB.get(i2.get)
     } yield
       e3 ?= Some(e2.copy(name = names.second))
   }
@@ -703,171 +904,6 @@ prop { (input: Input) =>
 
 
 
----
-
-template: inverse
-
-# Arbitrary skillz
-
----
-layout: false
-
-- Composable/re-usable
-- TODO
-
----
-
-## Domain Objects
-
-```scala
-TODO
-```
-
----
-
-template: image
-
-<img src="images/dividends.jpg" height="100%" />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-template: inverse
-
-# TDD
-
----
-
-template: inverse
-
-# Type Driven Development
-
----
-
-- TODO 
-
-
-
-
-
-
-
-
-
-
-
----
-
-# Data (Un)zipper
-- TODO NAME
- - peek?
-
-
----
-
-## Simple Example
-
-```scala
-class List[A] {
-  def headOption: Option[A]
-}
-```
-
----
-
-## When you first start
-
-```scala
-forAll { (a: List[Int]) =>
-  a.headOption ?= (if (a.isEmpty) None else a.head)
-}
-```
-
----
-template: question
-
-## Isn't that just the implementation?!?
-
----
-
-template: image-white
-
-<img src="images/pulling-hair-out.jpg" />
-
----
-
-## Take 2 - Ignore inputs
-
-```scala
-forAll { (l: List[Int]) => !l.isEmpty ==> {
-  l.headOption ?= Some(l.head)
-}}
-```
-
----
-
-## Beware...
-
-```scala
-forAll { l: List[Int] => l.isEmpty ==> {
-  true
-}}
-```
-
----
-
-template: rule
-
-### Gave up after only 5 passed tests.
-### 96 tests were discarded.
-
----
-
-## Secret
-
-```scala
-forAll { (h: Int, t: List[Int]) =>
-  (h :: t).headOption ?= Some(h)
-}
-```
-
----
-
-## Scalaz NonEmptyList
-
-```scala
-import scalaz._
-import scalaz.scalacheck.ScalazArbitrary._
-
-case class NonEmptyList(head: A, tail: List[A]) {
-  
-  def list: List[A] =
-    a :: tail
-}
-
-forAll { l: NonEmptyList[Int] =>
-   l.list.headOption ?= Some(a.head)
-}
-```
-
-
-
-
-
-
-
 
 
 
@@ -915,6 +951,82 @@ prop { (a: Int, b: Int) =>
   a + b must beGreaterThan(a)
 }
 ```
+
+---
+
+template: inverse
+
+# Idempotence
+
+---
+layout: false
+
+## Idempotence
+
+```scala
+prop { (a: String) =>
+  a.distinct.distinct ?= a.distinct
+}
+```
+
+---
+
+template: inverse
+
+# Invariants
+
+---
+layout: false
+
+## Example
+
+```scala
+prop { (a: List[Int]) =>
+  a.map(foo).size ?= a.size
+}
+```
+
+---
+
+template: inverse
+
+# Laws
+
+---
+
+## Laws - Equal
+
+```scala
+import scalaz.scalacheck.ScalazProperties._
+
+object equal {
+  def laws[A: Equal : Arbitrary]: Properties = ...
+}
+
+property("user equal") =
+  equal.laws[User]
+```
+
+---
+
+## Laws - Order
+
+```scala
+import scalaz.scalacheck.ScalazProperties._
+
+object equal {
+  def laws[A: Equal : Arbitrary]: Properties = ...
+}
+
+property("user order") =
+  order.laws[User]
+```
+
+
+
+
+
+
 
 
 
