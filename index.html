@@ -182,7 +182,8 @@ layout: false
 ## Today
 
 - Examples of _how_
-- Patterns (Laws?)
+- Patterns
+- Laws!
 - More motivation for _why_
 
 ---
@@ -234,6 +235,28 @@ prop { (a: String, b: String) =>
 
 
 
+---
+
+template: inverse
+
+# Quick Tutorial
+
+---
+layout: false
+
+## Arbitrary
+
+```scala
+case class User(name: String)
+
+implicit User
+```
+
+
+
+
+
+
 
 ---
 
@@ -271,15 +294,30 @@ prop { (a: User) =>
 
 ---
 
-## Capture
+## Codec Laws
 
 ```scala
-def hobbit[A, B](a: A, f: A => B, g: B => A): Boolean =
-  g(f(a)) == a
-
-prop { (a: User) =>
-  hobbit(a, read, write)
+forAll { a: User =>
+  implicitly[CodecJson[User]].codecLaw.encodedecode(a)
 }
+```
+
+---
+
+## Laws FTW
+
+```scala
+object equal {
+  def laws[A : Equal : Arbitrary]: Properties = ...
+}
+
+scalaz.scalacheck.ScalazProperties.equal.laws[User]
+
+object order {
+  def laws[A : Order : Arbitrary]: Properties = ...
+}
+
+scalaz.scalacheck.ScalazProperties.order.laws[User]
 ```
 
 ---
@@ -438,12 +476,91 @@ prop { (a: List[Int]) =>
 
 template: inverse
 
-# Functional/Integration
+# IO
+
+---
+layout: false
+
+## DB
+
+```scala
+property("insert empty") = 
+  forall { (e1: Entity) =>
+    for {
+      id &lt;- EntityDB.insert(e1)
+      e2 &lt;- EntityDB.get(id)
+    } yield e2 == Some(e1)
+  }
+```
+
+---
+
+## DB
+
+```scala
+property("insert non-empty") =
+  forAll { (e1: Entity, e2: Entity) =>
+    for {
+      i1 &lt;- EntityDB.insert(e1)
+      i2 &lt;- EntityDB.insert(e2)
+      e3 &lt;- EntityDB.get(i2)
+    } yield e3 == Some(e2)
+  }
+```
 
 ---
 template: question
 
-<i>But it's too slow to run 100 times</i>
+What happens if Entity.name has too be unique?
+
+---
+## DB
+
+```scala
+import com.ambiata.disorder.DistinctPair
+
+property("insert non-empty unique") =
+  forAll { (e1: Entity, e2a: Entity,
+            names: DistinctPair[String]) =>
+    run(for {
+      i1 &lt;- EntityDB.insert(e1.copy(name = names.first))
+      i2 &lt;- EntityDB.insert(e2.copy(name = names.second))
+      e3 &lt;- i2.map(EntityDB.get).getOrElse(DB.pure(None))
+    } yield
+      e3 == Some(e2.copy(name = names.second)))
+  }
+```
+
+---
+## DB
+
+```scala
+property("insert non-empty duplicate") =
+  forAll { (e1: Entity, e2a: Entity, name: String) =>
+    run(for {
+      i1 &lt;- EntityDB.insert(e1.copy(name = name))
+      i2 &lt;- EntityDB.insert(e2.copy(name = name))
+    } yield i1.isDefined &amp;&amp; i2.isEmpty)
+  }
+```
+
+---
+template: ambiata
+
+## [Disorder](https://github.com/ambiata/disorder/tree/master/src/main/scala/com/ambiata/disorder)
+
+- DistinctList
+- DistinctPair
+- List10/List100/List1000
+- NaturalInt
+- NonEmptyString
+- OrderPair
+- etc...
+
+---
+template: question
+
+<i>But is it too slow to run 100 times?</i>
 
 ---
 layout: false
@@ -511,6 +628,9 @@ TODO
 ---
 
 # Data (Un)zipper
+- TODO NAME
+ - peek?
+
 
 ---
 
@@ -616,7 +736,40 @@ prop { (a: Int, b: Int) =>
 ---
 template: inverse
 
-## Property based testing changed my life
+## This has nothing to do with Scala
+
+---
+template: inverse
+
+## It even works for Javascript!
+
+---
+
+## Polyglot
+
+```js
+check.it('Can handle negative lengths',
+
+  [gen.alphaNumString, gen.int],
+  function(input, length) {
+
+  StringUtils.truncate(input, length).should.equal('') 
+})
+```
+
+```java
+@Theory public void testTruncate(
+  @ForAll String input,
+  @ForAll int length) {
+
+  assertEquals(StringUtils.truncate(input, length), "");
+}
+```
+
+---
+template: image
+
+<img src="images/changed-my-life.jpg" height="100%" />
 
 ---
 layout: false
