@@ -876,9 +876,13 @@ property("insert non-empty") =
 ```
 
 ---
-template: question
+template: rule
 
-## What happens if User.name has too be unique?
+```
+User with name already exists
+> ARG_0: User("bob")
+> ARG_1: User("bob")
+```
 
 ---
 ## DB
