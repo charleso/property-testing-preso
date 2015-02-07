@@ -526,7 +526,7 @@ import scalaz._
 case class NonEmptyList[A](head: A, tail: List[A]) {
   
   def list: List[A] =
-    a :: tail
+    head :: tail
 }
 
 import scalaz.scalacheck.ScalazArbitrary._
@@ -1074,7 +1074,7 @@ template: ambiata
 
 ## Ambiata
 
-- We have a majority property-based tests
+- We have a majority of property-based tests
 - Need a compelling reason to write unit tests
 
 ---
