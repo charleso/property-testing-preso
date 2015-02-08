@@ -1243,7 +1243,7 @@ property("insert non-empty unique") =
 ---
 template: question
 
-## Data = Onion
+## Symmetry + Invariants
 
 ---
 ## DB
@@ -1282,9 +1282,9 @@ template: question
 ## Multiple Paths
 
 ---
-template: question
+template: inverse
 
-## But is it too slow to run 100 times?
+## Is it too slow to run 100 times?
 
 ---
 
@@ -1338,6 +1338,11 @@ prop { (input: Input) =>
 ---
 template: inverse
 
+## Almost there
+
+---
+template: question
+
 ## This has nothing to do with Scala
 
 ---
@@ -1358,7 +1363,7 @@ template: inverse
 ## Javascript
 
 ```js
-check.it('Addition is commutative',
+check.it('Addition',
 
   [gen.int, gen.int],
 
