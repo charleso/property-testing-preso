@@ -220,7 +220,7 @@ parseJson(read("example1.json")) == user1
 
 parseJson(read("example2.json")) == user2
 
-parseJson(read("example2.json")) == user2
+parseJson(read("example3.json")) == user3
 ```
 
 ---
@@ -1187,7 +1187,7 @@ property("insert empty") =
     for {
       id &lt;- UserDB.insert(u1)
       u2 &lt;- UserDB.get(id)
-    } yield e2 =? Some(u1)
+    } yield u2 =? Some(u1)
   }
 ```
 
