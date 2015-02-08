@@ -822,16 +822,9 @@ prop { s: String =>
 ```
 
 ---
-## Idempotence/Consistency
+## Consistency
 
 ```scala
-prop { s: String =>
-  val f = File.createTempFile
-  write(f, s)
-  write(f, s)
-  read(f) =? s
-}
-
 prop { (s1: String, s2: String) =>
   val f = File.createTempFile
   write(f, s1)
