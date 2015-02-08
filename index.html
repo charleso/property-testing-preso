@@ -458,7 +458,8 @@ layout: false
 - Multiple paths
 - Induction
 - Invariants
-- Idempotence
+  - Idempotence
+  - Consistency
 
 ---
 template: inverse
@@ -804,23 +805,6 @@ forAll { l: List[Int] =>
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
----
-
-template: inverse
-
-# Idempotence
-
 ---
 layout: false
 
@@ -833,7 +817,7 @@ prop { s: String =>
 ```
 
 ---
-## Idempotence
+## Idempotence/Consistency
 
 ```scala
 prop { s: String =>
@@ -1046,6 +1030,10 @@ def genUser: Gen[User] = for {
 } yield User(n, p)
 ```
 
+---
+
+## Symmetry FTW
+
 ```scala
 forAll { u: User =>
   UserService.get(UserService.add(u)) == u
@@ -1077,7 +1065,9 @@ def genUser: Gen[User] = for {
 
 ```scala
 object UserService {
+
   def findByPostcode(postcode: Int): Option[User]
+
   def updatePostcode(id: UserId, postcode: Int): Boolean
 }
 ```
@@ -1105,7 +1095,15 @@ object Postcode {
 case class User(
   name: String,
   postcode: Postcode)
+
+def genPostcode: Gen[Postcode]
 ```
+
+---
+
+template: question
+
+## Property-based testing leads to...
 
 ---
 
@@ -1121,32 +1119,13 @@ template: inverse
 
 ---
 
-## Reuse
+## Generators
 
-```scala
-def genPostcode: Gen[Postcode] =
-  Gen.choose(1, 9999).map(Postcode)
-
-def genUser: Gen[User] = for {
-  n &lt;- arbitrary[String]
-  p &lt;- genPostcode
-} yield User(n, p)
-
-def genUser: Gen[Suburb] = for {
-  n &lt;- arbitrary[String]
-  p &lt;- genPostcode
-} yield Suburb(n, p)
-
-forAll { postcode: Postcode =>
-  ...
-}
-```
-
----
-
-template: image
-
-<img src="images/dividends.jpg" height="100%" />
+- Are an asset
+  - Require investment (ie. developer time)
+- Pay dividends
+  - Re-use
+  - Encapsulate business logic
 
 
 
