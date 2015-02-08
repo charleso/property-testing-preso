@@ -523,7 +523,7 @@ forAll { l: List[Int] =>
 
 ```scala
 forAll { s: String =>
-  val f = File.createTempFile("", "tmp")
+  val f = File.createTempFile
   write(f, s)
   read(f) =? s
 }
@@ -531,11 +531,84 @@ forAll { s: String =>
 
 ---
 
-## With Encoding
+## Dates 1
+
+```scala
+forAll { dt: DateTime =>
+  val formatter = DateTimeFormat.fullDateTime()
+  val dt2 = dt.withMillisOfSecond(0)
+  formatter.parseDateTime(formatter.print(dt2)) =? dt2
+}
+```
+
+---
+template: rule
+
+```
+Invalid format:
+"Sunday, September 22, 2148 9:08:08 PM ART"
+is malformed at "ART"
+```
+
+---
+
+## Joda Bug/Feature
+
+- http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
+- http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
+- https://github.com/JodaOrg/joda-time/commit/14863a51230b3d44201646dbc1ce5d7f6bb97a33
+
+---
+
+## Dates 2
+
+```scala
+forAll { (dt: DateTime, dtz: DateTimeZone) =>
+  val formatter = DateTimeFormat
+    .forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZone(dtz)
+  val dt2 = dt.withMillisOfSecond(0).withZone(dtz)
+  formatter.parseDateTime(formatter.print(dt2)) =? dt2
+}
+```
+
+---
+template: rule
+
+```
+Expected 1970-04-22T00:04:50.000-00:44:30 
+but got 1970-04-22T00:05:20.000-00:44:30
+> ARG_0: 1970-04-22T10:49:50.601+10:00
+> ARG_1: Africa/Monrovia
+```
+
+---
+
+## Encoding
 
 ```scala
 forAll { (s: String, c: Codec) =>
-  val f = File.createTempFile("", "tmp")
+  c.decoder.decode(
+    c.encoder.encode(CharBuffer.wrap(s))
+  ).toString =? s
+}
+```
+
+---
+template: rule
+
+```scala
+> ARG_0: "돪"
+> ARG_1: windows-1252
+> UnmappableCharacterException: Input length = 1
+```
+
+---
+
+## Files + Encoding
+
+```scala
+forAll { (s: String, c: Codec) =>
+  val f = File.createTempFile
   write(f, s, c)
   read(f, c) =? s
 }
@@ -688,23 +761,6 @@ forAll { (i: Int, l: List[Int]) =>
 }
 ```
 
----
-## Induction
-
-```scala
-prop { s: String =>
-  val f = File.createTempFile("", "tmp")
-  write(f, s)
-  read(f) =? s
-}
-
-prop { (s1: String, s2: String) =>
-  val f = File.createTempFile("", "tmp")
-  write(f, s1)
-  write(f, s2)
-  read(f) =? s2
-}
-```
 
 
 
@@ -774,10 +830,17 @@ prop { s: String =>
 
 ```scala
 prop { s: String =>
-  val f = File.createTempFile("", "tmp")
+  val f = File.createTempFile
   write(f, s)
   write(f, s)
   read(f) =? s
+}
+
+prop { (s1: String, s2: String) =>
+  val f = File.createTempFile
+  write(f, s1)
+  write(f, s2)
+  read(f) =? s2
 }
 ```
 
