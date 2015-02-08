@@ -1088,12 +1088,22 @@ object Postcode {
     if (i > 0 || i &lt; 10000) Some(new Postcode(i))
     else None
 }
+```
 
+---
+
+## Be Precise
+
+```scala
 case class User(
   name: String,
   postcode: Postcode)
 
 def genPostcode: Gen[Postcode]
+
+forAll { p: Postcode =>
+  UserService.findByPostcode(p)
+}
 ```
 
 ---
