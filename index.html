@@ -535,13 +535,11 @@ forAll { l: List[Int] =>
 
 ---
 
-## Files
+## Serialisation
 
 ```scala
-forAll { s: String =>
-  val f = File.createTempFile
-  write(f, s)
-  read(f) =? s
+forAll { u: User =>
+  toBytes(toBytes(u)) =? u
 }
 ```
 
@@ -568,7 +566,7 @@ template: rule
 
 ---
 
-## Files + Encoding
+## Files
 
 ```scala
 forAll { (s: String, c: Codec) =>
@@ -675,19 +673,8 @@ trait List[A] {
 }
 
 forAll { l: List[Boolean] =>
-  l.partition(identity) =?
-    (l.filter(identity), l.filterNot(identity))
-}
-```
-
----
-
-## Option
-
-```scala
-forAll { (o: Option[Unit], i1: Int, i2: Int) =>
-  o.fold(i1)(_ => i2) =?
-    o.map(_ => i2).getOrElse(i1) 
+  l.partition(b => b) =?
+    (l.filter(b => b), l.filter(b => !b))
 }
 ```
 
@@ -696,14 +683,8 @@ forAll { (o: Option[Unit], i1: Int, i2: Int) =>
 ## Performance
 
 ```scala
-def sortMutable[A](a: List[A]): List[A] = {
-  val b = List.newBuilder[A](a.length)
-  ...
-  b.result()
-}
-
-forAll { (a: List[Int]) =>
-  sortMutable(a) =? a.sorted
+forAll { l: List[Int] =>
+  quickSort(l) =? bubbleSort(l)
 }
 ```
 
