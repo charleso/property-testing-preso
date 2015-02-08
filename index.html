@@ -306,11 +306,15 @@ class: middle, relative
 ## Gen
 
 ```scala
-def forAll(gen: Gen[A])(p: A => Prop): Prop
+trait Gen[A] {
+  def run(r: Random): Option[A]
+}
 
 object Gen {
   def string: Gen[String]
 }
+
+def forAll(gen: Gen[A])(p: A => Boolean): Boolean
 
 forAll(Gen.string) { s: String =>
   ...
@@ -383,8 +387,8 @@ object Arbitrary {
     a.arbitrary
 }
 
-def forAll(p: A => Prop)
-          (implicit a: Arbitrary[A]): Prop =
+def forAll(p: A => Boolean)
+          (implicit a: Arbitrary[A]): Boolean =
   forAll(a.arbitrary)(p)
 ```
 
