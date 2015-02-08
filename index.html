@@ -1220,9 +1220,7 @@ def genUser: Gen[User] = for {
 ```scala
 object UserService {
 
-  def findByPostcode(postcode: Int): Option[User]
-
-  def updatePostcode(id: UserId, postcode: Int): Boolean
+  def findByPostcode(postcode: Int): List[User]
 }
 ```
 
@@ -1405,7 +1403,7 @@ template: image
 ---
 layout: false
 
-# Links
+## Links
 
 - John Hughes - "Testing the Hard Stuff and Staying Sane"
   - https://www.youtube.com/watch?v=zi0rHwfiX1Q
