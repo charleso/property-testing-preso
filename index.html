@@ -531,6 +531,39 @@ forAll { s: String =>
 
 ---
 
+## Encoding
+
+```scala
+forAll { (s: String, c: Codec) =>
+  c.decoder.decode(
+    c.encoder.encode(CharBuffer.wrap(s))
+  ).toString =? s
+}
+```
+
+---
+template: rule
+
+```scala
+> ARG_0: "돪"
+> ARG_1: windows-1252
+> UnmappableCharacterException: Input length = 1
+```
+
+---
+
+## Files + Encoding
+
+```scala
+forAll { (s: String, c: Codec) =>
+  val f = File.createTempFile
+  write(f, s, c)
+  read(f, c) =? s
+}
+```
+
+---
+
 ## Dates 1
 
 ```scala
@@ -579,39 +612,6 @@ Expected 1970-04-22T00:04:50.000-00:44:30
 but got 1970-04-22T00:05:20.000-00:44:30
 > ARG_0: 1970-04-22T10:49:50.601+10:00
 > ARG_1: Africa/Monrovia
-```
-
----
-
-## Encoding
-
-```scala
-forAll { (s: String, c: Codec) =>
-  c.decoder.decode(
-    c.encoder.encode(CharBuffer.wrap(s))
-  ).toString =? s
-}
-```
-
----
-template: rule
-
-```scala
-> ARG_0: "돪"
-> ARG_1: windows-1252
-> UnmappableCharacterException: Input length = 1
-```
-
----
-
-## Files + Encoding
-
-```scala
-forAll { (s: String, c: Codec) =>
-  val f = File.createTempFile
-  write(f, s, c)
-  read(f, c) =? s
-}
 ```
 
 ---
@@ -704,6 +704,7 @@ forAll { l: List[Boolean] =>
 ```
 
 ---
+template: ambiata
 
 ## Example in the wild
 
@@ -717,9 +718,15 @@ forAll { (d: Date, i: Int) =>
 }
 ```
 
-- Break leap year every 400 years:
+---
+template: question
 
-```scala
+## If we get something wrong?
+
+---
+template: rule
+
+```
 A counter-example is [Date(2004,8,7), 0] (after 1 try)
 'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
 ```
