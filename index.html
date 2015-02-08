@@ -530,6 +530,18 @@ forAll { s: String =>
 ```
 
 ---
+
+## With Encoding
+
+```scala
+forAll { (s: String, c: Codec) =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s, c)
+  read(f, c) =? s
+}
+```
+
+---
 template: image
 
 <img src="images/golden-ticket.jpg" />
@@ -676,6 +688,24 @@ forAll { (i: Int, l: List[Int]) =>
 }
 ```
 
+---
+## Induction
+
+```scala
+prop { s: String =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s)
+  read(f) =? s
+}
+
+prop { (s1: String, s2: String) =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s1)
+  write(f, s2)
+  read(f) =? s2
+}
+```
+
 
 
 
@@ -736,6 +766,18 @@ layout: false
 ```scala
 prop { s: String =>
   s.distinct.distinct =? s.distinct
+}
+```
+
+---
+## Idempotence
+
+```scala
+prop { s: String =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s)
+  write(f, s)
+  read(f) =? s
 }
 ```
 
