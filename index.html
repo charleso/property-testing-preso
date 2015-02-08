@@ -729,15 +729,15 @@ def dayMinus(d: Date, i: Int): Date = {
   ...
 }
 
+forAll { d: Date =>
+  d.toJoda.fromJoda =? d
+}
+
 forAll { (d: Date, i: Int) =>
-  dayMinus(d, i) =? JodaTime.minusDays(d.toJoda, i)
+  dayMinus(d, i) =?
+    JodaTime.minusDays(d.toJoda, i).fromJoda
 }
 ```
-
----
-template: question
-
-## If we get something wrong?
 
 ---
 template: rule
@@ -777,7 +777,7 @@ layout: false
 ## Induction
 
 ```scala
-Nil.length =? 0
+Nil.size =? 0
 
 forAll { (i: Int, l: List[Int]) =>
   (i :: l) =? (l.size + 1)
@@ -1129,6 +1129,49 @@ template: inverse
 
 ---
 
+template: inverse
+
+# Frequency
+
+---
+
+## Naive
+
+```scala
+def genInt: Gen[Int] =
+  Gen.choose(Int.MinValue, Int.MaxValue)
+```
+
+---
+
+## More Frequent
+
+```scala
+def genInt: Gen[Int] =
+  Gen.frequency(
+    10 -> 0,
+    10 -> Int.MaxValue,
+    10 -> Int.MinValue,
+    5  -> 1,
+    5  -> -1,
+    50 -> Gen.choose(Int.MinValue + 1, Int.MaxValue - 1)
+  )
+```
+
+---
+
+## More Frequent
+
+```scala
+def genOption[A](gen: Gen[A]): Gen[Option[A]] =
+  Gen.frequency(
+    90 -> gen.map(Some),
+    10 -> Gen.const(None)
+  )
+```
+
+---
+
 ## Generators
 
 - Are an asset
@@ -1209,6 +1252,11 @@ property("insert non-empty") =
 ```
 
 ---
+template: question
+
+## Consistency
+
+---
 template: rule
 
 ```
@@ -1232,6 +1280,11 @@ property("insert non-empty unique") =
       u2 =? Some(u1.copy(name = n2))
   }
 ```
+
+---
+template: question
+
+## Data = Onion
 
 ---
 ## DB
@@ -1308,48 +1361,6 @@ prop { (input: Input) =>
 
 
 
----
-
-template: inverse
-
-# Frequency
-
----
-
-## Naive
-
-```scala
-def genInt: Gen[Int] =
-  Gen.choose(Int.MinValue, Int.MaxValue)
-```
-
----
-
-## More Frequent
-
-```scala
-def genInt: Gen[Int] =
-  Gen.frequency(
-    10 -> 0,
-    10 -> Int.MaxValue,
-    10 -> Int.MinValue,
-    5  -> 1,
-    5  -> -1,
-    50 -> Gen.choose(Int.MinValue + 1, Int.MaxValue - 1)
-  )
-```
-
----
-
-## More Frequent
-
-```scala
-def genOption[A](gen: Gen[A]): Gen[Option[A]] =
-  Gen.frequency(
-    90 -> gen.map(Some),
-    10 -> Gen.const(None)
-  )
-```
 
 
 
