@@ -1,18 +1,18 @@
 import java.nio.CharBuffer
 import java.nio.charset.Charset
 
-import org.joda.time.format.{DateTimeFormatter, DateTimeFormat}
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTimeZone, DateTime}
+import org.scalacheck._
 import org.scalacheck.Prop._
-import org.scalacheck.{Gen, Arbitrary, Properties}
 
 import scala.io.Codec
 import scala.collection.JavaConverters._
 
-object ThereBackAgain extends Properties("ThereBackAgain") {
+object Symmetry extends Properties("ThereBackAgain") {
 
   property("charset") = forAll { (s: String, c: Codec) =>
-    new String(s.getBytes(c.charSet), c.charSet) ?= s
+    new String(s.getBytes(c.charSet), c.charSet) =? s
   }
 
   property("codec") = forAll { (s: String, c: Codec) =>
