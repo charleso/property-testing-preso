@@ -501,7 +501,7 @@ forAll { l: List[Int] =>
 ---
 template: question
 
-## We need...
+## This calls for...
 
 
 
@@ -545,21 +545,21 @@ template: image-white
 <img src="images/property-inverse.png" style="margin-top: 150px" />
 
 ---
+template: image
 
-## JSON
+<img src="images/there-and-back-again3.jpg" />
+
+# There and back again
+
+---
+
+## We've seen this before...
 
 ```scala
 forAll { user: User =>
   parseJson(toJson(user)) =? user
 }
 ```
-
----
-template: image
-
-<img src="images/there-and-back-again3.jpg" />
-
-# There and back again
 
 ---
 
@@ -606,7 +606,7 @@ forAll { (s: String, c: Codec) =>
 ---
 template: rule
 
-```scala
+```
 > ARG_0: "돪"
 > ARG_1: windows-1252
 > UnmappableCharacterException: Input length = 1
