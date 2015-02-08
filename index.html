@@ -1161,7 +1161,7 @@ def user: Gen[User] = for {
 } yield User(name, postcode)
 
 forAll { user =>
-  UserDB.insert(user)
+  UserService.add(user)
 }
 ```
 
@@ -1171,6 +1171,22 @@ template: rule
 ```
 Invalid postcode
 > ARG_0: User("bob", -1)
+```
+
+---
+
+## Documentation is awesome
+
+```scala
+object UserService {
+
+  /**
+   * Adds a user.
+   *
+   * Fails if the postcode is negative.
+   */
+  def add(user: User): Option[Int]
+}
 ```
 
 ---
