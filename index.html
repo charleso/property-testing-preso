@@ -812,6 +812,11 @@ A counter-example is [Date(2004,3,1), 1] (after 1 try)
 
 
 
+
+
+
+
+
 ---
 
 template: inverse
@@ -830,6 +835,49 @@ forAll { (i: Int, l: List[Int]) =>
   (i :: l) =? (l.size + 1)
 }
 ```
+
+---
+
+## Induction to the rescue
+
+```scala
+Nil.headOption =? None
+
+forAll { (h: Int, t: List[Int]) =>
+  (h :: t).headOption =? Some(h)
+}
+```
+
+---
+
+template: image
+
+<img src="images/onion.jpg" style="width: 140%; left: -100px" />
+
+## Data is like an onion
+
+---
+
+## NonEmptyList
+
+```scala
+import scalaz._
+
+case class NonEmptyList[A](head: A, tail: List[A]) {
+
+  def list: List[A] =
+    head :: tail
+}
+
+import scalaz.scalacheck.ScalazArbitrary._
+
+forAll { l: NonEmptyList[Int] =>
+   l.list.headOption =? Some(l.head)
+}
+```
+
+
+
 
 
 
@@ -934,55 +982,149 @@ template: image
 
 
 
+
+
+
+
+
+
+
+
+
+
 ---
-## This again?!
+
+template: inverse
+
+# "Real World"
+
+---
+layout: false
+
+## Symmetry
 
 ```scala
-trait List[A] {
-  def headOption: Option[A]
-}
+property("insert empty") = 
+  forall { u1: User =>
+    for {
+      id &lt;- UserDB.insert(u1)
+      u2 &lt;- UserDB.get(id)
+    } yield u2 =? Some(u1)
+  }
+```
+
+---
+template: rule
+
+```
+Expected Some(User(\NULL)) but got Some(User())
 ```
 
 ---
 
-## Easy - Induction
+## Symmetry + Invariants
 
 ```scala
-Nil.headOption =? None
+property("insert non-empty") =
+  forAll { (u1: User, u2: User) =>
+    for {
+      i1 &lt;- UserDB.insert(u1)
+      i2 &lt;- UserDB.insert(u2)
+      u3 &lt;- UserDB.get(i2)
+    } yield u3 =? Some(u2)
+  }
+```
 
-forAll { (h: Int, t: List[Int]) =>
-  (h :: t).headOption =? Some(h)
-}
+---
+template: rule
 
+```
+User with name already exists
+> ARG_0: User("bob")
+> ARG_1: User("bob")
+```
+
+---
+## Symmetry + Invariants
+
+```scala
+property("insert non-empty unique") =
+  forAll { (u1: User, n1: String, n2: String) =>
+            n1 != n2 ==>
+    for {
+      i1 &lt;- UserDB.insert(u1.copy(name = n1))
+      i2 &lt;- UserDB.insert(u1.copy(name = n2))
+      u2 &lt;- UserDB.get(i2.get)
+    } yield
+      u2 =? Some(u1.copy(name = n2))
+  }
+```
+
+---
+## Invariants
+
+```scala
+property("insert non-empty duplicate") =
+  forAll { (u1: User, u2: User, name: String) =>
+    for {
+      i1 &lt;- UserDB.insert(u1.copy(name = name))
+      i2 &lt;- UserDB.insert(u2.copy(name = name))
+    } yield (i1.isDefined, i2.isEmpty) =? (true, true)
+  }
+```
+
+---
+## Symmetry + Multiple Paths
+
+```scala
+case class UniqueUsers(list: List[User])
+
+property("list") =
+  forAll { users: UniqueUsers =>
+    for {
+      _ &lt;- users.list.traverse(u => UserDB.insert(u))
+      u &lt;- UserDB.listSortByName
+    } yield u =? users.list.sortBy(_.name)
+  }
+```
+
+---
+template: inverse
+
+## Is it too slow to run 100 times?
+
+---
+
+## Minimum tests
+
+```scala
+prop { (input: Input) =>
+
+  runHadoopOhGodItsSlow(input) ====
+    input.groupBy(_.x).sortBy(_.y)
+
+}.set(minTestsOk = 3)
 ```
 
 ---
 
-template: image
+## Not perfect but...
 
-<img src="images/onion.jpg" style="width: 140%; left: -100px" />
+- Still better than hard-coded tests
+- Can increase number locally
+- Separate build with different sizes
+- Need to think harder about your code!
 
-## Data is like an onion
 
----
 
-## NonEmptyList
 
-```scala
-import scalaz._
 
-case class NonEmptyList[A](head: A, tail: List[A]) {
 
-  def list: List[A] =
-    head :: tail
-}
 
-import scalaz.scalacheck.ScalazArbitrary._
 
-forAll { l: NonEmptyList[Int] =>
-   l.list.headOption =? Some(l.head)
-}
-```
+
+
+
 
 
 
@@ -1001,26 +1143,10 @@ forAll { l: NonEmptyList[Int] =>
 
 
 ---
-template: image-white
 
-<img src="images/segue.png" style="width: 75%; left: 15%" />
+template: inverse
 
----
-
-## Seems legit
-
-```scala
-case class User(
-  name: String,
-  postcode: Int)
-```
-
-```scala
-def genUser: Gen[User] = for {
-  n &lt;- arbitrary[String]
-  p &lt;- arbitrary[Int]
-} yield User(n, p)
-```
+# Generator school
 
 ---
 
@@ -1082,6 +1208,12 @@ forAll { p: Int =>
   UserService.findByPostcode(p)
 }
 ```
+
+---
+
+template: inverse
+
+# Types are a thing
 
 ---
 
@@ -1164,182 +1296,9 @@ template: image
 
 
 ---
-
-template: inverse
-
-# "Real World"
-
----
-layout: false
-
-## DB
-
-```scala
-property("insert empty") = 
-  forall { u1: User =>
-    for {
-      id &lt;- UserDB.insert(u1)
-      u2 &lt;- UserDB.get(id)
-    } yield u2 =? Some(u1)
-  }
-```
-
----
 template: question
 
-## Symmetry
-
----
-template: rule
-
-```
-Expected Some(User(\NULL)) but got Some(User())
-```
-
----
-
-## DB
-
-```scala
-property("insert non-empty") =
-  forAll { (u1: User, u2: User) =>
-    for {
-      i1 &lt;- UserDB.insert(u1)
-      i2 &lt;- UserDB.insert(u2)
-      u3 &lt;- UserDB.get(i2)
-    } yield u3 =? Some(u2)
-  }
-```
-
----
-template: rule
-
-```
-User with name already exists
-> ARG_0: User("bob")
-> ARG_1: User("bob")
-```
-
----
-## DB
-
-```scala
-property("insert non-empty unique") =
-  forAll { (u1: User, n1: String, n2: String) =>
-            n1 != n2 ==>
-    for {
-      i1 &lt;- UserDB.insert(u1.copy(name = n1))
-      i2 &lt;- UserDB.insert(u1.copy(name = n2))
-      u2 &lt;- UserDB.get(i2.get)
-    } yield
-      u2 =? Some(u1.copy(name = n2))
-  }
-```
-
----
-template: question
-
-## Symmetry + Invariants
-
----
-## DB
-
-```scala
-property("insert non-empty duplicate") =
-  forAll { (u1: User, u2: User, name: String) =>
-    for {
-      i1 &lt;- UserDB.insert(u1.copy(name = name))
-      i2 &lt;- UserDB.insert(u2.copy(name = name))
-    } yield (i1.isDefined, i2.isEmpty) =? (true, true)
-  }
-```
-
----
-template: question
-
-## Invariants
-
----
-## DB
-
-```scala
-property("list") =
-  forAll { users: UniqueUsers =>
-    for {
-      _ &lt;- users.list.traverse(u => UserDB.insert(u))
-      u &lt;- UserDB.listSortByName
-    } yield u =? users.list.sortBy(_.name)
-  }
-```
-
----
-template: question
-
-## Symmetry + Multiple Paths
-
----
-template: inverse
-
-## Is it too slow to run 100 times?
-
----
-
-## Minimum tests
-
-```scala
-prop { (input: Input) =>
-
-  runHadoopOhGodItsSlow(input) ====
-    input.groupBy(_.x).sortBy(_.y)
-
-}.set(minTestsOk = 3)
-```
-
----
-
-## Not perfect but...
-
-- Still better than hard-coded tests
-- Can increase number locally
-- Separate build with different sizes
-- Need to think harder about your code!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-template: inverse
-
-## Almost there
-
----
-template: question
-
-## This has nothing to do with Scala
+## This talk is not about Scala
 
 ---
 
