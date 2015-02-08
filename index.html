@@ -313,13 +313,20 @@ trait Gen[A] {
 object Gen {
   def string: Gen[String]
 }
+```
 
+---
+
+## Gen in Action
+
+```scala
 def forAll(gen: Gen[A])(p: A => Boolean): Boolean
 
 forAll(Gen.string) { s: String =>
   ...
 }
 ```
+
 ---
 template: question
 
@@ -383,13 +390,26 @@ case class Arbitrary[A](arbitrary: Gen[A])
 
 object Arbitrary {
 
+  implicit def ArbitraryString: Arbitrary[String] =
+    Arbitrary(Gen.string)
+
   def arbitrary[T](implicit a: Arbitrary[T]): Gen[T] =
     a.arbitrary
 }
+```
 
+---
+
+## Arbitrary in Action
+
+```scala
 def forAll(p: A => Boolean)
           (implicit a: Arbitrary[A]): Boolean =
   forAll(a.arbitrary)(p)
+
+forAll { s: String =>
+  ...
+}
 ```
 
 ---
