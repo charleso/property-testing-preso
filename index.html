@@ -230,11 +230,6 @@ template: question
 ## There's gotta be a better way?
 
 ---
-template: image-white
-
-<img src="images/property-inverse.png" style="margin-top: 150px" />
-
----
 
 ## Inverse
 
@@ -279,61 +274,7 @@ object UserJsonTest extends Properties("UserJson") {
 }
 ```
 
----
-template: ambiata
 
-## [Argonaut Codec Laws](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
-
-```scala
-property("User json") =
-  codecJsonLaw[User]
-```
-
----
-template: image
-
-<img src="images/there-and-back-again3.jpg" />
-
-# There and back again
-
----
-
-## Hello World
-
-```scala
-forAll { s: String =>
-  s.reverse.reverse =? s
-}
-```
-
----
-
-## Files
-
-```scala
-forAll { s: String =>
-  val f = File.createTempFile("", "tmp")
-  write(f, s)
-  read(f) =? s
-}
-```
-
----
-
-## DB
-
-```scala
-forAll { a: User =>
-  get(create(a)) =? a
-}
-```
-
----
-template: image
-
-<img src="images/golden-ticket.jpg" />
-
-## Symmetry is your golden ticket
 
 
 
@@ -501,171 +442,102 @@ forAll { users: List[(Int, User)] =>
 
 
 
+---
+template: image-white
 
+<img src="images/patterns.jpg" style="width: 50%; left: 25%" />
+
+# Patterns
+
+---
+layout: false
+
+## Patterns
+
+- Symmetry
+- Multiple paths
+- Induction
+- Invariants
+- Idempotence
 
 ---
 template: inverse
 
-# Training wheels
+## Symmetry
+
+---
+template: image-white
+
+<img src="images/property-inverse.png" style="margin-top: 150px" />
 
 ---
 
-## Test this
+## JSON
 
 ```scala
-trait List[A] {
-  def headOption: Option[A]
+forAll { user: User =>
+  parseJson(toJson(user)) =? user
+}
+```
+
+---
+template: ambiata
+
+## [Argonaut Codec Laws](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
+
+```scala
+property("User json") =
+  codecJsonLaw[User]
+```
+
+---
+template: image
+
+<img src="images/there-and-back-again3.jpg" />
+
+# There and back again
+
+---
+
+## Hello World
+
+```scala
+forAll { s: String =>
+  s.reverse.reverse =? s
 }
 ```
 
 ---
 
-## Bleh
-
-```scala
-Nil.headOption = None
-
-List(1).headOption = Some(1)
-
-List(1, 2).headOption = Some(1)
-
-List(1, 2, 3).headOption = Some(1)
-
-...
-```
-
----
-
-## Rookie mistake
+## Data Structures
 
 ```scala
 forAll { l: List[Int] =>
-  l.headOption =?
-    (if (l.isEmpty) None else Some(l.head))
+  l.toStream.toList =? l
 }
 ```
 
 ---
 
-template: image-white
-
-<img src="images/pulling-hair-out.jpg" />
-
----
-
-## Take 2 - Ignore inputs
+## Files
 
 ```scala
-forAll { l: List[Int] => !l.isEmpty ==> {
-  l.headOption =? Some(l.head)
-}}
-```
-
----
-
-## Beware...
-
-```scala
-forAll { l: List[Int] => l.isEmpty ==> {
-  ...
-}}
-```
-
----
-template: rule
-
-### Gave up after only 5 passed tests.
-### 96 tests were discarded.
-
----
-
-template: image
-
-<img src="images/onion.jpg" style="width: 140%; left: -100px" />
-
-## Data is like an onion
-
----
-
-## Layers
-
-```scala
-forAll { (h: Int, t: List[Int]) =>
-  (h :: t).headOption =? Some(h)
-}
-
-Nil.headOption =? None
-```
-
----
-
-## NonEmptyList
-
-```scala
-import scalaz._
-
-case class NonEmptyList[A](head: A, tail: List[A]) {
-  
-  def list: List[A] =
-    head :: tail
-}
-
-import scalaz.scalacheck.ScalazArbitrary._
-
-forAll { l: NonEmptyList[Int] =>
-   l.list.headOption =? Some(l.head)
+forAll { s: String =>
+  val f = File.createTempFile("", "tmp")
+  write(f, s)
+  read(f) =? s
 }
 ```
 
 ---
 template: image
 
-<img src="images/lets-see-that-again.jpg" style="width: 1400px; left: -400px" />
+<img src="images/golden-ticket.jpg" />
 
-# Let's see that in instant replay...
+## Symmetry is your golden ticket
 
----
 
-## Example
 
-```scala
-case class User(
-  name: String,
-  phone: Option[String])
-
-forAll { (user: User, phone: String) =>
-  val userWithPhone = user.copy(phone = Some(phone))
-  ...
-}
-
-forAll { user: User =>
-  val userWithoutPhone = user.copy(phone = None)
-  ...
-}
-```
-
----
-
-## Re-use
-
-```scala
-case class UserWithPhone(
-  user: User[A],
-  phone: String) {
-  
-  def userWithPhone: User =
-    user.copy(phone = Some(phone))
-}
-
-def genUserWithPhone: Gen[UserWithPhone] = for {
-  user  &lt;- GenUser.user
-  phone &lt;- arbitrary[String]
-} yield UserWithPhone(user, phone)
-
-forAll { user: UserWithPhone =>
-  ...
-}
-```
 
 
 
@@ -766,6 +638,269 @@ forAll { (d: Date, i: Int) =>
 A counter-example is [Date(2004,8,7), 0] (after 1 try)
 'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Induction
+
+---
+layout: false
+
+## Induction
+
+- Base case property
+- Normal case property
+
+---
+
+## Induction
+
+```scala
+Nil.length =? 0
+
+forAll { (i: Int, l: List[Int]) =>
+  (i :: l) =? (l.size + 1)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Invariants
+
+---
+layout: false
+
+## As many as you can
+
+```scala
+forAll { l: List[Int] =>
+  l.map(identity).size =? l.size
+}
+```
+
+```scala
+forAll { l: List[Int] =>
+  l.sorted =? l.size
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Idempotence
+
+---
+layout: false
+
+## Idempotence
+
+```scala
+prop { s: String =>
+  s.distinct.distinct =? s.distinct
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+template: image
+
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
+
+## Properties everywhere
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+template: inverse
+
+# Training wheels
+
+---
+
+## Test this
+
+```scala
+trait List[A] {
+  def headOption: Option[A]
+}
+```
+
+---
+
+## Bleh
+
+```scala
+Nil.headOption = None
+
+List(1).headOption = Some(1)
+
+List(1, 2).headOption = Some(1)
+
+List(1, 2, 3).headOption = Some(1)
+
+...
+```
+
+---
+
+## Rookie mistake
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+```
+
+---
+
+template: image-white
+
+<img src="images/pulling-hair-out.jpg" />
+
+---
+
+## Take 2 - Ignore inputs
+
+```scala
+forAll { l: List[Int] => !l.isEmpty ==> {
+  l.headOption =? Some(l.head)
+}}
+```
+
+---
+
+## Beware...
+
+```scala
+forAll { l: List[Int] => l.isEmpty ==> {
+  ...
+}}
+```
+
+---
+template: rule
+
+### Gave up after only 5 passed tests.
+### 96 tests were discarded.
+
+---
+
+template: image
+
+<img src="images/onion.jpg" style="width: 140%; left: -100px" />
+
+## Data is like an onion
+
+---
+
+## Layers
+
+```scala
+Nil.headOption =? None
+
+forAll { (h: Int, t: List[Int]) =>
+  (h :: t).headOption =? Some(h)
+}
+
+```
+
+---
+template: question
+
+## Induction
+
+---
+
+## NonEmptyList
+
+```scala
+import scalaz._
+
+case class NonEmptyList[A](head: A, tail: List[A]) {
+
+  def list: List[A] =
+    head :: tail
+}
+
+import scalaz.scalacheck.ScalazArbitrary._
+
+forAll { l: NonEmptyList[Int] =>
+   l.list.headOption =? Some(l.head)
+}
+```
+
+
+
+
+
+
 
 
 
@@ -936,18 +1071,6 @@ layout: false
 ## DB
 
 ```scala
-property("get empty") = 
-  forall { id: Int =>
-    for {
-      u &lt;- UserDB.get(id)
-    } yield u =? None
-  }
-```
----
-
-## DB
-
-```scala
 property("insert empty") = 
   forall { u1: User =>
     for {
@@ -956,6 +1079,11 @@ property("insert empty") =
     } yield e2 =? Some(u1)
   }
 ```
+
+---
+template: question
+
+## Symmetry
 
 ---
 template: rule
@@ -992,17 +1120,15 @@ User with name already exists
 ## DB
 
 ```scala
-import com.ambiata.disorder.DistinctPair
-
 property("insert non-empty unique") =
-  forAll { (u1: User,
-            names: DistinctPair[String]) =>
+  forAll { (u1: User, n1: String, n2: String) =>
+            n1 != n2 ==>
     for {
-      i1 &lt;- UserDB.insert(u1.copy(name = names.first))
-      i2 &lt;- UserDB.insert(u1.copy(name = names.second))
+      i1 &lt;- UserDB.insert(u1.copy(name = n1))
+      i2 &lt;- UserDB.insert(u1.copy(name = n2))
       u2 &lt;- UserDB.get(i2.get)
     } yield
-      u2 =? Some(u1.copy(name = names.second))
+      u2 =? Some(u1.copy(name = n2))
   }
 ```
 
@@ -1020,17 +1146,27 @@ property("insert non-empty duplicate") =
 ```
 
 ---
-template: ambiata
+template: question
 
-## [Shameless Plug - Disorder](https://github.com/ambiata/disorder/tree/master/src/main/scala/com/ambiata/disorder)
+## Invariants
 
-- DistinctList
-- DistinctPair
-- List10/List100/List1000
-- NaturalInt
-- NonEmptyString
-- OrderPair
-- etc...
+---
+## DB
+
+```scala
+property("list") =
+  forAll { users: List[User] =>
+    for {
+      _ &lt;- users.traverse(u => UserDB.insert(u))
+      u &lt;- UserDB.listSortByName
+    } yield u =? users.sortBy(_.name)
+  }
+```
+
+---
+template: question
+
+## Multiple Paths
 
 ---
 template: question
@@ -1102,40 +1238,6 @@ def genInt: Gen[Int] =
   )
 ```
 
----
-
-template: inverse
-
-# Invariants
-
----
-layout: false
-
-## As many as you can
-
-```scala
-forAll { l: List[Int] =>
-  l.map(identity).size =? l.size
-}
-```
-
-```scala
-forAll { l: List[Int] =>
-  l.sorted =? l.size
-}
-```
-
----
-layout: false
-
-## Idempotence
-
-```scala
-prop { (a: String) =>
-  a.distinct.distinct =? a.distinct
-}
-```
-
 
 
 
@@ -1191,11 +1293,17 @@ template: ambiata
 - Need a compelling reason to write unit tests
 
 ---
-template: image
+template: ambiata
 
-<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
+## [Shameless Plug - Disorder](https://github.com/ambiata/disorder/tree/master/src/main/scala/com/ambiata/disorder)
 
-## Properties everywhere
+- DistinctList
+- DistinctPair
+- List10/List100/List1000
+- NaturalInt
+- NonEmptyString
+- OrderPair
+- etc...
 
 ---
 template: image
