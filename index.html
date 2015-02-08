@@ -998,13 +998,12 @@ layout: false
 ## Symmetry
 
 ```scala
-property("insert empty") = 
-  forall { u1: User =>
-    for {
-      id &lt;- UserDB.insert(u1)
-      u2 &lt;- UserDB.get(id)
-    } yield u2 =? Some(u1)
-  }
+forall { u1: User =>
+  for {
+    id &lt;- UserDB.insert(u1)
+    u2 &lt;- UserDB.get(id)
+  } yield u2 =? Some(u1)
+}
 ```
 
 ---
@@ -1019,14 +1018,13 @@ Expected Some(User(\NULL)) but got Some(User())
 ## Symmetry + Invariants
 
 ```scala
-property("insert non-empty") =
-  forAll { (u1: User, u2: User) =>
-    for {
-      i1 &lt;- UserDB.insert(u1)
-      i2 &lt;- UserDB.insert(u2)
-      u3 &lt;- UserDB.get(i2)
-    } yield u3 =? Some(u2)
-  }
+forAll { (u1: User, u2: User) =>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2)
+    u3 &lt;- UserDB.get(i2)
+  } yield u3 =? Some(u2)
+}
 ```
 
 ---
@@ -1042,29 +1040,27 @@ User with name already exists
 ## Symmetry + Invariants
 
 ```scala
-property("insert non-empty unique") =
-  forAll { (u1: User, u2: User) =>
-            u1.name != u2.name ==>
-    for {
-      i1 &lt;- UserDB.insert(u1)
-      i2 &lt;- UserDB.insert(u2)
-      u3 &lt;- UserDB.get(i2.get)
-    } yield
-      u3 =? Some(u2)
-  }
+forAll { (u1: User, u2: User) =>
+          u1.name != u2.name ==>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2)
+    u3 &lt;- UserDB.get(i2.get)
+  } yield
+    u3 =? Some(u2)
+}
 ```
 
 ---
 ## Invariants
 
 ```scala
-property("insert non-empty duplicate") =
-  forAll { (u1: User, u2: User) =>
-    for {
-      i1 &lt;- UserDB.insert(u1)
-      i2 &lt;- UserDB.insert(u2.copy(name = u1.name))
-    } yield (i1.isDefined, i2.isEmpty) =? (true, true)
-  }
+forAll { (u1: User, u2: User) =>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2.copy(name = u1.name))
+  } yield (i1.isDefined, i2.isEmpty) =? (true, true)
+}
 ```
 
 ---
@@ -1073,13 +1069,12 @@ property("insert non-empty duplicate") =
 ```scala
 case class UniqueUsers(list: List[User])
 
-property("list") =
-  forAll { users: UniqueUsers =>
-    for {
-      _ &lt;- users.list.traverse(u => UserDB.insert(u))
-      u &lt;- UserDB.listSortByName
-    } yield u =? users.list.sortBy(_.name)
-  }
+forAll { users: UniqueUsers =>
+  for {
+    _ &lt;- users.list.traverse(u => UserDB.insert(u))
+    u &lt;- UserDB.listSortByName
+  } yield u =? users.list.sortBy(_.name)
+}
 ```
 
 ---
