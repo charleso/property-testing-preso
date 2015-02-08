@@ -9,7 +9,7 @@ import org.scalacheck.Prop._
 import scala.io.Codec
 import scala.collection.JavaConverters._
 
-object Symmetry extends Properties("ThereBackAgain") {
+object Symmetry extends Properties("Symmetry") {
 
   property("charset") = forAll { (s: String, c: Codec) =>
     new String(s.getBytes(c.charSet), c.charSet) =? s

@@ -12,7 +12,7 @@ object MultiplePaths extends Properties("MultiplePaths") {
   }
 
   property("size and length") = forAll { l: List[Boolean] =>
-    l.size =? (l.length + 1)
+    l.size =? l.length
   }
 
   property("splitAt") = forAll { (l: List[Int], i: Int) =>
