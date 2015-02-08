@@ -1258,9 +1258,7 @@ object Postcode {
 ## Types with Benefits
 
 ```scala
-case class User(
-  name: String,
-  postcode: Postcode)
+case class User(name: String, postcode: Postcode)
 
 def genPostcode: Gen[Postcode]
 
