@@ -1150,11 +1150,18 @@ template: inverse
 
 ---
 
-## Symmetry FTW
+## Spot the bug
 
 ```scala
-forAll { u: User =>
-  UserService.get(UserService.add(u)) =? u
+case class User(name: String, postcode: Int)
+
+def user: Gen[User] = for {
+  name     &lt;- arbitrary[String]
+  postcode &lt;- arbitrary[Int]
+} yield User(name, postcode)
+
+forAll { user =>
+  UserDB.insert(user)
 }
 ```
 
