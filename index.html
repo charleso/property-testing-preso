@@ -1059,10 +1059,10 @@ property("insert non-empty unique") =
 
 ```scala
 property("insert non-empty duplicate") =
-  forAll { (u1: User, u2: User, name: String) =>
+  forAll { (u1: User, u2: User) =>
     for {
-      i1 &lt;- UserDB.insert(u1.copy(name = name))
-      i2 &lt;- UserDB.insert(u2.copy(name = name))
+      i1 &lt;- UserDB.insert(u1)
+      i2 &lt;- UserDB.insert(u2.copy(name = u1.name))
     } yield (i1.isDefined, i2.isEmpty) =? (true, true)
   }
 ```
