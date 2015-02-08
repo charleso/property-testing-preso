@@ -237,7 +237,7 @@ template: question
 
 ---
 
-## Inverse
+## Getting warmer
 
 ```scala
 def inverse(user: User): Boolean =
@@ -258,7 +258,7 @@ template: question
 ## Magic?
 
 ```scala
-forAll { user: User =>
+summon { user: User =>
   parseJson(toJson(user)) == user
 }
 ```
@@ -453,6 +453,64 @@ forAll { users: List[(Int, User)] =>
 
 
 
+---
+template: inverse
+class: evolution
+
+<img src="images/evolution.jpg" />
+
+# Evolution
+
+---
+
+## Our first test
+
+```scala
+trait List[A] {
+  def headOption: Option[A]
+}
+```
+
+---
+
+## Bleh
+
+```scala
+Nil.headOption = None
+
+List(1).headOption = Some(1)
+
+List(1, 2).headOption = Some(1)
+
+List(1, 2, 3).headOption = Some(1)
+
+...
+```
+
+---
+
+## Rookie mistake
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+```
+
+---
+template: question
+
+## We need some help...
+
+
+
+
+
+
+
+
+
 
 
 
@@ -494,16 +552,6 @@ template: image-white
 forAll { user: User =>
   parseJson(toJson(user)) =? user
 }
-```
-
----
-template: ambiata
-
-## [Argonaut Codec Laws](https://github.com/ambiata/ivory/blob/master/ivory-core/src/test/scala/com/ambiata/ivory/core/ArgonautProperties.scala)
-
-```scala
-property("User json") =
-  codecJsonLaw[User]
 ```
 
 ---
@@ -752,13 +800,6 @@ layout: false
 
 ## Induction
 
-- Base case property
-- Normal case property
-
----
-
-## Induction
-
 ```scala
 Nil.size =? 0
 
@@ -840,16 +881,13 @@ forAll { (s1: String, s2: String) =>
 
 
 
-
-
-
 ---
+
 template: image
 
 <img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
 
-## Properties everywhere
-
+## The same patterns everywhere
 
 
 
@@ -864,16 +902,7 @@ template: image
 
 
 ---
-template: inverse
-class: evolution
-
-<img src="images/evolution.jpg" />
-
-# Evolution
-
----
-
-## Test this
+## This again?!
 
 ```scala
 trait List[A] {
@@ -883,68 +912,7 @@ trait List[A] {
 
 ---
 
-## Bleh
-
-```scala
-Nil.headOption = None
-
-List(1).headOption = Some(1)
-
-List(1, 2).headOption = Some(1)
-
-List(1, 2, 3).headOption = Some(1)
-
-...
-```
-
----
-
-## Rookie mistake
-
-```scala
-forAll { l: List[Int] =>
-  l.headOption =?
-    (if (l.isEmpty) None else Some(l.head))
-}
-```
-
----
-
-## Take 2 - Ignore inputs
-
-```scala
-forAll { l: List[Int] => !l.isEmpty ==> {
-  l.headOption =? Some(l.head)
-}}
-```
-
----
-
-## Beware...
-
-```scala
-forAll { l: List[Int] => l.isEmpty ==> {
-  ...
-}}
-```
-
----
-template: rule
-
-### Gave up after only 5 passed tests.
-### 96 tests were discarded.
-
----
-
-template: image
-
-<img src="images/onion.jpg" style="width: 140%; left: -100px" />
-
-## Data is like an onion
-
----
-
-## Layers
+## Easy
 
 ```scala
 Nil.headOption =? None
@@ -959,6 +927,14 @@ forAll { (h: Int, t: List[Int]) =>
 template: question
 
 ## Induction
+
+---
+
+template: image
+
+<img src="images/onion.jpg" style="width: 140%; left: -100px" />
+
+## Data is like an onion
 
 ---
 
@@ -1391,12 +1367,39 @@ check.it('Addition is commutative',
   })
 ```
 
+
+
+
+
+
+
+
+
+
+
+---
+
+template: image
+
+<img src="images/everything-light-touches.jpg" height="120%" style="margin-top: -60px" />
+
+## Every line that properties test...
+
+
+
+
+
+
+
+
+
 ---
 template: ambiata
 
 ## Ambiata
 
 - We have a majority of property-based tests
+- The default
 - Need a compelling reason to write unit tests
 
 ---
