@@ -311,6 +311,11 @@ forAll(Gen.string) { s: String =>
 }
 ```
 ---
+template: question
+
+## Build your own
+
+---
 
 ## Step 1 - Data
 
@@ -344,7 +349,7 @@ forAll(GenUser.user) { user: User =>
 
 ---
 
-## Painful
+## Manual Composition
 
 ```scala
 forAll(???) { users: List[(Int, User)] =>
@@ -379,7 +384,7 @@ def forAll(p: A => Prop)
 
 ---
 
-## Arbitrary
+## Step 2 - Take 2
 
 ```scala
 import org.scalacheck.Arbitrary._
@@ -1009,6 +1014,11 @@ forAll { l: NonEmptyList[Int] =>
 
 
 ---
+template: image-white
+
+<img src="images/segue.png" style="width: 75%; left: 15%" />
+
+---
 template: inverse
 
 # Types are a thing
@@ -1326,6 +1336,18 @@ def genInt: Gen[Int] =
     5  -> 1,
     5  -> -1,
     50 -> Gen.choose(Int.MinValue + 1, Int.MaxValue - 1)
+  )
+```
+
+---
+
+## More Frequent
+
+```scala
+def genOption[A](gen: Gen[A]): Gen[Option[A]] =
+  Gen.frequency(
+    90 -> gen.map(Some),
+    10 -> Gen.const(None)
   )
 ```
 
