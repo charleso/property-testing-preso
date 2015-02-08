@@ -707,7 +707,7 @@ forAll { l: List[Int] =>
 
 ```scala
 forAll { l: List[Int] =>
-  l.sorted =? l.size
+  l.sorted.size =? l.size
 }
 ```
 
