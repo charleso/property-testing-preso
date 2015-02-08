@@ -579,10 +579,23 @@ forAll { (s: String, c: Codec) =>
 ```
 
 ---
+template: question
 
-## Dates 1
+## @mhibberd
+## "Maybe you could test a relatively well known open source library and find a bug for something they have unit tests for"
+
+---
+template: image-white
+
+<img src="images/challenge.jpg" />
+
+---
+
+## Joda
 
 ```scala
+import org.joda.time._
+
 forAll { dt: DateTime =>
   val formatter = DateTimeFormat.fullDateTime()
   val dt2 = dt.withMillisOfSecond(0)
@@ -601,7 +614,7 @@ is malformed at "ART"
 
 ---
 
-## Joda Bug/Feature
+## Bug or Feature?
 
 - http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
 - http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
@@ -609,26 +622,15 @@ is malformed at "ART"
 
 ---
 
-## Dates 2
+## Not quite bugs
 
-```scala
-forAll { (dt: DateTime, dtz: DateTimeZone) =>
-  val formatter = DateTimeFormat
-    .forPattern("yyyy-MM-dd'T'HH:mm:ssZ").withZone(dtz)
-  val dt2 = dt.withMillisOfSecond(0).withZone(dtz)
-  formatter.parseDateTime(formatter.print(dt2)) =? dt2
-}
-```
-
----
-template: rule
-
-```
-Expected 1970-04-22T00:04:50.000-00:44:30 
-but got 1970-04-22T00:05:20.000-00:44:30
-> ARG_0: 1970-04-22T10:49:50.601+10:00
-> ARG_1: Africa/Monrovia
-```
+- Scala Json
+  - Can't handle `null`
+  - https://issues.scala-lang.org/browse/SI-5092
+- [commons-csv](http://commons.apache.org/proper/commons-csv/)
+  - Uses \uFFFE for [disabling comments](http://commons.apache.org/proper/commons-csv/jacoco/org.apache.commons.csv/Lexer.java.html)
+- [jscv](https://code.google.com/p/jcsv/)
+  - Is completely useless
 
 ---
 template: image
