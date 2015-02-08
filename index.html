@@ -85,6 +85,12 @@
       .ambiata-full {
         background-image: url(http://ambiata.com/images/ambiata_avatar.png);
       }
+      .evolution {
+        background-color: #DEDEDE;
+      }
+      .evolution h1 {
+        color: black !important;
+      }
       /*
       .ambiata-full h2 {
         position: absolute;
@@ -872,8 +878,11 @@ template: image
 
 ---
 template: inverse
+class: evolution
 
-# Training wheels
+<img src="images/evolution.jpg" />
+
+# Evolution
 
 ---
 
@@ -911,12 +920,6 @@ forAll { l: List[Int] =>
     (if (l.isEmpty) None else Some(l.head))
 }
 ```
-
----
-
-template: image-white
-
-<img src="images/pulling-hair-out.jpg" />
 
 ---
 
