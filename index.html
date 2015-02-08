@@ -263,23 +263,6 @@ summon { user: User =>
 }
 ```
 
----
-
-## ScalaCheck!
-
-```scala
-import org.scalacheck._
-import org.scalacheck.Gen._
-
-object UserJsonTest extends Properties("UserJson") {
- 
-  property("User json") =
-    forAll { user: User =>
-      parseJson(toJson(user)) =? user
-    } 
-}
-```
-
 
 
 
@@ -483,7 +466,7 @@ class: evolution
 
 ---
 
-## In the beginning
+## Let the healing begin
 
 ```scala
 trait List[A] {
