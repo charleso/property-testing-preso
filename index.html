@@ -690,7 +690,7 @@ def sortMutable[A](a: List[A]): List[A] = {
   b.result()
 }
 
-prop { (a: List[Int]) =>
+forAll { (a: List[Int]) =>
   sortMutable(a) =? a.sorted
 }
 ```
@@ -816,7 +816,7 @@ layout: false
 ## Idempotence
 
 ```scala
-prop { s: String =>
+forAll { s: String =>
   s.distinct.distinct =? s.distinct
 }
 ```
@@ -825,7 +825,7 @@ prop { s: String =>
 ## Consistency
 
 ```scala
-prop { (s1: String, s2: String) =>
+forAll { (s1: String, s2: String) =>
   val f = File.createTempFile
   write(f, s1)
   write(f, s2)
