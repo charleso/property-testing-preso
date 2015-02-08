@@ -1050,11 +1050,24 @@ Invalid postcode
 ## Business Rules
 
 ```scala
+def genPostcode: Gen[Int] =
+  Gen.choose(1, 9999)
+
 def genUser: Gen[User] = for {
   n &lt;- arbitrary[String]
-  p &lt;- Gen.choose(1, 9999)
+  p &lt;- genPostcode
 } yield User(n, p)
 ```
+
+---
+
+## Generators
+
+- Are an asset
+  - Require investment
+- Pay dividends
+  - Called from other generators
+  - Used in multiple properties
 
 ---
 
@@ -1126,56 +1139,11 @@ template: inverse
 
 ---
 
-template: inverse
+template: image
 
-# Frequency
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
 
----
-
-## Naive
-
-```scala
-def genInt: Gen[Int] =
-  Gen.choose(Int.MinValue, Int.MaxValue)
-```
-
----
-
-## More Frequent
-
-```scala
-def genInt: Gen[Int] =
-  Gen.frequency(
-    10 -> 0,
-    10 -> Int.MaxValue,
-    10 -> Int.MinValue,
-    5  -> 1,
-    5  -> -1,
-    50 -> Gen.choose(Int.MinValue + 1, Int.MaxValue - 1)
-  )
-```
-
----
-
-## More Frequent
-
-```scala
-def genOption[A](gen: Gen[A]): Gen[Option[A]] =
-  Gen.frequency(
-    90 -> gen.map(Some),
-    10 -> Gen.const(None)
-  )
-```
-
----
-
-## Generators
-
-- Are an asset
-  - Require investment
-- Pay dividends
-  - Called from other generators
-  - Used in multiple properties
+## Types for everything
 
 
 
