@@ -1367,12 +1367,13 @@ template: question
 
 ```js
 check.it('Addition',
-
+  // NOTE: No arbitrary - manual gen
   [gen.int, gen.int],
 
   function(a, b) {
     (a + b).should.equal(b + a) 
-  })
+  }
+)
 ```
 
 
@@ -1399,7 +1400,7 @@ template: ambiata
 ## Ambiata
 
 - We have a majority of property-based tests
-- The default
+- Our default
 - Need a compelling reason to write unit tests
 
 ---
