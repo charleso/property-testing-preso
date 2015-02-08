@@ -826,7 +826,7 @@ layout: false
 Nil.size =? 0
 
 forAll { (i: Int, l: List[Int]) =>
-  (i :: l) =? (l.size + 1)
+  (i :: l).size =? (l.size + 1)
 }
 ```
 
