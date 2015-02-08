@@ -463,7 +463,7 @@ class: evolution
 
 ---
 
-## Our first test
+## In the beginning
 
 ```scala
 trait List[A] {
@@ -473,7 +473,7 @@ trait List[A] {
 
 ---
 
-## Bleh
+## Crawling out of the swamp
 
 ```scala
 Nil.headOption = None
@@ -586,20 +586,18 @@ forAll { l: List[Int] =>
 ## Serialisation
 
 ```scala
-forAll { u: User =>
-  toBytes(toBytes(u)) =? u
+forAll { s: String =>
+  new String(s.getBytes) =? s
 }
 ```
 
 ---
 
-## Encoding
+## Watch out for encoding!
 
 ```scala
-forAll { (s: String, c: Codec) =>
-  c.decoder.decode(
-    c.encoder.encode(CharBuffer.wrap(s))
-  ).toString =? s
+forAll { (s: String, c: Charset) =>
+  new String(s.getBytes(c), c) =? s
 }
 ```
 
@@ -609,7 +607,7 @@ template: rule
 ```
 > ARG_0: "돪"
 > ARG_1: windows-1252
-> UnmappableCharacterException: Input length = 1
+Expected "쮢" but got "?"
 ```
 
 ---
@@ -668,7 +666,7 @@ is malformed at "ART"
 
 ---
 
-## Not quite bugs
+## Not quite bugs :(
 
 - Scala Json
   - Can't handle `null`
@@ -766,7 +764,7 @@ forAll { d: Date =>
 
 forAll { (d: Date, i: Int) =>
   dayMinus(d, i) =?
-    JodaTime.minusDays(d.toJoda, i).fromJoda
+    d.toJoda.minusDays(i).fromJoda
 }
 ```
 
@@ -774,8 +772,8 @@ forAll { (d: Date, i: Int) =>
 template: rule
 
 ```
-A counter-example is [Date(2004,8,7), 0] (after 1 try)
-'Date(2004,8,6)' is not equal to 'Date(2004,8,7)'
+A counter-example is [Date(2004,3,1), 1] (after 1 try)
+'Date(2004,2,28)' is not equal to 'Date(2004,2,29)'
 ```
 
 
@@ -830,7 +828,7 @@ template: inverse
 ---
 layout: false
 
-## As many as you can
+## Collect them all
 
 ```scala
 forAll { l: List[Int] =>
@@ -841,6 +839,12 @@ forAll { l: List[Int] =>
 ```scala
 forAll { l: List[Int] =>
   l.sorted.size =? l.size
+}
+```
+
+```scala
+forAll { l: List[Int] =>
+  l.reverse.size =? l.size
 }
 ```
 
@@ -1000,7 +1004,7 @@ def genUser: Gen[User] = for {
 
 ```scala
 forAll { u: User =>
-  UserService.get(UserService.add(u)) == u
+  UserService.get(UserService.add(u)) =? u
 }
 ```
 
@@ -1129,10 +1133,10 @@ def genOption[A](gen: Gen[A]): Gen[Option[A]] =
 ## Generators
 
 - Are an asset
-  - Require investment (ie. developer time)
+  - Require investment
 - Pay dividends
-  - Re-use
-  - Encapsulate business logic
+  - Called from other generators
+  - Used in multiple properties
 
 
 
@@ -1258,11 +1262,11 @@ template: question
 
 ```scala
 property("list") =
-  forAll { users: List[User] =>
+  forAll { users: UniqueUsers =>
     for {
-      _ &lt;- users.traverse(u => UserDB.insert(u))
+      _ &lt;- users.list.traverse(u => UserDB.insert(u))
       u &lt;- UserDB.listSortByName
-    } yield u =? users.sortBy(_.name)
+    } yield u =? users.list.sortBy(_.name)
   }
 ```
 

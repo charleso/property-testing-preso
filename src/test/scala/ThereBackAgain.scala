@@ -11,6 +11,10 @@ import scala.collection.JavaConverters._
 
 object ThereBackAgain extends Properties("ThereBackAgain") {
 
+  property("charset") = forAll { (s: String, c: Codec) =>
+    new String(s.getBytes(c.charSet), c.charSet) ?= s
+  }
+
   property("codec") = forAll { (s: String, c: Codec) =>
     c.decoder.decode(c.encoder.encode(CharBuffer.wrap(s))).toString =? s
   }
