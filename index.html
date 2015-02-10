@@ -1114,10 +1114,11 @@ template: inverse
 ## Minimum tests
 
 ```scala
-prop { (input: Input) =>
+forAll { users: List[Users] =>
 
-  runHadoopOhGodItsSlow(input) ====
-    input.groupBy(_.x).sortBy(_.y)
+  runHadoopOhGodItsSlow(users) =?
+    users.groupBy(_.name)
+      .mapValues(_.sortBy(_.postcode))
 
 }.set(minTestsOk = 3)
 ```
