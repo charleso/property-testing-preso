@@ -881,26 +881,6 @@ template: image
 
 ## Data is like an onion
 
----
-
-## NonEmptyList
-
-```scala
-import scalaz._
-
-case class NonEmptyList[A](head: A, tail: List[A]) {
-
-  def list: List[A] =
-    head :: tail
-}
-
-import scalaz.scalacheck.ScalazArbitrary._
-
-forAll { l: NonEmptyList[Int] =>
-   l.list.headOption =? Some(l.head)
-}
-```
-
 
 
 
