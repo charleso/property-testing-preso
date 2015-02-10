@@ -447,6 +447,16 @@ forAll { users: List[(Int, User)] =>
 }
 ```
 
+---
+
+## Generators
+
+- Are an asset
+  - Require investment
+- Pay dividends
+  - Called from other generators
+  - Used in multiple properties
+
 
 
 
@@ -554,16 +564,16 @@ template: inverse
 ## Symmetry
 
 ---
-template: image-white
-
-<img src="images/property-inverse.png" style="margin-top: 150px" />
-
----
 template: image
 
 <img src="images/there-and-back-again3.jpg" />
 
 # There and back again
+
+---
+template: image-white
+
+<img src="images/property-inverse.png" style="margin-top: 150px" />
 
 ---
 
@@ -745,9 +755,19 @@ forAll { (l: List[Int], i: Int) =>
 
 ---
 
-## Performance
+## Performance - Crazy Town
 
 ```scala
+def sum(l: List[Int]): Int = {
+  val v = 0
+  l.foreach ( i => v += i )
+  v
+}
+
+forAll { l: List[Int] =>
+  sum(l) =? l.foldLeft(0)(_ + _)
+}
+
 forAll { l: List[Int] =>
   quickSort(l) =? bubbleSort(l)
 }
@@ -763,7 +783,7 @@ forAll { l: List[Int] =>
 }
 
 forAll { l: List[Boolean] =>
-  l.filter(b => !b) =? l.filterNot(b => b)
+  l.filterNot(b => b) =? l.filter(b => !b)
 }
 ```
 
@@ -916,7 +936,23 @@ forAll { l: List[Int] =>
 ```
 
 ---
-layout: false
+## Invariants
+
+```scala
+forAll { l: List[Int] =>
+  l.filter(_ => true) =? l
+}
+
+forAll { l: List[Int] =>
+  l.filter(_ => false) =? Nil
+}
+
+forAll { l: List[Int] =>
+  l.map(i => i) =? l
+}
+```
+
+---
 
 ## Idempotence
 
@@ -1135,7 +1171,7 @@ prop { (input: Input) =>
 
 template: inverse
 
-# Generator school
+# TDD
 
 ---
 
@@ -1174,7 +1210,7 @@ object UserService {
    *
    * Fails if the postcode is negative.
    */
-  def add(user: User): Option[Int]
+  def add(user: User): Unit
 }
 ```
 
@@ -1191,16 +1227,6 @@ def genUser: Gen[User] = for {
   p &lt;- genPostcode
 } yield User(n, p)
 ```
-
----
-
-## Generators
-
-- Are an asset
-  - Require investment
-- Pay dividends
-  - Called from other generators
-  - Used in multiple properties
 
 ---
 
@@ -1221,9 +1247,9 @@ forAll { p: Int =>
 
 ---
 
-template: inverse
+template: question
 
-# Types are a thing
+# Type Driven Development
 
 ---
 
@@ -1256,21 +1282,43 @@ forAll { p: Postcode =>
 
 ---
 
+## What the hell
+
+```scala
+case class User(name: UserName, postcode: Postcode)
+```
+
+---
+
+template: image
+
+<img src="images/play-a-game.jpg" />
+
+---
+
+## Replace free variables
+
+```scala
+def testSomething() {
+  foo("bar") =? "bar"
+}
+```
+
+### With
+
+```scala
+forAll { s: String =>
+  foo(s) =? s
+}
+```
+
+---
+
 template: question
 
-## Property-based testing leads to...
+## What errors do you see?
 
----
-
-template: inverse
-
-## TDD
-
----
-
-template: inverse
-
-## Type Driven Development
+## Are they bugs or imprecise types?
 
 ---
 
