@@ -303,7 +303,7 @@ object Gen {
 ## Gen in Action
 
 ```scala
-def forAll(gen: Gen[A])(p: A => Boolean): Boolean
+def forAll[A](gen: Gen[A])(p: A => Boolean): Boolean
 
 forAll(Gen.string) { s: String =>
   ...
@@ -386,8 +386,8 @@ object Arbitrary {
 ## Arbitrary in Action
 
 ```scala
-def forAll(p: A => Boolean)
-          (implicit a: Arbitrary[A]): Boolean =
+def forAll[A](p: A => Boolean)
+             (implicit a: Arbitrary[A]): Boolean =
   forAll(a.arbitrary)(p)
 
 forAll { s: String =>
@@ -520,6 +520,23 @@ forAll { l: List[Int] =>
   l.headOption =?
     (if (l.isEmpty) None else Some(l.head))
 }
+
+```
+
+---
+
+## Echo
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+
+trait List[A] {
+  def headOption: Option[A] =
+    if (isEmpty) None else Some(head)
+}
 ```
 
 ---
@@ -587,21 +604,15 @@ forAll { user: User =>
 
 ---
 
-## Hello World
-
-```scala
-forAll { s: String =>
-  s.reverse.reverse =? s
-}
-```
-
----
-
 ## Data Structures
 
 ```scala
 forAll { l: List[Int] =>
   l.toStream.toList =? l
+}
+
+forAll { l: List[Int] =>
+  l.toVector.toList =? l
 }
 ```
 
@@ -755,6 +766,20 @@ forAll { (l: List[Int], i: Int) =>
 
 ---
 
+## Aliases
+
+```scala
+forAll { l: List[Int] =>
+  l.size =? l.length
+}
+
+forAll { l: List[Boolean] =>
+  l.filterNot(b => b) =? l.filter(b => !b)
+}
+```
+
+---
+
 ## Performance - Crazy Town
 
 ```scala
@@ -770,20 +795,6 @@ forAll { l: List[Int] =>
 
 forAll { l: List[Int] =>
   quickSort(l) =? bubbleSort(l)
-}
-```
-
----
-
-## Aliases
-
-```scala
-forAll { l: List[Int] =>
-  l.size =? l.length
-}
-
-forAll { l: List[Boolean] =>
-  l.filterNot(b => b) =? l.filter(b => !b)
 }
 ```
 
@@ -1273,6 +1284,8 @@ object Postcode {
 ```scala
 case class User(name: String, postcode: Postcode)
 
+def findByPostcode(postcode: Postcode): List[User]
+
 def genPostcode: Gen[Postcode]
 
 forAll { p: Postcode =>
@@ -1282,7 +1295,7 @@ forAll { p: Postcode =>
 
 ---
 
-## What the hell
+## Types are cheap
 
 ```scala
 case class User(name: UserName, postcode: Postcode)
@@ -1316,7 +1329,7 @@ forAll { s: String =>
 
 template: question
 
-## What errors do you see?
+## Errors?
 
 ## Are they bugs or imprecise types?
 
