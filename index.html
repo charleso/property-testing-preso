@@ -457,6 +457,19 @@ forAll { users: List[(Int, User)] =>
   - Called from other generators
   - Used in multiple properties
 
+---
+
+## Testing bug fixes
+
+```scala
+def genUsername: Gen[String] =
+  Gen.oneOf(
+    arbitrary[String],
+    // PROD-1234 - never again!
+    Gen.const("null")
+  )
+```
+
 
 
 
