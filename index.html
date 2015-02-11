@@ -449,6 +449,16 @@ forAll { users: List[(Int, User)] =>
 
 ---
 
+## Not magic!
+
+```scala
+summon { user: User =>
+  parseJson(toJson(user)) == user
+}
+```
+
+---
+
 ## Generators
 
 - Are an asset
