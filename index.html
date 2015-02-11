@@ -452,7 +452,7 @@ forAll { users: List[(Int, User)] =>
 ## Generators
 
 - Are an asset
-  - Require investment
+  - Requires investment
 - Pay dividends
   - Called from other generators
   - Used in multiple properties
@@ -784,7 +784,7 @@ forAll { l: List[Boolean] =>
 
 ```scala
 def sum(l: List[Int]): Int = {
-  val v = 0
+  var v = 0
   l.foreach ( i => v += i )
   v
 }
@@ -1295,8 +1295,8 @@ template: image
 ## Replace free variables
 
 ```scala
-def testSomething() {
-  foo("bar") =? "bar"
+def testHeadOption() {
+  List("bar").headOption =? Some("bar")
 }
 ```
 
@@ -1304,7 +1304,7 @@ def testSomething() {
 
 ```scala
 forAll { s: String =>
-  foo(s) =? s
+  List(s).headOption =? Some(s)
 }
 ```
 
@@ -1313,6 +1313,8 @@ forAll { s: String =>
 
 - Bugs
 - Imprecise type
+
+## Also makes you think!
 
 ---
 
@@ -1426,7 +1428,7 @@ layout: false
 
 
     </textarea>
-    <script src="http://gnab.github.io/remark/downloads/remark-latest.min.js" type="text/javascript">
+    <script src="js/remark-latest.min.js" type="text/javascript">
     </script>
     <script type="text/javascript">
       var slideshow = remark.create();
