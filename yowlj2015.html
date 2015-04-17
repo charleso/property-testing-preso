@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Real World Property Based Testing</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+      body {
+        font-family: Futura, 'Yanone Kaffeesatz';
+      }
+      li {
+        font-size: 30px;
+        padding-top: 20px;
+      }
+      .remark-code {
+        font-size: 30px;
+      }
+      h1, h2, h3 {
+        font-weight: normal;
+      }
+      .inverse {
+        background: #4795c6;
+        color: white;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+      .starwars {
+        background: black;
+        color: #07ffff;
+      }
+      .relative h1 {
+        position: relative !important;
+      }
+      .question {
+        background: #76b242;
+        color: white;
+      }
+      .rule {
+        background: #ee2a24;
+        color: white;
+      }
+      .image {
+        padding: 0px;
+        color: white;
+        background-color: black;
+
+        position: relative;
+      }
+      .image img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        /*height: 100%;*/
+        float: left;
+      }
+      .image h1, .image h2 {
+        position: absolute;
+        bottom: 0;
+        text-align: center;
+        left: 20px;
+      }
+      .image-white {
+        color: black;
+        background-color: white;
+      }
+      .image-last h1 {
+        right: 0;
+        bottom: 100px;
+      }
+      .remark-code, .remark-inline-code {
+        font-family: 'Ubuntu Mono';
+      }
+      .remark-slide-content {
+        padding: 10px 10px 10px 30px;
+      }
+      .hljs-default .hljs {
+        background-color: transparent;
+      }
+      .ambiata-full {
+        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+      }
+      .evolution {
+        background-color: #DEDEDE;
+      }
+      .evolution h1 {
+        color: black !important;
+      }
+      .top h1 {
+        top: 0px;
+      }
+      /*
+      .ambiata-full h2 {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+      }
+      */
+      .ambiata {
+        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+        background-position: top right;
+        background-size: 100px;
+        /*-webkit-filter: grayscale(40%);*/
+      }
+      .code-small .remark-code {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <textarea id="source">
+name: image
+layout: true
+class: center, middle, image
+
+---
+name: image-white
+layout: true
+class: center, middle, image, image-white
+
+---
+name: image-last
+layout: true
+class: center, middle, image, image-last
+
+---
+name: ambiata
+layout: true
+class: ambiata
+
+---
+name: ambiata-full
+layout: true
+class: center, middle, ambiata-full
+
+---
+name: code-small
+layout: true
+class: code-small
+
+---
+name: question
+layout: true
+class: center, middle, question
+
+---
+name: rule
+layout: true
+class: center, middle, rule
+
+---
+name: inverse
+layout: true
+class: center, middle, inverse
+
+---
+name: starwars
+layout: true
+class: center, middle, starwars
+
+---
+
+class: center, middle
+template: image
+
+<img src="images/love-the-bomb.jpg" height="100%" />
+
+# How I learned to stop unit testing and love property-based testing
+
+---
+
+template: image
+
+<img src="https://s3.amazonaws.com/uploads.hipchat.com/66910/469077/D3ZFdOwP7TRLlid/upload.jpg" />
+
+# Charles O'Farrell
+
+
+
+
+
+
+
+
+
+
+
+
+---
+layout: false
+
+## One year ago
+
+- Had heard good things about property-based testing
+- Had written one or two properties
+- But found it hard work :(
+
+---
+
+template: image
+
+<img src="images/all-powerful.jpg" height="100%" />
+
+# Today
+
+
+
+
+
+
+
+
+
+
+
+---
+
+## Property Testing 101
+
+```scala
+case class User(name: String, postcode: Int)
+
+object User {
+
+  def user: Gen[User] = for {
+    name     &lt;- Gen.string
+    postcode &lt;- Gen.int
+  } yield User(name, postcode)
+
+  implicit def ArbitraryGen = Arbitrary(user)
+}
+
+forAll { user: User =>
+  ...
+}
+```
+
+
+
+
+
+
+
+
+
+
+---
+template: inverse
+class: evolution
+
+<img src="images/evolution.jpg" />
+
+# Evolution
+
+---
+
+## Let the healing begin
+
+```scala
+trait List[A] {
+  def headOption: Option[A]
+}
+```
+
+---
+
+## Crawling out of the swamp
+
+```scala
+Nil.headOption = None
+
+List(1).headOption = Some(1)
+
+List(1, 2).headOption = Some(1)
+
+List(1, 2, 3).headOption = Some(1)
+
+...
+```
+
+---
+
+## Umm, now what?
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    ???
+}
+```
+
+---
+
+## Rookie mistake
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+
+```
+
+---
+
+## Echo
+
+```scala
+forAll { l: List[Int] =>
+  l.headOption =?
+    (if (l.isEmpty) None else Some(l.head))
+}
+
+trait List[A] {
+  def headOption: Option[A] =
+    if (isEmpty) None else Some(head)
+}
+```
+
+---
+template: question
+
+## This calls for...
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+template: image-white
+
+<img src="images/patterns.jpg" style="width: 50%; left: 25%" />
+
+# Patterns
+
+---
+layout: false
+
+## Patterns
+
+- Symmetry
+- Multiple paths
+- Induction
+- Invariants
+  - Idempotence
+  - Consistency
+
+---
+template: inverse
+
+## Symmetry
+
+---
+template: image-white
+
+<img src="images/property-inverse.png" style="margin-top: 150px" />
+
+---
+
+## Codecs
+
+```scala
+forAll { user: User =>
+  parseJson(toJson(user)) =? user
+}
+```
+
+---
+
+## Data Structures
+
+```scala
+forAll { l: List[Int] =>
+  l.toStream.toList =? l
+}
+
+forAll { l: List[Int] =>
+  l.toVector.toList =? l
+}
+```
+
+---
+
+## Serialisation
+
+```scala
+forAll { s: String =>
+  new String(s.getBytes) =? s
+}
+```
+
+---
+
+## Watch out for encoding!
+
+```scala
+forAll { (s: String, c: Charset) =>
+  new String(s.getBytes(c), c) =? s
+}
+```
+
+---
+template: rule
+
+```
+> ARG_0: "돪"
+> ARG_1: windows-1252
+Expected "돪" but got "?"
+```
+
+---
+
+## Files
+
+```scala
+forAll { (s: String, c: Codec) =>
+  val f = File.createTempFile
+  write(f, s, c)
+  read(f, c) =? s
+}
+```
+
+---
+template: question
+
+## @mhibberd
+## "Maybe you could test a relatively well known open source library and find a bug for something they have unit tests for"
+
+---
+template: image-white
+
+<img src="images/challenge.jpg" />
+
+---
+
+## Joda
+
+```scala
+import org.joda.time._
+
+forAll { dt: DateTime =>
+  val formatter = DateTimeFormat.fullDateTime()
+  val dt2 = dt.withMillisOfSecond(0)
+  formatter.parseDateTime(formatter.print(dt2)) =? dt2
+}
+```
+
+---
+template: rule
+
+```
+Invalid format:
+"Sunday, September 22, 2148 9:08:08 PM ART"
+is malformed at "ART"
+```
+
+---
+
+## Bug or Feature?
+
+- http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
+- http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
+- https://github.com/JodaOrg/joda-time/commit/14863a51230b3d44201646dbc1ce5d7f6bb97a33
+
+---
+template: image
+
+<img src="images/golden-ticket.jpg" />
+
+## Symmetry is your golden ticket
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Multiple Paths
+
+---
+template: image-white
+
+<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" style="margin-top: 120px;"/>
+
+---
+
+## List
+
+```scala
+forAll { l: List[Boolean] =>
+  l.partition(b => b) =?
+    (l.filter(b => b), l.filter(b => !b))
+}
+
+forAll { (l: List[Int], i: Int) =>
+  l.take(i) ++ l.drop(i) =? l
+}
+
+forAll { (l: List[Int], i: Int) =>
+  l.splitAt(i) =?
+    (l.take(i), l.drop(i))
+}
+```
+
+---
+
+## Aliases
+
+```scala
+forAll { l: List[Int] =>
+  l.size =? l.length
+}
+
+forAll { l: List[Boolean] =>
+  l.filterNot(b => b) =? l.filter(b => !b)
+}
+```
+
+---
+
+## Performance - Crazy Town
+
+```scala
+def sum(l: List[Int]): Int = {
+  var v = 0
+  l.foreach ( i => v += i )
+  v
+}
+
+forAll { l: List[Int] =>
+  sum(l) =? l.foldLeft(0)(_ + _)
+}
+
+forAll { l: List[Int] =>
+  quickSort(l) =? bubbleSort(l)
+}
+```
+
+---
+template: ambiata
+
+## Example in the wild
+
+```scala
+def dayMinus(d: Date, i: Int): Date = {
+  ...
+}
+
+forAll { d: Date =>
+  d.toJoda.fromJoda =? d
+}
+
+forAll { (d: Date, i: Int) =>
+  dayMinus(d, i) =?
+    d.toJoda.minusDays(i).fromJoda
+}
+```
+
+---
+template: rule
+
+```
+A counter-example is [Date(2004,3,1), 1] (after 1 try)
+'Date(2004,2,28)' is not equal to 'Date(2004,2,29)'
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Induction
+
+---
+layout: false
+
+## Induction
+
+```scala
+Nil.size =? 0
+
+forAll { (i: Int, l: List[Int]) =>
+  (i :: l).size =? (l.size + 1)
+}
+```
+
+---
+
+## Induction to the rescue
+
+```scala
+Nil.headOption =? None
+
+forAll { (h: Int, t: List[Int]) =>
+  (h :: t).headOption =? Some(h)
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# Invariants
+
+---
+layout: false
+
+## Collect them all
+
+```scala
+forAll { l: List[Int] =>
+  l.map(i => i).size =? l.size
+}
+```
+
+```scala
+forAll { l: List[Int] =>
+  l.sorted.size =? l.size
+}
+```
+
+```scala
+forAll { l: List[Int] =>
+  l.reverse.size =? l.size
+}
+```
+
+---
+## Invariants
+
+```scala
+forAll { l: List[Int] =>
+  l.filter(_ => true) =? l
+}
+
+forAll { l: List[Int] =>
+  l.filter(_ => false) =? Nil
+}
+
+forAll { l: List[Int] =>
+  l.map(i => i) =? l
+}
+```
+
+---
+
+## Idempotence
+
+```scala
+forAll { s: String =>
+  s.distinct.distinct =? s.distinct
+}
+
+forAll { s: String =>
+  s.sorted.sorted =? s.sorted
+}
+```
+
+---
+## Consistency
+
+```scala
+forAll { (s1: String, s2: String) =>
+  val f = File.createTempFile
+  write(f, s1)
+  write(f, s2)
+  read(f) =? s2
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: image
+
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
+
+## The same patterns everywhere
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# "Real World"
+
+---
+layout: false
+
+## Symmetry
+
+```scala
+forall { u1: User =>
+  for {
+    id &lt;- UserDB.insert(u1)
+    u2 &lt;- UserDB.get(id)
+  } yield u2 =? Some(u1)
+}
+```
+
+---
+template: rule
+
+```
+Expected Some(User(\NULL)) but got Some(User())
+```
+
+---
+
+## Symmetry + Invariants
+
+```scala
+forAll { (u1: User, u2: User) =>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2)
+    u3 &lt;- UserDB.get(i2)
+  } yield u3 =? Some(u2)
+}
+```
+
+---
+template: rule
+
+```
+User with name already exists
+> ARG_0: User("bob")
+> ARG_1: User("bob")
+```
+
+---
+## Symmetry + Invariants
+
+```scala
+forAll { (u1: User, u2: User) =>
+          u1.name != u2.name ==>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2)
+    u3 &lt;- UserDB.get(i2.get)
+  } yield
+    u3 =? Some(u2)
+}
+```
+
+---
+## Invariants
+
+```scala
+forAll { (u1: User, u2: User) =>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2.copy(name = u1.name))
+  } yield (i1.isDefined, i2.isEmpty) =? (true, true)
+}
+```
+
+---
+## Symmetry + Multiple Paths
+
+```scala
+case class UniqueUsers(list: List[User])
+
+forAll { users: UniqueUsers =>
+  for {
+    _ &lt;- users.list.traverse(u => UserDB.insert(u))
+    u &lt;- UserDB.listSortByName
+  } yield u =? users.list.sortBy(_.name)
+}
+```
+
+---
+template: inverse
+
+## Is it too slow to run 100 times?
+
+---
+
+## Minimum tests
+
+```scala
+forAll { users: List[Users] =>
+
+  runHadoopOhGodItsSlow(users) =?
+    users.groupBy(_.name)
+      .mapValues(_.sortBy(_.postcode))
+
+}.set(minTestsOk = 3)
+```
+
+---
+
+## Not perfect but...
+
+- Still better than hard-coded tests
+- Can increase number locally
+- Separate build with different sizes
+- Need to think harder about your code!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+template: inverse
+
+# TDD
+
+---
+
+## Spot the bug
+
+```scala
+case class User(name: String, postcode: Int)
+
+def user: Gen[User] = for {
+  name     &lt;- arbitrary[String]
+  postcode &lt;- arbitrary[Int]
+} yield User(name, postcode)
+
+forAll { user =>
+  UserService.add(user)
+}
+```
+
+---
+template: rule
+
+```
+Invalid postcode
+> ARG_0: User("bob", -1)
+```
+
+---
+
+## Documentation is awesome
+
+```scala
+object UserService {
+
+  /**
+   * Adds a user.
+   *
+   * Fails if the postcode is negative.
+   */
+  def add(user: User): Unit
+}
+```
+
+---
+
+## Business Rules
+
+```scala
+def genPostcode: Gen[Int] =
+  Gen.choose(1, 9999)
+
+def genUser: Gen[User] = for {
+  n &lt;- arbitrary[String]
+  p &lt;- genPostcode
+} yield User(n, p)
+```
+
+---
+
+## But what about?
+
+```scala
+object UserService {
+
+  def findByPostcode(postcode: Int): List[User]
+}
+```
+
+```scala
+forAll { p: Int =>
+  UserService.findByPostcode(p)
+}
+```
+
+---
+
+template: question
+
+# Type Driven Development
+
+---
+
+## Be Precise
+
+```scala
+class Postcode private(val value: Int) extends AnyVal
+
+object Postcode {
+  
+  def fromInt(i: Int): Option[Postcode] =
+    if (i > 0 || i &lt; 10000) Some(new Postcode(i))
+    else None
+}
+```
+
+---
+
+## Types with Benefits
+
+```scala
+case class User(name: String, postcode: Postcode)
+
+def findByPostcode(postcode: Postcode): List[User]
+
+def genPostcode: Gen[Postcode]
+
+forAll { p: Postcode =>
+  UserService.findByPostcode(p)
+}
+```
+
+---
+
+## Types are cheap
+
+```scala
+case class User(name: UserName, postcode: Postcode)
+
+case class UserName(string: Name)
+```
+
+---
+
+template: image
+
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
+
+## Types for everything
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+template: ambiata
+
+## Ambiata
+
+- We have a majority of property-based tests
+- Our default
+- Need a compelling reason to write unit tests
+
+---
+template: image-white
+class: top
+
+<img src="images/all-the-things.png" height="100%" />
+
+# Property Tests
+
+---
+layout: false
+
+## Links
+
+- John Hughes - "Testing the Hard Stuff and Staying Sane"
+  - https://www.youtube.com/watch?v=zi0rHwfiX1Q
+- Jessica Kerr - "Property-Based Testing for Better Code"
+  - https://www.youtube.com/watch?v=shngiiBfD80
+- "Choosing properties for property-based testing"
+  - http://fsharpforfunandprofit.com/posts/property-based-testing-2/
+- https://github.com/charleso/property-testing-preso
+
+
+    </textarea>
+    <script src="js/remark-latest.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>.
