@@ -455,6 +455,8 @@ forAll { users: List[(Int, User)] =>
 summon { user: User =>
   parseJson(toJson(user)) == user
 }
+
++ Json json: OK, passed 100 tests.
 ```
 
 ---
