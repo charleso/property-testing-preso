@@ -1019,6 +1019,9 @@ def testUser = {
 }
 ```
 
+---
+
+## Just Add Properties
 
 ```scala
 forAll { (name: String, postcode: Int) =>
@@ -1272,11 +1275,17 @@ template: inverse
 
 ## Quicktip - Boolean
 
-- Scala
-  - `def ?=[T](x: T, y: T)(implicit pp: T => Pretty): Prop`
-- Haskell
-  - `(===) :: (Eq a, Show a) => a -> a -> Property`
+### Scala
 
+```scala
+def ?=[T](x: T, y: T)(implicit pp: T => Pretty): Prop
+```
+
+### Haskell
+
+```haskell
+(===) :: (Eq a, Show a) => a -> a -> Property
+```
 
 
 ---
