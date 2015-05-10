@@ -699,7 +699,8 @@ forAll { (s1: String, s2: String) =>
 
 ```scala
 forAll { (u1: User, u2: User) =>
-  val i1 = UserDB.insert(u1)
+
+  UserDB.insert(u1)
   val i2 = UserDB.insert(u2)
   val u3 = UserDB.get(i2)
 
@@ -717,11 +718,12 @@ User with name already exists
 ```
 
 ---
-## Symmetry + Invariants
+## Preconditions
 
 ```scala
 forAll { (u1: User, u2: User) =>
           u1.name != u2.name ==>
+
   val i1 = UserDB.insert(u1)
   val i2 = UserDB.insert(u2)
   val u3 = UserDB.get(i2.get)
@@ -736,6 +738,7 @@ forAll { (u1: User, u2: User) =>
 ```scala
 forAll { (u1: User, u2: User) =>
           u1.name == u2.name ==>
+
   val i1 = UserDB.insert(u1)
   val i2 = UserDB.insert(u2)
 
@@ -1058,13 +1061,14 @@ object UserDB {
 def genPostcode: Gen[Int] =
   Gen.choose(1, 8000)
 
+def genUsername: Gen[String] =
+  Gen.string
 
-forAll(Gen.string, genPostcode) {
+
+forAll(genUsername, genPostcode) {
   (name: String, postcode: Int) =>
 
-  val user = User(name, postcode)
-  val id = db.insert(user)
-  db.load(id) =? user
+  ...
 }
 ```
 
@@ -1074,10 +1078,8 @@ forAll(Gen.string, genPostcode) {
 
 ```scala
 def genPostcode: Gen[Int] =
-  Gen.choose(1, 9000)
-```
+  Gen.choose(1, 9999)
 
-```scala
 def genUsername: Gen[String] =
   Gen.frequency(
     19 -> Gen.string
@@ -1100,14 +1102,20 @@ class Postcode private(val value: Int) extends AnyVal
 object Postcode {
   
   def fromInt(i: Int): Option[Postcode] =
-    if (i > 0 || i &lt; 10000) Some(new Postcode(i))
-    else None
+    if (i > 0 || i &lt; 10000)
+      Some(new Postcode(i))
+    else
+      None
 }
 ```
 
+---
+
+## Types with Benefits
+
 ```scala
-forAll { (name: String, p: Postcode) =>
-  ...
+forAll { (name: Username, postcode: Postcode) =>
+   ...
 }
 ```
 
