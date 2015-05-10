@@ -1012,7 +1012,7 @@ template: inverse
 def testUser = {
   val user = User("bob", 2000)
   val id = db.insert(user)
-  db.load(id) =? user
+  db.load(id) =? Some(user)
 }
 ```
 
@@ -1024,7 +1024,7 @@ def testUser = {
 forAll { (name: String, postcode: Int) =>
   val user = User(name, postcode)
   val id = db.insert(user)
-  db.load(id) =? user
+  db.load(id) =? Some(user)
 }
 ```
 
@@ -1045,11 +1045,11 @@ Invalid postcode
 object UserDB {
 
   /**
-   * Adds a user.
+   * Inserts a user.
    *
    * Fails if the postcode is negative.
    */
-  def insert(user: User): Unit
+  def insert(user: User): Int
 }
 ```
 
@@ -1059,7 +1059,7 @@ object UserDB {
 
 ```scala
 def genPostcode: Gen[Int] =
-  Gen.choose(1, 8000)
+  Gen.choose(1000, 8000)
 
 def genUsername: Gen[String] =
   Gen.string
@@ -1078,7 +1078,7 @@ forAll(genUsername, genPostcode) {
 
 ```scala
 def genPostcode: Gen[Int] =
-  Gen.choose(1, 9999)
+  Gen.choose(1000, 9999)
 
 def genUsername: Gen[String] =
   Gen.frequency(
