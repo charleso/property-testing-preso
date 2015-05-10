@@ -1179,9 +1179,8 @@ forAll { (name: String, postcode: Int) =>
 ```
 ---
 
-## Quicktip - Assert
+## Quicktip - Boolean
 
-- Don't use `Boolean`/`Bool`
 - Scala
   - `def ?=[T](x: T, y: T)(implicit pp: T => Pretty): Prop`
 - Haskell
@@ -1208,6 +1207,20 @@ template: ambiata
 - ~20 non-property tests
   - Mostly integration/sanity tests
 - ~20 minutes to run
+
+---
+template: ambiata
+
+## Ambiata - Libraries
+
+- https://github.com/ambiata/disorder
+  - Umbrella project
+- https://github.com/ambiata/disorder.scala
+  - DistinctPair
+  - PositiveInt
+- https://github.com/ambiata/disorder.hs
+  - Main runner
+  - Aeson/Lens laws
 
 ---
 template: image-white
