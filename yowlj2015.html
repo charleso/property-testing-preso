@@ -536,7 +536,7 @@ template: ambiata
 ## Example in the wild
 
 ```scala
-def dayMinus(d: Date, i: Int): Date = {
+def dayPlus(d: Date, i: Int): Date = {
   ...
 }
 
@@ -545,8 +545,8 @@ forAll { d: Date =>
 }
 
 forAll { (d: Date, i: Int) =>
-  dayMinus(d, i) =?
-    d.toJoda.minusDays(i).fromJoda
+  dayPlus(d, i) =?
+    d.toJoda.plusDays(i).fromJoda
 }
 ```
 
