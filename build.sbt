@@ -34,4 +34,6 @@ libraryDependencies ++= Seq(
  , "com.googlecode.jcsv"            % "jcsv"                   % "1.4.0"
  , "commons-codec"                  % "commons-codec"          % "1.6"
  , "org.apache.commons"             % "commons-csv"            % "1.1"
+ , "org.rauschig"                   % "jarchivelib"            % "0.7.0"
+ , "org.tukaani"                    % "xz" % "1.5"
 )
