@@ -319,7 +319,7 @@ layout: false
 ## Patterns
 
 - Symmetry
-- Multiple paths
+- Model-based
 - Induction
 - Invariants
   - Idempotence
@@ -453,16 +453,12 @@ template: image
 
 template: inverse
 
-# Multiple Paths
-
-AKA
-
-# Model-based testing
+# Model-based
 
 ---
 template: image-white
 
-<img src="http://fsharpforfunandprofit.com/assets/img/property_commutative.png" style="margin-top: 120px;"/>
+<img src="images/model-based.png" style="margin-top: 120px;"/>
 
 ---
 
@@ -759,6 +755,7 @@ Gave up after only 1 passed tests.
 
 ```scala
 forAll { (u1: User, u2: User) =>
+
   val i1 = UserDB.insert(u1)
   val i2 = UserDB.insert(u2.copy(name = u1.name))
 
