@@ -371,12 +371,12 @@ Expected "돪" but got "?"
 
 ```scala
 def toJson(user: User): Json
-def parseJson(Json): Either[Exception, User]
+def fromJson(Json): Either[Exception, User]
 ```
 
 ```scala
 forAll { user: User =>
-  parseJson(toJson(user)) =? Right(user)
+  fromJson(toJson(user)) =? Right(user)
 }
 ```
 
@@ -407,6 +407,26 @@ forAll { (s: String, c: Codec) =>
 ```
 
 ---
+
+## Database
+
+```scala
+forall { u1: User =>
+  for {
+    id &lt;- UserDB.insert(u1)
+    u2 &lt;- UserDB.get(id)
+  } yield u2 =? Some(u1)
+}
+```
+
+---
+template: rule
+
+```
+Expected Some(User(\NULL)) but got Some(User())
+```
+
+---
 template: image
 
 <img src="images/golden-ticket.jpg" />
@@ -433,6 +453,8 @@ template: image
 template: inverse
 
 # Multiple Paths
+
+## AKA Model-based testing
 
 ---
 template: image-white
@@ -490,6 +512,20 @@ forAll { l: List[Int] =>
 
 forAll { l: List[Int] =>
   quickSort(l) =? bubbleSort(l)
+}
+```
+
+---
+## Database
+
+```scala
+case class UniqueUsers(list: List[User])
+
+forAll { users: UniqueUsers =>
+  for {
+    _ &lt;- users.list.traverse(u => UserDB.insert(u))
+    u &lt;- UserDB.listSortByName
+  } yield u =? users.list.sortBy(_.name)
 }
 ```
 
@@ -656,80 +692,9 @@ forAll { (s1: String, s2: String) =>
 }
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
-template: image
-
-<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
-
-## The same patterns everywhere
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-template: inverse
-
-# "Real World"
-
----
-layout: false
-
-## Symmetry
-
-```scala
-forall { u1: User =>
-  for {
-    id &lt;- UserDB.insert(u1)
-    u2 &lt;- UserDB.get(id)
-  } yield u2 =? Some(u1)
-}
-```
-
----
-template: rule
-
-```
-Expected Some(User(\NULL)) but got Some(User())
-```
-
----
-
-## Symmetry + Invariants
+## Database Consistency
 
 ```scala
 forAll { (u1: User, u2: User) =>
@@ -798,19 +763,48 @@ forAll { (u1: User, u2: User) =>
 }
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
-## Symmetry + Multiple Paths
 
-```scala
-case class UniqueUsers(list: List[User])
+template: image
 
-forAll { users: UniqueUsers =>
-  for {
-    _ &lt;- users.list.traverse(u => UserDB.insert(u))
-    u &lt;- UserDB.listSortByName
-  } yield u =? users.list.sortBy(_.name)
-}
-```
+<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
+
+## The same patterns everywhere
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 template: inverse
@@ -849,9 +843,9 @@ tests = $quickCheckWithResult (stdArgs{maxSuccess = 5})
 
 ## Not perfect but...
 
-- Still better than hard-coded tests
-- Can increase number locally
+- Can increase/toggle runs
 - Separate build with different sizes
+- _Still_ better than hard-coded tests
 
 
 
@@ -865,6 +859,120 @@ tests = $quickCheckWithResult (stdArgs{maxSuccess = 5})
 
 
 
+
+
+
+
+
+---
+template: inverse
+
+## Laws
+
+---
+
+## Usual Suspects
+
+<img src="images/usual-suspects.jpg" width="650px" style="position: absolute; right: 20px; top: 170px;" />
+
+- Equal
+- Order
+- Functor
+- Monad
+
+
+---
+
+## [Scalaz](https://github.com/scalaz/scalaz/blob/master/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazProperties.scala)
+
+```scala
+libraryDependencies +=
+  "org.scalaz" %% "scalaz-binding" % "7.1.2"
+
+property("user equal") =
+  scalaz.scalacheck.equal.laws[User]
+```
+
+---
+
+## JSON
+
+```scala
+def toFromJSON
+  [A: EncodeJson: DecodeJson: Arbitrary: Equal]: Prop =
+
+  Prop.forAll { a =>
+    fromJson(toJson(a)) =? Right(a)
+  }
+```
+
+```scala
+property("user") = toFromJSON[User]
+property("job") = toFromJSON[Job]
+```
+
+- [Argonaut CodecLaw](https://github.com/argonaut-io/argonaut/blob/master/src/main/scala/argonaut/CodecJson.scala#L19)
+
+---
+
+## Idempotence
+
+```scala
+def idempotence[A: Equal](i: A, f: => A => A): Property =
+  f(f(i)) =? f(i)
+```
+
+---
+
+## Database Abstraction
+
+```scala
+trait DB {
+  def create(user: User): UserId
+  def read(id: UserId): Option[UserId]
+  ...
+}
+
+object PostgresDB extends DB
+object MemoryDB extends DB
+```
+
+- Could be your Free interpreters
+
+---
+
+## Database Laws
+
+```scala
+def dbLaws(db: DB): Prop = new Properties("DB Laws") {
+
+  property("symmetry") = forAll { (u: User) =>
+    db.read(db.create(u)) =? Some(u)
+  }
+
+  property("empty") = forAll { (id: UserId) =>
+    db.read(id) =? None
+  }
+}
+```
+
+```scala
+property("postgres DB laws") = dbLaws[PostgresDB]
+property("memory DB laws") = dbLaws[MemoryDB]
+```
+
+---
+
+## Haskell
+
+```haskell
+dbLaws :: DB -> Property
+
+dbLaws db = conjoin [
+    property $ dbSymmetry db
+  , property $ dbEmpty db
+  ]
+```
 
 
 
@@ -884,22 +992,26 @@ tests = $quickCheckWithResult (stdArgs{maxSuccess = 5})
 
 template: inverse
 
-# TDD
+# Easy Wins
 
 ---
 
-## Spot the bug
+## Free Variables
 
 ```scala
-case class User(name: String, postcode: Int)
+def testUser = {
+  val user = User("bob", 2000)
+  val id = db.insert(user)
+  db.load(id) =? user
+}
+```
 
-def user: Gen[User] = for {
-  name     &lt;- arbitrary[String]
-  postcode &lt;- arbitrary[Int]
-} yield User(name, postcode)
 
-forAll { user =>
-  UserService.add(user)
+```scala
+forAll { (name: String, postcode: Int) =>
+  val user = User(name, postcode)
+  val id = db.insert(user)
+  db.load(id) =? user
 }
 ```
 
@@ -908,7 +1020,8 @@ template: rule
 
 ```
 Invalid postcode
-> ARG_0: User("bob", -1)
+> ARG_0: "bob"
+> ARG_1: -1
 ```
 
 ---
@@ -916,14 +1029,14 @@ Invalid postcode
 ## Documentation is awesome
 
 ```scala
-object UserService {
+object UserDB {
 
   /**
    * Adds a user.
    *
    * Fails if the postcode is negative.
    */
-  def add(user: User): Unit
+  def insert(user: User): Unit
 }
 ```
 
@@ -933,29 +1046,25 @@ object UserService {
 
 ```scala
 def genPostcode: Gen[Int] =
-  Gen.choose(1, 9999)
+  Gen.choose(1, 8000)
 
-def genUser: Gen[User] = for {
-  n &lt;- arbitrary[String]
-  p &lt;- genPostcode
-} yield User(n, p)
+
+forAll(Gen.string, genPostcode) {
+  (name: String, postcode: Int) =>
+
+  val user = User(name, postcode)
+  val id = db.insert(user)
+  db.load(id) =? user
+}
 ```
 
 ---
 
-## But what about?
+## Single Point
 
 ```scala
-object UserService {
-
-  def findByPostcode(postcode: Int): List[User]
-}
-```
-
-```scala
-forAll { p: Int =>
-  UserService.findByPostcode(p)
-}
+def genPostcode: Gen[Int] =
+  Gen.choose(1, 9000)
 ```
 
 ---
@@ -984,25 +1093,9 @@ object Postcode {
 ## Types with Benefits
 
 ```scala
-case class User(name: String, postcode: Postcode)
-
-def findByPostcode(postcode: Postcode): List[User]
-
-def genPostcode: Gen[Postcode]
-
-forAll { p: Postcode =>
-  UserService.findByPostcode(p)
+forAll { (name: String, p: Postcode) =>
+  ...
 }
-```
-
----
-
-## Types are cheap
-
-```scala
-case class User(name: UserName, postcode: Postcode)
-
-case class UserName(string: Name)
 ```
 
 ---
@@ -1012,9 +1105,6 @@ template: image
 <img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
 
 ## Types for everything
-
-
-
 
 
 
@@ -1089,10 +1179,8 @@ template: image-white
 ```scala
 import org.rauschig.jarchivelib._
 
-forAll { (
-    files: Map[FilePath, Array[Byte]]
-  , format: ArchiveFormat
-  ) => {
+def archiveLaws(format: ArchiveFormat): Prop =
+  forAll { files: Map[FilePath, Array[Byte]] => {
 
   val archiver = ArchiverFactory.createArchiver(format)
   withTmpDir { dir =>
@@ -1100,6 +1188,10 @@ forAll { (
     archive.loadAll() =? files
   }
 }
+
+archiveLaws(ArchiveFormat.Jar)
+archiveLaws(ArchiveFormat.7zip)
+archiveLaws(ArchiveFormat.Ar)
 ```
 ---
 
@@ -1153,30 +1245,8 @@ Right 1858-11-17 00:00:00 UTC /=
 ---
 template: question
 
-# Stuff
+# Summary
 
----
-
-## Good place to start
-
-- Replace free variables in your tests
-
-```scala
-def testUser = {
-  val user = User("a", 2000)
-  val id = db.insert(user)
-  db.load(id) =? user
-}
-```
-
-
-```scala
-forAll { (name: String, postcode: Int) =>
-  val user = User(name, postcode)
-  val id = db.insert(user)
-  db.load(id) =? user
-}
-```
 ---
 
 ## Quicktip - Boolean
@@ -1235,12 +1305,12 @@ layout: false
 
 ## Links
 
+- "Choosing properties for property-based testing"
+  - http://fsharpforfunandprofit.com/posts/property-based-testing-2/
 - John Hughes - "Testing the Hard Stuff and Staying Sane"
   - https://www.youtube.com/watch?v=zi0rHwfiX1Q
 - Jessica Kerr - "Property-Based Testing for Better Code"
   - https://www.youtube.com/watch?v=shngiiBfD80
-- "Choosing properties for property-based testing"
-  - http://fsharpforfunandprofit.com/posts/property-based-testing-2/
 - https://github.com/charleso/property-testing-preso
 
 
