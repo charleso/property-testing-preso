@@ -915,7 +915,7 @@ property("job") = toFromJSON[Job]
 ## Idempotence
 
 ```scala
-def idempotence[A: Equal](i: A, f: => A => A): Property =
+def idempotence[A: Equal](i: A, f: A => A) =
   f(f(i)) =? f(i)
 ```
 
