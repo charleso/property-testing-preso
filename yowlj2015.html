@@ -1204,27 +1204,28 @@ template: image-white
 ```scala
 import org.rauschig.jarchivelib._
 
-def archiveLaws(format: ArchiveFormat): Prop =
+def archiveLaws(archiver: ArchiverFactory): Prop =
+
   forAll { files: Map[FilePath, Array[Byte]] => {
 
-  val archiver = ArchiverFactory.createArchiver(format)
-  withTmpDir { dir =>
-    val archive = archiver.create(dir, files)
-    archive.loadAll() =? files
-  }
+    withTmpDir { dir =>
+      val archive = archiver.create(dir, files)
+      archive.loadAll() =? files
+    }
 }
 
-archiveLaws(ArchiveFormat.Jar)
-archiveLaws(ArchiveFormat.7zip)
-archiveLaws(ArchiveFormat.Ar)
+archiveLaws(createArchiver(Jar, PACK200))
+archiveLaws(createArchiver(7zip))
+archiveLaws(createArchiver(Ar))
 ```
 ---
 
-## TIL
+## Boom!
 
-- `file name 'aὠ눧䄬裦㕃띶੩軃ꨣ昚댃㏔磝ꕠ忎⽪滊槔  螎鴲뻣ᛍ䆕䡟ꘘ뱷꒙떓' is too long ( > 100 bytes)`
-- `java.nio.file.InvalidPathException: Nul character not allowed`
-- `Expected "aⲐ" "a?"`
+- `CompressionFormat.PACK200`
+  - `Expected "" but got "PKPACK2000"`
+- `ArchiveFormat.Ar`
+  - `Expected "aⲐ" "a?"`
 
 ---
 
