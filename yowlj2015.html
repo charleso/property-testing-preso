@@ -814,9 +814,13 @@ template: inverse
 ```scala
 forAll { users: List[Users] =>
 
-  runHadoopOhGodItsSlow(users) =?
+  val out = runHadoopOhGodItsSlow(users)
+
+  val expected =
     users.groupBy(_.name)
-      .mapValues(_.sortBy(_.postcode))
+         .mapValues(_.sortBy(_.postcode))
+
+  out =? expected
 
 }.set(minTestsOk = 5)
 ```
@@ -887,6 +891,12 @@ libraryDependencies +=
 
 property("user equal") =
   scalaz.scalacheck.equal.laws[User]
+
+property("set functor")
+  scalaz.scalacheck.functor.laws[Set]
+
+property("db monad")
+  scalaz.scalacheck.monad.laws[DB]
 ```
 
 ---
@@ -920,7 +930,7 @@ def idempotence[A: Equal](i: A, f: A => A) =
 
 ---
 
-## Database Abstraction
+## "Abstraction"
 
 ```scala
 trait DB {
@@ -1144,7 +1154,8 @@ import org.joda.time._
 
 forAll { dt: DateTime =>
   val formatter = DateTimeFormat.fullDateTime()
-  formatter.parseDateTime(formatter.print(dt)) =? dt
+  val s = formatter.print(dt)
+  formatter.parseDateTime(s) =? dt
 }
 ```
 
