@@ -207,9 +207,9 @@ template: starwars
 
 ---
 
-template: image
+template: image-white
 
-<img src="images/jedi-master.jpg" />
+<img src="images/jedi-master.jpg" height="100%" />
 
 # Today
 
@@ -236,7 +236,7 @@ trait List[A] {
 
 ---
 
-## Crawling out of the swamp
+## Examples
 
 ```scala
 Nil.headOption = None
@@ -341,7 +341,8 @@ template: image-white
 
 ```scala
 forAll { s: String =>
-  new String(s.getBytes) =? s
+  val b = s.getBytes
+  new String(b) =? s
 }
 ```
 
@@ -351,7 +352,8 @@ forAll { s: String =>
 
 ```scala
 forAll { (s: String, c: Charset) =>
-  new String(s.getBytes(c), c) =? s
+  val b = s.getBytes(c)
+  new String(b, c) =? s
 }
 ```
 
