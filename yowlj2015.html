@@ -33,6 +33,10 @@
         background: black;
         color: #07ffff;
       }
+      .starwars li {
+         text-align: justify;
+         color: #ff6;
+      }
       .relative h1 {
         position: relative !important;
       }
@@ -175,9 +179,10 @@ template: image
 
 ---
 
+layout: false
 template: image
 
-<img src="https://s3.amazonaws.com/uploads.hipchat.com/66910/469077/D3ZFdOwP7TRLlid/upload.jpg" />
+<img src="images/chopsticks.jpg" />
 
 # Charles O'Farrell
 
@@ -193,7 +198,7 @@ template: image
 
 
 ---
-layout: false
+template: starwars
 
 ## One year ago
 
@@ -205,7 +210,7 @@ layout: false
 
 template: image
 
-<img src="images/all-powerful.jpg" height="100%" />
+<img src="images/jedi-master.jpg" />
 
 # Today
 
@@ -221,45 +226,7 @@ template: image
 
 ---
 
-## Property Testing 101
-
-```scala
-case class User(name: String, postcode: Int)
-
-object User {
-
-  def user: Gen[User] = for {
-    name     &lt;- Gen.string
-    postcode &lt;- Gen.int
-  } yield User(name, postcode)
-
-  implicit def ArbitraryGen = Arbitrary(user)
-}
-
-forAll { user: User =>
-  ...
-}
-```
-
-
-
-
-
-
-
-
-
-
----
-template: inverse
-class: evolution
-
-<img src="images/evolution.jpg" />
-
-# Evolution
-
----
-
+layout: false
 ## Let the healing begin
 
 ```scala
@@ -371,31 +338,7 @@ template: image-white
 
 ---
 
-## Codecs
-
-```scala
-forAll { user: User =>
-  parseJson(toJson(user)) =? user
-}
-```
-
----
-
-## Data Structures
-
-```scala
-forAll { l: List[Int] =>
-  l.toStream.toList =? l
-}
-
-forAll { l: List[Int] =>
-  l.toVector.toList =? l
-}
-```
-
----
-
-## Serialisation
+## Show me the code
 
 ```scala
 forAll { s: String =>
@@ -424,6 +367,35 @@ Expected "돪" but got "?"
 
 ---
 
+## Codecs
+
+```scala
+def toJson(user: User): Json
+def parseJson(Json): Either[Exception, User]
+```
+
+```scala
+forAll { user: User =>
+  parseJson(toJson(user)) =? Right(user)
+}
+```
+
+---
+
+## Data Structures
+
+```scala
+forAll { l: List[Int] =>
+  l.toStream.toList =? l
+}
+
+forAll { l: List[Int] =>
+  l.toVector.toList =? l
+}
+```
+
+---
+
 ## Files
 
 ```scala
@@ -433,48 +405,6 @@ forAll { (s: String, c: Codec) =>
   read(f, c) =? s
 }
 ```
-
----
-template: question
-
-## @mhibberd
-## "Maybe you could test a relatively well known open source library and find a bug for something they have unit tests for"
-
----
-template: image-white
-
-<img src="images/challenge.jpg" />
-
----
-
-## Joda
-
-```scala
-import org.joda.time._
-
-forAll { dt: DateTime =>
-  val formatter = DateTimeFormat.fullDateTime()
-  val dt2 = dt.withMillisOfSecond(0)
-  formatter.parseDateTime(formatter.print(dt2)) =? dt2
-}
-```
-
----
-template: rule
-
-```
-Invalid format:
-"Sunday, September 22, 2148 9:08:08 PM ART"
-is malformed at "ART"
-```
-
----
-
-## Bug or Feature?
-
-- http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
-- http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
-- https://github.com/JodaOrg/joda-time/commit/14863a51230b3d44201646dbc1ce5d7f6bb97a33
 
 ---
 template: image
@@ -836,6 +766,27 @@ forAll { (u1: User, u2: User) =>
 ```
 
 ---
+## Warning: Preconditions
+
+```scala
+forAll { (u1: User, u2: User) =>
+          u1.name == u2.name ==>
+  for {
+    i1 &lt;- UserDB.insert(u1)
+    i2 &lt;- UserDB.insert(u2)
+  } yield (i1.isDefined, i2.isEmpty) =? (true, true)
+}
+```
+
+---
+template: rule
+
+```
+Gave up after only 1 passed tests.
+100 tests were discarded.
+```
+
+---
 ## Invariants
 
 ```scala
@@ -877,7 +828,21 @@ forAll { users: List[Users] =>
     users.groupBy(_.name)
       .mapValues(_.sortBy(_.postcode))
 
-}.set(minTestsOk = 3)
+}.set(minTestsOk = 5)
+```
+
+---
+
+## Haskell
+
+```haskell
+prop_db user = monadicIO . run $ do
+  i  &lt;- insert user
+  u' &lt;- load i
+  stop $ i === u'
+
+tests :: IO Bool
+tests = $quickCheckWithResult (stdArgs{maxSuccess = 5})
 ```
 
 ---
@@ -887,7 +852,6 @@ forAll { users: List[Users] =>
 - Still better than hard-coded tests
 - Can increase number locally
 - Separate build with different sizes
-- Need to think harder about your code!
 
 
 
@@ -1071,6 +1035,157 @@ template: image
 
 
 
+---
+template: question
+
+## @mhibberd
+## "Maybe you could test a relatively well known open source library and find a bug for something they have unit tests for"
+
+---
+template: image-white
+
+<img src="images/challenge.jpg" />
+
+---
+
+## Joda
+
+```scala
+import org.joda.time._
+
+forAll { dt: DateTime =>
+  val formatter = DateTimeFormat.fullDateTime()
+  val dt2 = dt.withMillisOfSecond(0)
+  formatter.parseDateTime(formatter.print(dt2)) =? dt2
+}
+```
+
+---
+template: rule
+
+```
+Invalid format:
+"Sunday, September 22, 2148 9:08:08 PM ART"
+is malformed at "ART"
+```
+
+---
+
+## Bug or Feature?
+
+- http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
+- http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
+- https://github.com/JodaOrg/joda-time/commit/14863a51230b3d44201646dbc1ce5d7f6bb97a33
+
+---
+template: image-white
+
+<a href="https://twitter.com/da_terry/status/587602658011189252">
+  <img src="images/alex.png" >
+</a>
+
+---
+
+```scala
+import org.rauschig.jarchivelib._
+
+forAll { (
+    files: Map[FilePath, Array[Byte]]
+  , format: ArchiveFormat
+  ) => {
+
+  val archiver = ArchiverFactory.createArchiver(format)
+  withTmpDir { dir =>
+    val archive = archiver.create(dir, files)
+    archive.loadAll() =? files
+  }
+}
+```
+---
+
+## TIL
+
+- `file name 'aὠ눧䄬裦㕃띶੩軃ꨣ昚댃㏔磝ꕠ忎⽪滊槔  螎鴲뻣ᛍ䆕䡟ꘘ뱷꒙떓' is too long ( > 100 bytes)`
+- `java.nio.file.InvalidPathException: Nul character not allowed`
+- `Expected "aⲐ" "a?"`
+
+---
+
+# Haskell Too
+
+```haskell
+import Data.Aeson
+
+toFromJSON :: (ToJSON a, FromJSON a, Eq a, Show a) =>
+  a -> Property
+
+prop_time :: UTCTime -> Property
+prop_time = toFromJSON
+```
+
+---
+template: rule
+
+```
+Failed! Falsifiable (after 1 test and 54 shrinks):
+1858-11-17 00:00:00.000000000001 UTC
+
+Right 1858-11-17 00:00:00 UTC /=
+  Right 1858-11-17 00:00:00.000000000001 UTC
+```
+
+---
+
+## Bug
+
+- https://github.com/bos/aeson/issues/240
+- https://github.com/bos/aeson/pull/241
+- "Updates UTCTime ToJSON instance to output full picosecond resolution"
+
+
+
+
+
+
+
+
+
+---
+template: question
+
+# Stuff
+
+---
+
+## Good place to start
+
+- Replace free variables in your tests
+
+```scala
+def testUser = {
+  val user = User("a", 2000)
+  val id = db.insert(user)
+  db.load(id) =? user
+}
+```
+
+
+```scala
+forAll { (name: String, postcode: Int) =>
+  val user = User(name, postcode)
+  val id = db.insert(user)
+  db.load(id) =? user
+}
+```
+---
+
+## Quicktip - Assert
+
+- Don't use `Boolean`/`Bool`
+- Scala
+  - `def ?=[T](x: T, y: T)(implicit pp: T => Pretty): Prop`
+- Haskell
+  - `(===) :: (Eq a, Show a) => a -> a -> Property`
 
 
 
@@ -1082,6 +1197,17 @@ template: ambiata
 - We have a majority of property-based tests
 - Our default
 - Need a compelling reason to write unit tests
+
+---
+template: ambiata
+
+## https://github.com/ambiata/ivory
+
+- ~600 properties
+- ~40 Hadoop properties
+- ~20 non-property tests
+  - Mostly integration/sanity tests
+- ~20 minutes to run
 
 ---
 template: image-white

@@ -1,0 +1,39 @@
+name:                  test
+version:               0.0.1
+license:               AllRightsReserved
+author:                Ambiata <info@ambiata.com>
+maintainer:            Ambiata <info@ambiata.com>
+copyright:             (c) 2015 Ambiata.
+synopsis:              test
+category:              test
+cabal-version:         >= 1.8
+build-type:            Simple
+description:           test.
+
+library
+  build-depends:
+                       base                            >= 3          && < 5
+
+  ghc-options:
+                       -Wall
+
+
+
+test-suite test2
+  type:                exitcode-stdio-1.0
+
+  main-is:             test.hs
+
+  ghc-options:         -Wall -threaded -O2
+
+  hs-source-dirs:
+                       test
+
+  build-depends:
+                       aeson
+                     , base
+                     , QuickCheck                      == 2.7.*
+                     , quickcheck-instances            == 0.3.*
+                     , text
+                     , test
+                     , time
