@@ -1232,6 +1232,38 @@ Right 1858-11-17 00:00:00 UTC /=
 - https://github.com/bos/aeson/pull/241
 - "Updates UTCTime ToJSON instance to output full picosecond resolution"
 
+---
+
+# Haskell Again
+
+```haskell
+import Aws.S3
+
+prop_s3 :: String -> ByteString -> Property
+prop_s3 key body = do
+  putObject "bucket" key body
+  deletObject "bucket" key
+```
+
+---
+template: rule
+
+```
+The request signature we calculated does not
+match the signature you provided.
+Check your key and signing method.
+
+檤翂
+```
+
+---
+
+## Bug
+
+- https://github.com/aristidb/aws/pull/154
+  - "Use urlEncode on object keys"
+- Also causes problems for the Java CLI client
+
 
 
 
