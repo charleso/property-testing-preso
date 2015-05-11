@@ -368,42 +368,14 @@ Expected "돪" but got "?"
 
 ---
 
-## Files
-
-```scala
-forAll { (s: String, c: Codec) =>
-  val f = File.createTempFile
-  write(f, s, c)
-  read(f, c) =? s
-}
-```
-
----
-
 ## JSON
 
 ```scala
 def toJson(user: User): Json
 def fromJson(Json): Either[Exception, User]
-```
 
-```scala
 forAll { user: User =>
   fromJson(toJson(user)) =? Right(user)
-}
-```
-
----
-
-## Data Structures
-
-```scala
-forAll { l: List[Int] =>
-  l.toStream.toList =? l
-}
-
-forAll { l: List[Int] =>
-  l.toVector.toList =? l
 }
 ```
 
