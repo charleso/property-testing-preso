@@ -811,7 +811,7 @@ property("db monad")
 def toFromJSON
   [A: EncodeJson: DecodeJson: Arbitrary]: Prop =
 
-  Prop.forAll { a =>
+  forAll { a: A =>
     fromJson(toJson(a)) =? Right(a)
   }
 ```
@@ -821,15 +821,15 @@ property("user") = toFromJSON[User]
 property("job") = toFromJSON[Job]
 ```
 
-- [Argonaut CodecLaw](https://github.com/argonaut-io/argonaut/blob/master/src/main/scala/argonaut/CodecJson.scala#L19)
-
 ---
 
 ## Idempotence
 
 ```scala
-def idempotence(i: A, f: A => A) =
-  f(f(i)) =? f(i)
+def idempotence[A: Arbitrary](f: A => A) =
+  forAll { a: A =>
+    f(f(a)) =? f(a)
+  }
 ```
 
 ---
@@ -867,8 +867,8 @@ def dbLaws(db: DB): Prop = new Properties("DB Laws") {
 ```
 
 ```scala
-property("postgres DB laws") = dbLaws[PostgresDB]
-property("memory DB laws") = dbLaws[MemoryDB]
+property("postgres DB laws") = dbLaws(PostgresDB)
+property("memory DB laws") = dbLaws(MemoryDB)
 ```
 
 
