@@ -1083,8 +1083,8 @@ import Aws.S3
 
 prop_s3 :: String -> ByteString -> Property
 prop_s3 key body = do
-  putObject "bucket" key body
-  deletObject "bucket" key
+  putObject bucket key body
+  deletObject bucket key
 ```
 
 ---
