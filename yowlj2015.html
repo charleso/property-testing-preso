@@ -756,25 +756,7 @@ template: inverse
 
 ---
 
-## Minimum tests
-
-```scala
-forAll { users: List[Users] =>
-
-  val out = runHadoopOhGodItsSlow(users)
-
-  val expected =
-    users.groupBy(_.name)
-         .mapValues(_.sortBy(_.postcode))
-
-  out =? expected
-
-}.set(minTestsOk = 5)
-```
-
----
-
-## Not perfect but...
+## Configuration
 
 - Can increase/toggle runs
 - Separate build with different sizes
