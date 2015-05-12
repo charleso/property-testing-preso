@@ -803,20 +803,6 @@ forAll { users: List[Users] =>
 
 ---
 
-## Haskell
-
-```haskell
-prop_db user = monadicIO . run $ do
-  i  &lt;- insert user
-  u' &lt;- load i
-  stop $ i === u'
-
-tests :: IO Bool
-tests = $quickCheckWithResult (stdArgs{maxSuccess = 5})
-```
-
----
-
 ## Not perfect but...
 
 - Can increase/toggle runs
@@ -942,19 +928,6 @@ def dbLaws(db: DB): Prop = new Properties("DB Laws") {
 ```scala
 property("postgres DB laws") = dbLaws[PostgresDB]
 property("memory DB laws") = dbLaws[MemoryDB]
-```
-
----
-
-## Haskell
-
-```haskell
-dbLaws :: DB -> Property
-
-dbLaws db = conjoin [
-    property $ dbSymmetry db
-  , property $ dbEmpty db
-  ]
 ```
 
 
