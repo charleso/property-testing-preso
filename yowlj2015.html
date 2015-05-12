@@ -444,40 +444,6 @@ template: image-white
 
 ---
 
-## List
-
-```scala
-forAll { l: List[Boolean] =>
-  l.partition(b => b) =?
-    (l.filter(b => b), l.filter(b => !b))
-}
-
-forAll { (l: List[Int], i: Int) =>
-  l.take(i) ++ l.drop(i) =? l
-}
-
-forAll { (l: List[Int], i: Int) =>
-  l.splitAt(i) =?
-    (l.take(i), l.drop(i))
-}
-```
-
----
-
-## Aliases
-
-```scala
-forAll { l: List[Int] =>
-  l.size =? l.length
-}
-
-forAll { l: List[Boolean] =>
-  l.filterNot(b => b) =? l.filter(b => !b)
-}
-```
-
----
-
 ## Performance - Crazy Town
 
 ```scala
