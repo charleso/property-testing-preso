@@ -361,9 +361,9 @@ template: image-white
 ## Show me the code
 
 ```scala
-forAll { s: String =>
-  val b = s.getBytes
-  new String(b) =? s
+forAll { (s: String, c: Charset) =>
+  val b = s.getBytes(c)
+  new String(b, c) =? s
 }
 ```
 
