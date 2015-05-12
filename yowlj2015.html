@@ -456,21 +456,15 @@ def sum(l: List[Int]): Int = {
 forAll { l: List[Int] =>
   sum(l) =? l.foldLeft(0)(_ + _)
 }
-
-forAll { l: List[Int] =>
-  quickSort(l) =? bubbleSort(l)
-}
 ```
 
 ---
-## Database
+
+## Sorting
 
 ```scala
-forAll { users: List[User] =>
-  users.foreach(u => UserDB.insert(u))
-  val u = UserDB.listSortByName
-
-  u =? users.sortBy(_.name)
+forAll { l: List[Int] =>
+  quickSort(l) =? bubbleSort(l)
 }
 ```
 
@@ -500,6 +494,35 @@ template: rule
 ```
 A counter-example is [Date(2004,3,1), 1] (after 1 try)
 'Date(2004,2,28)' is not equal to 'Date(2004,2,29)'
+```
+
+---
+## Database
+
+```scala
+forAll { users: List[User] =>
+  users.foreach(u => UserDB.insert(u))
+  val u = UserDB.listSortByName
+
+  u =? users.sortBy(_.name)
+}
+```
+
+---
+
+## Hadoop
+
+```scala
+forAll { users: List[Users] =>
+
+  val out = hadoopJob(users)
+
+  val expected =
+    users.groupBy(_.name)
+         .mapValues(_.sortBy(_.postcode))
+
+  out =? expected
+}
 ```
 
 
