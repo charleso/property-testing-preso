@@ -368,17 +368,6 @@ forAll { s: String =>
 ```
 
 ---
-
-## Watch out for encoding!
-
-```scala
-forAll { (s: String, c: Charset) =>
-  val b = s.getBytes(c)
-  new String(b, c) =? s
-}
-```
-
----
 template: rule
 
 ```
