@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
  , "org.specs2"              %% "specs2-core"                  % "2.4.8"   % "test"
  , "org.specs2"              %% "specs2-scalacheck"            % "2.4.8"   % "test"
  , "org.scalacheck"          %% "scalacheck"                   % "1.11.3"  % "test"
- , "com.ambiata"             %% "disorder"                     % "0.0.1-20141222035214-f1cb255" % "test"
+ , "com.ambiata"             %% "disorder"                     % "0.0.1-20150317050225-9c1f81e" % "test"
  , "com.googlecode.json-simple"     % "json-simple"            % "1.1"
  , "com.eclipsesource.minimal-json" % "minimal-json"           % "0.9.2"
  , "com.googlecode.jcsv"            % "jcsv"                   % "1.4.0"
