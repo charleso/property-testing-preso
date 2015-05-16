@@ -228,11 +228,15 @@ template: ambiata
 ## https://github.com/ambiata/ivory
 
 - ~600 properties
-- ~40 Hadoop properties
 - ~30 non-property tests
   - Mostly integration/sanity tests
-- ~20 minutes to run
-  - SBT cache locking doesn't help
+- ~40 Hadoop properties
+
+---
+template: question
+
+## What Have I Learned?
+
 
 
 
@@ -427,10 +431,14 @@ A counter-example is [Date(2004,3,1), 1] (after 1 try)
 
 ```scala
 forAll { users: List[User] =>
+
   users.foreach(u => UserDB.insert(u))
+
   val u = UserDB.listSortByName
 
-  u =? users.sortBy(_.name)
+  val e = users.sortBy(_.name)
+
+  u =? e
 }
 ```
 
@@ -666,18 +674,6 @@ template: inverse
 - Separate build with different sizes
 - Without changing a single line of code
 
----
-
-## Test At Scale
-
-- Pure functions
-- Files
-- "Real World"
-  - Database
-  - Hadoop
-  - S3 storage
-  - EC2 provisioning
-
 
 
 
@@ -753,10 +749,17 @@ property("job") = toFromJSON[Job]
 ## Idempotence
 
 ```scala
-def idempotence[A: Arbitrary](f: A => A) =
+def idempotent[A: Arbitrary](f: A => A) =
   forAll { a: A =>
     f(f(a)) =? f(a)
   }
+
+
+property("distinct") =
+  idempotent[List[Int]](_.distinct)
+
+property("sort") =
+  idempotent[List[Int]](_.sorted)
 ```
 
 ---
@@ -869,46 +872,7 @@ object UserDB {
 
 ---
 
-## Business Rules
-
-```scala
-def genPostcode: Gen[Int] =
-  Gen.choose(1000, 8000)
-
-def genUsername: Gen[String] =
-  Gen.string
-
-
-forAll(genUsername, genPostcode) {
-  (name: String, postcode: Int) =>
-
-  ...
-}
-```
-
----
-
-## Changing Requirements
-
-```scala
-def genPostcode: Gen[Int] =
-  Gen.choose(1000, 9999)
-
-def genUsername: Gen[String] =
-  Gen.frequency(
-    19 -> Gen.string
-  , 1  -> Gen.const("null")
-  )
-```
----
-
-template: question
-
-# Type Driven Development
-
----
-
-## Be Precise
+## Be Precise - Types!
 
 ```scala
 class Postcode private(val value: Int) extends AnyVal
@@ -916,7 +880,7 @@ class Postcode private(val value: Int) extends AnyVal
 object Postcode {
   
   def fromInt(i: Int): Option[Postcode] =
-    if (i > 0 || i &lt; 10000)
+    if (i >= 1000 || i &lt; 10000)
       Some(new Postcode(i))
     else
       None
@@ -925,16 +889,52 @@ object Postcode {
 
 ---
 
-## Types with Benefits
+## Generators = Edge Cases
 
 ```scala
-forAll { (name: Username, postcode: Postcode) =>
-   ...
-}
+def genPostcode: Gen[Postcode] =
+  Gen.choose(1000, 9999)
+    .map(Postcode.fromInt)
 
-forAll { postcodes: List[Postcode] =>
-   ...
+def genUsername: Gen[Username] =
+  Gen.alphaStr
+    .map(Username.fromString)
+
+
+forAll { (u: Username, p: Postcode) =>
+  ...
 }
+```
+
+---
+
+template: question
+
+## True Story - "null" username
+
+- Broke when migrating databases
+
+---
+
+## Previously
+
+```scala
+def testNullUsername = {
+  dbMigration.migrate("null")
+}
+```
+
+---
+
+## Generators FTW
+
+```scala
+def genUsername: Gen[Username] =
+  Gen.frequency(
+    19 -> Gen.alphaStr
+  , 1  -> Gen.const("null")
+
+  ).map(Username.fromString)
 ```
 
 ---
@@ -943,7 +943,7 @@ template: image
 
 <img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
 
-## Types for everything
+## Generators for everything (with types)
 
 
 
@@ -1048,8 +1048,8 @@ archiveLaws(createArchiver(Ar))
 ```haskell
 import Data.Aeson
 
-toFromJSON :: (ToJSON a, FromJSON a, Eq a, Show a) =>
-  a -> Property
+toFromJSON :: (ToJSON a, FromJSON a, Eq a,
+  Show a, Arbitrary a) => Property
 
 prop_time :: UTCTime -> Property
 prop_time = toFromJSON
@@ -1084,7 +1084,8 @@ import Aws.S3
 prop_s3 :: String -> ByteString -> Property
 prop_s3 key body = do
   putObject bucket key body
-  deletObject bucket key
+  r &lt;- getObject bucket key
+  assert $ r === body
 ```
 
 ---
@@ -1129,19 +1130,24 @@ template: ambiata
   - PositiveInt
 - https://github.com/ambiata/disorder.hs
   - DistinctPair
-  - PositiveInt
+  - OrdPair
   - Aeson/Lens laws
 
 ---
 
 ## Conclusion
 
-<img src="images/all-the-things.png" height="70%" style="position: absolute; bottom: 0; right: 0;" />
+<img src="images/all-the-things.png" height="60%" style="position: absolute; bottom: 0; right: -100px;" />
 
 - Easy once you get started
   - Look for patterns
+  - Laws
+  - Types
 - Test more with less
+  - Generators
 - "Real World"
+- Property test all the things!
+
 
 
 ---
