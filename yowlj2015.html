@@ -230,12 +230,18 @@ template: ambiata
 - ~600 properties
 - ~30 non-property tests
   - Mostly integration/sanity tests
-- ~40 Hadoop properties
 
 ---
-template: question
+template: inverse
 
 ## What Have I Learned?
+
+
+
+
+
+
+
 
 
 
@@ -458,9 +464,6 @@ forAll { users: List[User] =>
 template: rule
 
 ```
-> ARG_0: List(User("a"), User("b"), User("B"))
-
-
 Expected List(User("a"), User("b"), User("B"))
 
 but got
@@ -469,6 +472,8 @@ Expected List(User("B"), User("a"), User("b"))
 ```
 
 ---
+
+template: ambiata
 
 ## Hadoop
 
@@ -484,6 +489,8 @@ forAll { users: List[Users] =>
   out =? expected
 }
 ```
+
+- ~40 Hadoop properties
 
 
 
@@ -730,26 +737,6 @@ property("job") = toFromJSON[Job]
 
 ---
 
-## Idempotence
-
-```scala
-def idempotent[A: Arbitrary](f: A => A) =
-
-  forAll { a: A =>
-
-    f(f(a)) =? f(a)
-  }
-
-
-property("distinct") =
-  idempotent[List[Int]](_.distinct)
-
-property("sort") =
-  idempotent[List[Int]](_.sorted)
-```
-
----
-
 ## "Abstraction"
 
 ```scala
@@ -930,6 +917,15 @@ def genUsername: Gen[Username] =
 ```
 
 ---
+template: ambiata
+
+## Ivory Generators
+
+- Dictionary: ~100 properties
+- Date: ~110 properties
+- Fact: ~140 proprties
+
+---
 
 template: image
 
@@ -1010,7 +1006,7 @@ template: image-white
 ```scala
 import org.rauschig.jarchivelib._
 
-def archiveLaws(archiver: ArchiverFactory): Prop =
+def archiveProps(archiver: ArchiverFactory): Prop =
 
   forAll { files: Map[FilePath, Array[Byte]] => {
 
@@ -1133,9 +1129,9 @@ template: ambiata
 
 - Easy once you get started
   - Look for patterns
+- Test more with less
   - Laws
   - Types
-- Test more with less
   - Generators
 - "Real World"
 - Property test all the things!
