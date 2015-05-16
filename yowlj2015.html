@@ -197,6 +197,15 @@ template: image
 
 
 ---
+template: ambiata
+
+## Ambiata
+
+- Property-based testing is our default
+- We have a majority of property-based tests
+- Need a compelling reason to write unit tests
+
+---
 template: starwars
 
 ## One year ago
@@ -212,15 +221,6 @@ template: image-white
 <img src="images/jedi-master.jpg" height="100%" />
 
 # Today
-
----
-template: ambiata
-
-## Ambiata
-
-- We have a majority of property-based tests
-- Our default
-- Need a compelling reason to write unit tests
 
 ---
 template: ambiata
@@ -320,13 +320,24 @@ forAll { user: User =>
 ```
 
 ---
+template: rule
+
+```
+Failed! Falsifiable (after 1 test and 54 shrinks):
+1858-11-17 00:00:00.000000000001 UTC
+
+Right 1858-11-17 00:00:00 UTC /=
+  Right 1858-11-17 00:00:00.000000000001 UTC
+```
+
+---
 
 ## Database
 
 ```scala
 forall { u1: User =>
-  val id = UserDB.insert(u1)
-  val u2 = UserDB.get(id)
+  val id = userDb.insert(u1)
+  val u2 = userDb.get(id)
 
   u2 =? Some(u1)
 }
@@ -423,6 +434,7 @@ template: rule
 
 ```
 A counter-example is [Date(2004,3,1), 1] (after 1 try)
+
 'Date(2004,2,28)' is not equal to 'Date(2004,2,29)'
 ```
 
@@ -432,14 +444,28 @@ A counter-example is [Date(2004,3,1), 1] (after 1 try)
 ```scala
 forAll { users: List[User] =>
 
-  users.foreach(u => UserDB.insert(u))
+  users.foreach(u => userDb.insert(u))
 
-  val u = UserDB.listSortByName
+  val u = userDb.listSortByName
 
-  val e = users.sortBy(_.name)
+  val e = users.sortBy(_.name.toLowerCase)
 
   u =? e
 }
+```
+
+---
+template: rule
+
+```
+> ARG_0: List(User("a"), User("b"), User("B"))
+
+
+Expected List(User("a"), User("b"), User("B"))
+
+but got
+
+Expected List(User("B"), User("a"), User("b"))
 ```
 
 ---
@@ -490,13 +516,14 @@ layout: false
 Nil.size =? 0
 
 forAll { (i: Int, l: List[Int]) =>
+
   (i :: l).size =? (l.size + 1)
 }
 ```
 
 ---
 
-## Induction to the rescue
+## Induction
 
 ```scala
 Nil.headOption =? None
@@ -529,68 +556,33 @@ template: inverse
 # Invariants
 
 ---
-layout: false
-
-## Collect them all
-
-```scala
-forAll { l: List[Int] =>
-  l.map(i => i).size =? l.size
-}
-```
-
-```scala
-forAll { l: List[Int] =>
-  l.sorted.size =? l.size
-}
-```
-
-```scala
-forAll { l: List[Int] =>
-  l.reverse.size =? l.size
-}
-```
-
----
-## Invariants
-
-```scala
-forAll { l: List[Int] =>
-  l.filter(_ => true) =? l
-}
-
-forAll { l: List[Int] =>
-  l.filter(_ => false) =? Nil
-}
-
-forAll { l: List[Int] =>
-  l.map(i => i) =? l
-}
-```
-
----
 
 ## Idempotence
 
 ```scala
-forAll { s: String =>
-  s.distinct.distinct =? s.distinct
+forAll { s: List[Int] =>
+
+  l.distinct.distinct =? l.distinct
 }
 
-forAll { s: String =>
-  s.sorted.sorted =? s.sorted
+forAll { l: List[Int] =>
+
+  l.sorted.sorted =? l.sorted
 }
 ```
 
 ---
-## Consistency
+
+## Database Idempotence
 
 ```scala
-forAll { (s1: String, s2: String) =>
-  val f = File.createTempFile
-  write(f, s1)
-  write(f, s2)
-  read(f) =? s2
+forAll { u: User =>
+
+  val r1 = userDb.createOrUpdate(u)
+
+  val r2 = userDb.createOrUpdate(u)
+
+  r1 =? r2
 }
 ```
 
@@ -600,13 +592,16 @@ forAll { (s1: String, s2: String) =>
 
 ```scala
 forAll { (u1: User, u2: User) =>
+  u1.name != u2.name ==> {
 
-  UserDB.insert(u1)
-  val i2 = UserDB.insert(u2)
-  val u3 = UserDB.get(i2)
+  userDb.insert(u1)
+
+  val i = userDb.insert(u2)
+
+  val u3 = userDb.get(i)
 
   u3 =? Some(u2)
-}
+}}
 ```
 
 ---
@@ -614,8 +609,8 @@ template: rule
 
 ```
 User with name already exists
-> ARG_0: User("bob")
-> ARG_1: User("bob")
+> ARG_0: User("a")
+> ARG_1: User("A")
 ```
 
 
@@ -698,18 +693,6 @@ template: inverse
 
 ---
 
-## Usual Suspects
-
-<img src="images/usual-suspects.jpg" width="650px" style="position: absolute; right: 20px; top: 170px;" />
-
-- Equal
-- Order
-- Functor
-- Monad
-
-
----
-
 ## [Scalaz](https://github.com/scalaz/scalaz/blob/master/scalacheck-binding/src/main/scala/scalaz/scalacheck/ScalazProperties.scala)
 
 ```scala
@@ -735,6 +718,7 @@ def toFromJSON
   [A: EncodeJson: DecodeJson: Arbitrary]: Prop =
 
   forAll { a: A =>
+
     fromJson(toJson(a)) =? Right(a)
   }
 ```
@@ -750,7 +734,9 @@ property("job") = toFromJSON[Job]
 
 ```scala
 def idempotent[A: Arbitrary](f: A => A) =
+
   forAll { a: A =>
+
     f(f(a)) =? f(a)
   }
 
@@ -827,8 +813,11 @@ template: inverse
 
 ```scala
 def testUser = {
+
   val user = User("bob", 2000)
+
   val id = db.insert(user)
+
   db.load(id) =? Some(user)
 }
 ```
@@ -839,8 +828,11 @@ def testUser = {
 
 ```scala
 forAll { (name: String, postcode: Int) =>
+
   val user = User(name, postcode)
+
   val id = db.insert(user)
+
   db.load(id) =? Some(user)
 }
 ```
@@ -859,7 +851,7 @@ Invalid postcode
 ## Documentation is awesome
 
 ```scala
-object UserDB {
+trait UserDb {
 
   /**
    * Inserts a user.
@@ -912,7 +904,7 @@ template: question
 
 ## True Story - "null" username
 
-- Broke when migrating databases
+Broke when migrating databases
 
 ---
 
