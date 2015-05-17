@@ -333,7 +333,6 @@ layout: false
 
 - Symmetry
 - Model-based
-- Induction
 - Invariants
   - Idempotence
   - Consistency
@@ -563,73 +562,6 @@ forAll { users: List[Users] =>
 
 
 
-
-
-
-
-
-
----
-
-template: inverse
-
-# Induction
-
----
-layout: false
-
-## Induction
-
-```scala
-forAll { l: List[Int] =>
-
-  l.size =? l match {
-
-    case Nil =>
-      0
-
-    case i :: l =>
-      l.size + 1
-  }
-}
-```
-
----
-
-## Migration ADT
-
-```scala
-sealed trait Migration
-
-case class ColumnInsert(column: String)
-
-case class ColumnRename(before: String, after: String)
-
-...
-```
-
----
-
-## Database Induction
-
-```scala
-forAll { (table: Table, migration: Migration) =>
-
-  val prev = table.columns
-  migration match {
-
-    case ColumnInsert(column) =>
-
-      table.migrate(migration)
-      table.columns =? column :: prev
-
-    case ColumnRename(before, after) =>
-
-      table.addColumn(Column(before))
-      table.migrate(migration)
-      table.columns =? after :: (prev - before)
-}
-```
 
 
 
