@@ -581,19 +581,16 @@ layout: false
 ## Induction
 
 ```scala
-Nil.size =? 0
+forAll { l: List[Int] =>
 
-forAll { (i: Int, l: List[Int]) =>
+  l.size =? l match {
 
-  (i :: l).size =? (l.size + 1)
-}
+    case Nil =>
+      0
 
-
-Nil.headOption =? None
-
-forAll { (h: Int, t: List[Int]) =>
-
-  (h :: t).headOption =? Some(h)
+    case i :: l =>
+      l.size + 1
+  }
 }
 ```
 
@@ -604,7 +601,7 @@ forAll { (h: Int, t: List[Int]) =>
 ```scala
 sealed trait Migration
 
-case class ColumnInsert(column: Column)
+case class ColumnInsert(column: String)
 
 case class ColumnRename(before: String, after: String)
 
@@ -613,43 +610,24 @@ case class ColumnRename(before: String, after: String)
 
 ---
 
-## Painful
-
-```scala
-forAll { m: Migration =>
-
-  m match {
-    ...
-  }
-
-  db.migrate(m)
-
-  m match {
-    ...
-  }
-}
-```
-
----
-
 ## Database Induction
 
 ```scala
-forAll { column: Column =>
+forAll { (table: Table, migration: Migration) =>
 
-  db.migrate(ColumnInsert(column))
+  val prev = table.columns
+  migration match {
 
-  db.tableColumns =? List(column)
-}
+    case ColumnInsert(column) =>
 
+      table.migrate(migration)
+      table.columns =? column :: prev
 
-forAll { (before: String, after: String) =>
+    case ColumnRename(before, after) =>
 
-  db.createTable(Table(List(Column(before))
-
-  db.migrate(ColumnRename(before, after))
-
-  db.tableColumns =? List(Column(after))
+      table.addColumn(Column(before))
+      table.migrate(migration)
+      table.columns =? after :: (prev - before)
 }
 ```
 
