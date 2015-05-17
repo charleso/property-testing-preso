@@ -338,6 +338,14 @@ Right 1858-11-17 00:00:00 UTC /=
 
 ---
 
+## Bug
+
+- https://github.com/bos/aeson/issues/240
+- https://github.com/bos/aeson/pull/241
+- "Updates UTCTime ToJSON instance to output full picosecond resolution"
+
+---
+
 ## Database
 
 ```scala
@@ -1044,27 +1052,8 @@ prop_time = toFromJSON
 ```
 
 ---
-template: rule
 
-```
-Failed! Falsifiable (after 1 test and 54 shrinks):
-1858-11-17 00:00:00.000000000001 UTC
-
-Right 1858-11-17 00:00:00 UTC /=
-  Right 1858-11-17 00:00:00.000000000001 UTC
-```
-
----
-
-## Bug
-
-- https://github.com/bos/aeson/issues/240
-- https://github.com/bos/aeson/pull/241
-- "Updates UTCTime ToJSON instance to output full picosecond resolution"
-
----
-
-# Haskell Again
+# Haskell Too
 
 ```haskell
 import Aws.S3
