@@ -1165,7 +1165,7 @@ template: image-white
 ```scala
 import org.rauschig.jarchivelib._
 
-def archiveProps(archiver: ArchiverFactory): Prop =
+def archiveProp(archiver: ArchiverFactory): Prop =
 
   forAll { files: Map[FilePath, Array[Byte]] => {
 
@@ -1175,9 +1175,9 @@ def archiveProps(archiver: ArchiverFactory): Prop =
     }
 }
 
-archiveLaws(createArchiver(Jar, PACK200))
-archiveLaws(createArchiver(7zip))
-archiveLaws(createArchiver(Ar))
+archiveProp(createArchiver(Jar, PACK200))
+archiveProp(createArchiver(7zip))
+archiveProp(createArchiver(Ar))
 ```
 ---
 
