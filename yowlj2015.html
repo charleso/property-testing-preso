@@ -1164,20 +1164,6 @@ archiveLaws(createArchiver(Ar))
 # Haskell Too
 
 ```haskell
-import Data.Aeson
-
-toFromJSON :: (ToJSON a, FromJSON a, Eq a,
-  Show a, Arbitrary a) => Property
-
-prop_time :: UTCTime -> Property
-prop_time = toFromJSON
-```
-
----
-
-# Haskell Too
-
-```haskell
 import Aws.S3
 
 prop_s3 :: String -> ByteString -> Property
