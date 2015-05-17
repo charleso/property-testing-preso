@@ -613,9 +613,9 @@ forAll { (h: Int, t: List[Int]) =>
 ```scala
 sealed trait Migration
 
-case class ColumnRename(before: String, after: String)
+case class ColumnInsert(column: Column)
 
-case class ColumnUniqueness(column: String)
+case class ColumnRename(before: String, after: String)
 
 ...
 ```
@@ -644,20 +644,20 @@ forAll { m: Migration =>
 ## Database Induction
 
 ```scala
+forAll { column: Column =>
+
+  db.migrate(ColumnInsert(column))
+
+  db.tableColumns =? List(column)
+}
+
 forAll { (before: String, after: String) =>
+
   db.createTable(Table(List(Column(before))
 
   db.migrate(ColumnRename(m))
 
   db.tableColumns(after) =? List(Column(after))
-}
-
-forAll { column: Column =>
-  db.createTable(Table(List(c.copy(unique=false))))
-
-  db.migrate(ColumnUniqueness(column))
-
-  db.tableColumns =? List(List(c.copy(unique=true)))
 }
 ```
 
@@ -768,6 +768,23 @@ forAll { u: User =>
   val r2 = userDb.createOrUpdate(u)
 
   r1 =? r2
+}
+```
+
+---
+
+## Database Idempotence
+
+```scala
+forAll { m: Migration =>
+
+  db.migrate(m)
+  val s1 = db.schema()
+
+  db.migrate(m)
+  val s2 = db.schema()
+
+  s1 =? s2
 }
 ```
 
