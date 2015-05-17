@@ -646,7 +646,7 @@ forAll { (before: String, after: String) =>
 
   db.createTable(Table(List(Column(before))
 
-  db.migrate(ColumnRename(m))
+  db.migrate(ColumnRename(before, after))
 
   db.tableColumns(after) =? List(Column(after))
 }
