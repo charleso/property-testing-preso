@@ -648,7 +648,7 @@ forAll { (before: String, after: String) =>
 
   db.migrate(ColumnRename(before, after))
 
-  db.tableColumns(after) =? List(Column(after))
+  db.tableColumns =? List(Column(after))
 }
 ```
 
