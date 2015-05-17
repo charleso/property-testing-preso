@@ -970,10 +970,8 @@ forAll { (name: String, postcode: Int) =>
 ```
 
 <pre class="error">
+Invalid username: ""
 Invalid postcode: -1
-
-> ARG_0: "bob"
-> ARG_1: -1
 </pre>
 
 ---
@@ -986,7 +984,8 @@ trait UserDb {
   /**
    * Inserts a user.
    *
-   * Fails if the postcode is &lt; 1000 or &gt; 10000
+   * The username must not be blank
+   * Postcode must be &lt; 1000 or &gt; 10000
    */
   def insert(user: User): Int
 }
@@ -1014,14 +1013,13 @@ object Postcode {
 ## Invest in Generators
 
 ```scala
+def genUsername: Gen[Username] =
+  Gen.nonEmptyListOf(Gen.alphaChar)
+    .map(Username.fromString)
+
 def genPostcode: Gen[Postcode] =
   Gen.choose(1000, 9999)
     .map(Postcode.fromInt)
-
-def genUsername: Gen[Username] =
-  Gen.alphaStr
-    .map(Username.fromString)
-
 ```
 
 ---
@@ -1029,13 +1027,13 @@ def genUsername: Gen[Username] =
 ## Invest in Generators
 
 ```scala
+def genUsername: Gen[Username] =
+  Gen.nonEmptyListOf(Gen.alphaChar)
+    .map(Username.fromString)
+
 def genPostcode: Gen[Postcode] =
   Gen.choose(1000, 9999)
     .map(Postcode.fromInt)
-
-def genUsername: Gen[Username] =
-  Gen.alphaStr
-    .map(Username.fromString)
 
 
 forAll { (u: Username, p: Postcode) => ... }

@@ -8,6 +8,7 @@ object HelloWorld extends Properties("HelloWorld") {
   }
 
   property("list reverse 2") = forAll { (a: String, b: String) =>
+    Gen.nonEmptyListOf(Gen.alphaNumChar)
     (b + a).reverse =? (a.reverse + b.reverse)
   }
 }
