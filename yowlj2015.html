@@ -370,9 +370,12 @@ Expected "돪" but got "?"
 
 ```scala
 def toJson(user: User): Json
+
 def fromJson(Json): Either[Exception, User]
 
+
 forAll { user: User =>
+
   fromJson(toJson(user)) =? Right(user)
 }
 ```
@@ -402,7 +405,9 @@ Right 1858-11-17 00:00:00 UTC /=
 
 ```scala
 forall { u1: User =>
+
   val id = userDb.insert(u1)
+
   val u2 = userDb.get(id)
 
   u2 =? Some(u1)
@@ -460,7 +465,9 @@ def sum(l: List[Int]): Int = {
   v
 }
 
+
 forAll { l: List[Int] =>
+
   sum(l) =? l.foldLeft(0)(_ + _)
 }
 ```
@@ -471,6 +478,7 @@ forAll { l: List[Int] =>
 
 ```scala
 forAll { l: List[Int] =>
+
   quickSort(l) =? bubbleSort(l)
 }
 ```
@@ -486,10 +494,12 @@ def dayPlus(d: Date, i: Int): Date = {
 }
 
 forAll { d: Date =>
+
   d.toJoda.fromJoda =? d
 }
 
 forAll { (d: Date, i: Int) =>
+
   dayPlus(d, i) =?
     d.toJoda.plusDays(i).fromJoda
 }
@@ -598,7 +608,7 @@ forAll { (h: Int, t: List[Int]) =>
 
 ---
 
-## Database Migration
+## Migration ADT
 
 ```scala
 sealed trait Migration
@@ -607,14 +617,25 @@ case class ColumnRename(before: String, after: String)
 
 case class ColumnUniqueness(column: String)
 
+...
+```
 
+---
+
+## Painful
+
+```scala
 forAll { m: Migration =>
 
-  ???
+  m match {
+    ...
+  }
 
   db.migrate(m)
 
-  ???
+  m match {
+    ...
+  }
 }
 ```
 
