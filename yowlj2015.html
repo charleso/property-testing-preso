@@ -530,9 +530,7 @@ forAll { users: List[User] =>
 
   val u = userDb.listSortByName
 
-  val e = users.sortBy(_.name.toLowerCase)
-
-  u =? e
+  users.sortBy(_.name.toLowerCase) =? u
 }
 ```
 
@@ -729,9 +727,7 @@ forAll { u1: User =>
 
   userDb.delete(i)
 
-  val u2 = userDb.get(i)
-
-  u2 ?= None
+  userDb.get(i) ?= None
 }
 ```
 
