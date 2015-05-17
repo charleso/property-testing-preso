@@ -973,7 +973,7 @@ trait UserDb {
   /**
    * Inserts a user.
    *
-   * Fails if the postcode is negative.
+   * Fails if the postcode is &lt; 1000 or &gt; 10000
    */
   def insert(user: User): Int
 }
