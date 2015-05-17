@@ -1241,6 +1241,30 @@ def archiveProp(archiver: ArchiverFactory): Prop =
     archive.loadAll() =? files
   }
 
+
+archiveProp(createArchiver(Tar))
+```
+
+<pre class="error">
+file name '...' is too long (> 100 bytes)
+</pre>
+
+---
+template: boom
+
+```scala
+import org.rauschig.jarchivelib._
+
+
+def archiveProp(archiver: ArchiverFactory): Prop =
+
+  forAll { files: Map[FilePath, Array[Byte]] =>
+
+    val archive = archiver.create(files)
+
+    archive.loadAll() =? files
+  }
+
  
 archiveProp(createArchiver(Ar))
 ```
