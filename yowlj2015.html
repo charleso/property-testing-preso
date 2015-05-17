@@ -4,9 +4,61 @@
     <title>Real World Property Based Testing</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
-      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
-      @import url(http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
-      @import url(http://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+    /* latin-ext */
+      @font-face {
+        font-family: 'Yanone Kaffeesatz';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Yanone Kaffeesatz Regular'), local('YanoneKaffeesatz-Regular'), url(fonts/YDAoLskQQ5MOAgvHUQCcLaa0P60JZGaCMFbL3N9v4H0.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Yanone Kaffeesatz';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Yanone Kaffeesatz Regular'), local('YanoneKaffeesatz-Regular'), url(fonts/YDAoLskQQ5MOAgvHUQCcLWjF_m7mVnhXExjNED3rUtY.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+
+      /* latin */
+      @font-face {
+        font-family: 'Droid Serif';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Droid Serif'), local('DroidSerif'), url(fonts/0AKsP294HTD-nvJgucYTaIgp9Q8gbYrhqGlRav_IXfk.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Droid Serif';
+        font-style: normal;
+        font-weight: 700;
+        src: local('Droid Serif Bold'), local('DroidSerif-Bold'), url(fonts/QQt14e8dY39u-eYBZmppwf79_ZuUxCigM2DespTnFaw.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Droid Serif';
+        font-style: italic;
+        font-weight: 400;
+        src: local('Droid Serif Italic'), local('DroidSerif-Italic'), url(fonts/cj2hUnSRBhwmSPr9kS589weOulFbQKHxPa89BaxZzA0.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+      @font-face {
+        font-family: 'Ubuntu Mono';
+        font-style: normal;
+        font-weight: 700;
+        src: local('Ubuntu Mono Bold'), local('UbuntuMono-Bold'), url(fonts/ceqTZGKHipo8pJj4molytv79_ZuUxCigM2DespTnFaw.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+      @font-face {
+        font-family: 'Ubuntu Mono';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Ubuntu Mono'), local('UbuntuMono-Regular'), url(fonts/ViZhet7Ak-LRXZMXzuAfkYgp9Q8gbYrhqGlRav_IXfk.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
 
       body {
         font-family: Futura, 'Yanone Kaffeesatz';
@@ -86,7 +138,7 @@
         background-color: transparent;
       }
       .ambiata-full {
-        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+        background-image: url(images/ambiata_avatar.png);
       }
       .evolution {
         background-color: #DEDEDE;
@@ -105,7 +157,7 @@
       }
       */
       .ambiata {
-        background-image: url(http://ambiata.com/images/ambiata_avatar.png);
+        background-image: url(images/ambiata_avatar.png);
         background-position: top right;
         background-size: 100px;
         /*-webkit-filter: grayscale(40%);*/
