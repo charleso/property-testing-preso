@@ -410,11 +410,11 @@ Right 1858-11-17 00:00:00 UTC /=
 ## Database
 
 ```scala
-forAll { u1: User =>
+forAll { u: User =>
 
-  val id = userDb.insert(u1)
+  val id = userDb.insert(u)
 
-  userDb.get(id) =? Some(u1)
+  userDb.get(id) =? Some(u)
 }
 ```
 
