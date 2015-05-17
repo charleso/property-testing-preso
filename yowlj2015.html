@@ -1040,6 +1040,7 @@ def testNullUsername = {
 
 ```scala
 def genUsername: Gen[Username] =
+
   Gen.frequency(
     19 -> Gen.alphaStr
   , 1  -> Gen.const("null")
