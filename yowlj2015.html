@@ -869,6 +869,7 @@ template: inverse
 libraryDependencies +=
   "org.scalaz" %% "scalaz-binding" % "7.1.2"
 
+
 property("user equal") =
   scalaz.scalacheck.equal.laws[User]
 
