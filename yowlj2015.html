@@ -1032,7 +1032,7 @@ object Postcode {
 
 ---
 
-## Generators = Edge Cases
+## Invest in Generators
 
 ```scala
 def genPostcode: Gen[Postcode] =
@@ -1044,10 +1044,21 @@ def genUsername: Gen[Username] =
     .map(Username.fromString)
 
 
-forAll { (u: Username, p: Postcode) =>
-  ...
-}
+forAll { (u: Username, p: Postcode) => ... }
+
+forAll { (u: Username, u: Username) => ... }
+
+forAll { p: List[Postcode] => ... }
 ```
+
+---
+template: ambiata
+
+## Ivory Generators
+
+- Dictionary: ~100 properties
+- Date: ~110 properties
+- Fact: ~140 proprties
 
 ---
 
@@ -1081,15 +1092,6 @@ def genUsername: Gen[Username] =
 
   ).map(Username.fromString)
 ```
-
----
-template: ambiata
-
-## Ivory Generators
-
-- Dictionary: ~100 properties
-- Date: ~110 properties
-- Fact: ~140 proprties
 
 ---
 
