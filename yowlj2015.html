@@ -526,9 +526,9 @@ forAll { users: List[User] =>
 
   users.foreach(u => userDb.insert(u))
 
-  val u = userDb.listSortByName
+  val l = userDb.listSortByName
 
-  users.sortBy(_.name.toLowerCase) =? u
+  l =? users.sortBy(_.name.toLowerCase)
 }
 ```
 
