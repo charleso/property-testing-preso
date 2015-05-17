@@ -350,7 +350,9 @@ template: image-white
 
 ```scala
 forAll { (s: String, c: Charset) =>
+
   val b = s.getBytes(c)
+
   new String(b, c) =? s
 }
 ```
