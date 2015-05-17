@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Real World Property Based Testing</title>
+    <title>Property Based Test All The Things</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <style type="text/css">
     /* latin-ext */
@@ -641,6 +641,7 @@ forAll { column: Column =>
 
   db.tableColumns =? List(column)
 }
+
 
 forAll { (before: String, after: String) =>
 
