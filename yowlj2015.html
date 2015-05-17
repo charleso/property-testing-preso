@@ -414,9 +414,7 @@ forAll { u1: User =>
 
   val id = userDb.insert(u1)
 
-  val u2 = userDb.get(id)
-
-  u2 =? Some(u1)
+  userDb.get(id) =? Some(u1)
 }
 ```
 
