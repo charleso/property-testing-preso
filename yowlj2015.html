@@ -1132,9 +1132,13 @@ template: image-white
 ```scala
 import org.joda.time._
 
+
 forAll { dt: DateTime =>
+
   val formatter = DateTimeFormat.fullDateTime()
+
   val s = formatter.print(dt)
+
   formatter.parseDateTime(s) =? dt
 }
 ```
@@ -1168,15 +1172,16 @@ template: image-white
 ```scala
 import org.rauschig.jarchivelib._
 
+
 def archiveProp(archiver: ArchiverFactory): Prop =
 
-  forAll { files: Map[FilePath, Array[Byte]] => {
+  forAll { files: Map[FilePath, Array[Byte]] =>
 
-    withTmpDir { dir =>
-      val archive = archiver.create(dir, files)
-      archive.loadAll() =? files
-    }
-}
+    val archive = archiver.create(files)
+
+    archive.loadAll() =? files
+  }
+
 
 archiveProp(createArchiver(Jar, PACK200))
 archiveProp(createArchiver(7zip))
