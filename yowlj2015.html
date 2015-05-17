@@ -99,6 +99,12 @@
         background: #ee2a24;
         color: white;
       }
+      .boom {
+      }
+      .error {
+        color: #ee2a24;
+        font-size: 30px;
+      }
       .image {
         padding: 0px;
         color: white;
@@ -136,6 +142,7 @@
       }
       .hljs-default .hljs {
         background-color: transparent;
+        padding: 0px !important;
       }
       .ambiata-full {
         background-image: url(images/ambiata_avatar.png);
@@ -212,6 +219,11 @@ class: center, middle, question
 name: rule
 layout: true
 class: center, middle, rule
+
+---
+name: boom
+layout: true
+class: boom
 
 ---
 name: inverse
@@ -361,13 +373,25 @@ forAll { (s: String, c: Charset) =>
 ```
 
 ---
-template: rule
+template: boom
 
+## Show me the code
+
+```scala
+forAll { (s: String, c: Charset) =>
+
+  val b = s.getBytes(c)
+
+  new String(b, c) =? s
+}
 ```
+
+<pre class="error">
+"돪" != "?"
+
 > ARG_0: "돪"
 > ARG_1: windows-1252
-Expected "돪" but got "?"
-```
+</pre>
 
 ---
 
@@ -386,25 +410,6 @@ forAll { user: User =>
 ```
 
 ---
-template: rule
-
-```
-Failed! Falsifiable (after 1 test and 54 shrinks):
-1858-11-17 00:00:00.000000000001 UTC
-
-Right 1858-11-17 00:00:00 UTC /=
-  Right 1858-11-17 00:00:00.000000000001 UTC
-```
-
----
-
-## Bug
-
-- https://github.com/bos/aeson/issues/240
-- https://github.com/bos/aeson/pull/241
-- "Updates UTCTime ToJSON instance to output full picosecond resolution"
-
----
 
 ## Database
 
@@ -418,11 +423,22 @@ forAll { u: User =>
 ```
 
 ---
-template: rule
+template: boom
 
+## Database
+
+```scala
+forAll { u: User =>
+
+  val id = userDb.insert(u)
+
+  userDb.get(id) =? Some(u)
+}
 ```
-Expected Some(User(\NULL)) but got Some(User())
-```
+
+<pre class="error">
+Some(User(\NULL)) != Some(User())
+</pre>
 
 ---
 template: image
@@ -489,16 +505,30 @@ forAll { l: List[Int] =>
 ---
 template: ambiata
 
+## Date
+
+```scala
+case class Date(value: Int)
+
+
+def toJoda(date: Date): JodaDate
+
+def fromJoda(date: JodaDate): Date
+
+
+forAll { d: Date =>
+
+  d.toJoda.fromJoda =? d
+}
+```
+
+---
+
 ## Test Oracle
 
 ```scala
 def dayPlus(d: Date, i: Int): Date = {
   ...
-}
-
-forAll { d: Date =>
-
-  d.toJoda.fromJoda =? d
 }
 
 forAll { (d: Date, i: Int) =>
@@ -509,13 +539,28 @@ forAll { (d: Date, i: Int) =>
 ```
 
 ---
-template: rule
+template: boom
 
-```
-A counter-example is [Date(2004,3,1), 1] (after 1 try)
+## Test Oracle
 
-'Date(2004,2,28)' is not equal to 'Date(2004,2,29)'
+```scala
+def dayPlus(d: Date, i: Int): Date = {
+  ...
+}
+
+forAll { (d: Date, i: Int) =>
+
+  dayPlus(d, i) =?
+    d.toJoda.plusDays(i).fromJoda
+}
 ```
+
+<pre class="error">
+Date(2004,2,28) != Date(2004,2,29)
+
+ARG_0: Date(2004,3,1)
+ARG_1: 1
+</pre>
 
 ---
 ## Database
@@ -528,6 +573,25 @@ forAll { users: List[User] =>
   val l = userDb.listSortByName
 
   l =? users.sortBy(_.name.toLowerCase)
+}
+```
+
+---
+
+template: ambiata
+
+## Hadoop
+
+```scala
+forAll { users: List[Users] =>
+
+  val out = hadoopJob(users)
+
+  val expected =
+    users.groupBy(_.name)
+         .mapValues(_.sortBy(_.postcode))
+
+  out =? expected
 }
 ```
 
@@ -797,9 +861,8 @@ def toFromJSON
 
     fromJson(toJson(a)) =? Right(a)
   }
-```
 
-```scala
+
 property("user") = toFromJSON[User]
 property("job") = toFromJSON[Job]
 ```
@@ -836,9 +899,8 @@ def dbLaws(db: DB): Prop = new Properties("DB Laws") {
     db.read(id) =? None
   }
 }
-```
 
-```scala
+
 property("postgres DB laws") = dbLaws(PostgresDB)
 property("memory DB laws") = dbLaws(MemoryDB)
 ```
@@ -894,13 +956,27 @@ forAll { (name: String, postcode: Int) =>
 ```
 
 ---
-template: rule
+template: boom
 
+## Just Add Properties
+
+```scala
+forAll { (name: String, postcode: Int) =>
+
+  val user = User(name, postcode)
+
+  val id = db.insert(user)
+
+  db.load(id) =? Some(user)
+}
 ```
-Invalid postcode
+
+<pre class="error">
+Invalid postcode: -1
+
 > ARG_0: "bob"
 > ARG_1: -1
-```
+</pre>
 
 ---
 
@@ -933,6 +1009,21 @@ object Postcode {
     else
       None
 }
+```
+
+---
+
+## Invest in Generators
+
+```scala
+def genPostcode: Gen[Postcode] =
+  Gen.choose(1000, 9999)
+    .map(Postcode.fromInt)
+
+def genUsername: Gen[Username] =
+  Gen.alphaStr
+    .map(Username.fromString)
+
 ```
 
 ---
@@ -1055,13 +1146,29 @@ forAll { dt: DateTime =>
 ```
 
 ---
-template: rule
+template: boom
 
+## Joda
+
+```scala
+import org.joda.time._
+
+
+forAll { dt: DateTime =>
+
+  val formatter = DateTimeFormat.fullDateTime()
+
+  val s = formatter.print(dt)
+
+  formatter.parseDateTime(s) =? dt
+}
 ```
+
+<pre class="error">
 Invalid format:
 "Sunday, September 22, 2148 9:08:08 PM ART"
 is malformed at "ART"
-```
+</pre>
 
 ---
 
@@ -1092,28 +1199,106 @@ def archiveProp(archiver: ArchiverFactory): Prop =
 
     archive.loadAll() =? files
   }
+```
+
+---
+template: boom
+
+```scala
+import org.rauschig.jarchivelib._
 
 
+def archiveProp(archiver: ArchiverFactory): Prop =
+
+  forAll { files: Map[FilePath, Array[Byte]] =>
+
+    val archive = archiver.create(files)
+
+    archive.loadAll() =? files
+  }
+
+ 
 archiveProp(createArchiver(Jar, PACK200))
-archiveProp(createArchiver(7zip))
+```
+
+<pre class="error">
+Expected "" but got "PKPACK2000"
+</pre>
+
+---
+template: boom
+
+```scala
+import org.rauschig.jarchivelib._
+
+
+def archiveProp(archiver: ArchiverFactory): Prop =
+
+  forAll { files: Map[FilePath, Array[Byte]] =>
+
+    val archive = archiver.create(files)
+
+    archive.loadAll() =? files
+  }
+
+ 
 archiveProp(createArchiver(Ar))
 ```
----
 
-## Boom!
-
-- `CompressionFormat.PACK200`
-  - `Expected "" but got "PKPACK2000"`
-- `ArchiveFormat.Ar`
-  - `Expected "aⲐ" "a?"`
+<pre class="error">
+Expected "aⲐ" "a?"
+</pre>
 
 ---
 
-# Haskell Too
+## Haskell Too
+
+```haskell
+import Data.Aeson
+
+toFromJSON :: (ToJSON a, FromJSON a, Eq a,
+  Show a, Arbitrary a) => Property
+
+prop_time :: UTCTime -> Property
+prop_time = toFromJSON
+```
+
+---
+template: boom
+
+## Haskell Too
+
+```haskell
+import Data.Aeson
+
+toFromJSON :: (ToJSON a, FromJSON a, Eq a,
+  Show a, Arbitrary a) => Property
+
+prop_time :: UTCTime -> Property
+prop_time = toFromJSON
+```
+
+<pre class="error">
+Falsifiable (after 1 test and 54 shrinks):
+
+Right 1858-11-17 00:00:00 UTC /=
+  Right 1858-11-17 00:00:00.000000000001 UTC
+</pre>
+
+---
+
+## Bug
+
+- https://github.com/bos/aeson/issues/240
+- https://github.com/bos/aeson/pull/241
+- "Updates UTCTime ToJSON instance to output full picosecond resolution"
+
+---
+
+# Haskell Again
 
 ```haskell
 import Aws.S3
-
 
 prop_s3 :: String -> ByteString -> Property
 prop_s3 key body = do
@@ -1126,15 +1311,28 @@ prop_s3 key body = do
 ```
 
 ---
-template: rule
+template: boom
 
+# Haskell Again
+
+```haskell
+import Aws.S3
+
+prop_s3 :: String -> ByteString -> Property
+prop_s3 key body = do
+
+  putObject bucket key body
+
+  r &lt;- getObject bucket key
+
+  assert $ r === body
 ```
+
+<pre class="error">
 The request signature we calculated does not
 match the signature you provided.
-Check your key and signing method.
-
-檤翂
-```
+ARG_0: 檤翂
+<pre>
 
 ---
 
