@@ -586,17 +586,57 @@ forAll { (i: Int, l: List[Int]) =>
 
   (i :: l).size =? (l.size + 1)
 }
+
+
+Nil.headOption =? None
+
+forAll { (h: Int, t: List[Int]) =>
+
+  (h :: t).headOption =? Some(h)
+}
 ```
 
 ---
 
-## Induction
+## Database Migration
 
 ```scala
-Nil.headOption =? None
+sealed trait Migration
 
-forAll { (h: Int, t: List[Int]) =>
-  (h :: t).headOption =? Some(h)
+case class ColumnRename(before: String, after: String)
+
+case class ColumnUniqueness(column: String)
+
+
+forAll { m: Migration =>
+
+  ???
+
+  db.migrate(m)
+
+  ???
+}
+```
+
+---
+
+## Database Induction
+
+```scala
+forAll { (before: String, after: String) =>
+  db.createTable(Table(List(Column(before))
+
+  db.migrate(ColumnRename(m))
+
+  db.tableColumns(after) =? List(Column(after))
+}
+
+forAll { column: Column =>
+  db.createTable(Table(List(c.copy(unique=false))))
+
+  db.migrate(ColumnUniqueness(column))
+
+  db.tableColumns =? List(List(c.copy(unique=true)))
 }
 ```
 
@@ -621,6 +661,63 @@ forAll { (h: Int, t: List[Int]) =>
 template: inverse
 
 # Invariants
+
+---
+
+## Invariants
+
+```scala
+forAll { l: List[Int] =>
+
+  l.map(a => a) =? l
+}
+
+forAll { l: List[Int] =>
+
+  l.filter(_ => true) =? l
+}
+
+forAll { l: List[Int] =>
+
+  l.filter(_ => false) =? Nil
+}
+```
+
+---
+
+## Database Invariants
+
+```scala
+def insert(u: User): Either[UserError, UserId]
+
+
+forAll { u: User =>
+
+  val i1 = userDb.insert(u)
+
+  val i2 = userDb.insert(u)
+
+  (i1.isRight, i2) =?
+    (true, Left(DuplicateUsername)) 
+}
+```
+
+---
+
+## Database Invariants
+
+```scala
+forAll { u1: User =>
+
+  val i = userDb.insert(u1)
+
+  userDb.delete(i)
+
+  val u2 = userDb.get(i)
+
+  u2 ?= None
+}
+```
 
 ---
 
@@ -651,33 +748,6 @@ forAll { u: User =>
 
   r1 =? r2
 }
-```
-
----
-
-## Database Consistency
-
-```scala
-forAll { (u1: User, u2: User) =>
-  u1.name != u2.name ==> {
-
-  userDb.insert(u1)
-
-  val i = userDb.insert(u2)
-
-  val u3 = userDb.get(i)
-
-  u3 =? Some(u2)
-}}
-```
-
----
-template: rule
-
-```
-User with name already exists
-> ARG_0: User("a")
-> ARG_1: User("A")
 ```
 
 
