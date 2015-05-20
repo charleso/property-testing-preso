@@ -364,11 +364,26 @@ template: image-white
 ## Show me the code
 
 ```scala
+def toBytes(s: String, c: Charset): Array[Byte]
+
+def fromBytes(b: Array[Bytes], c: Charset): String
+```
+
+---
+
+## Show me the code
+
+```scala
+def toBytes(s: String, c: Charset): Array[Byte]
+
+def fromBytes(b: Array[Bytes], c: Charset): String
+
+
 forAll { (s: String, c: Charset) =>
 
-  val b = s.getBytes(c)
+  val b = toBytes(s, c)
 
-  new String(b, c) == s
+  fromBytes(b, c) == s
 }
 ```
 
@@ -378,11 +393,16 @@ template: boom
 ## Show me the code
 
 ```scala
+def toBytes(s: String, c: Charset): Array[Byte]
+
+def fromBytes(b: Array[Bytes], c: Charset): String
+
+
 forAll { (s: String, c: Charset) =>
 
-  val b = s.getBytes(c)
+  val b = toBytes(s, c)
 
-  new String(b, c) == s
+  fromBytes(b, c) == s
 }
 ```
 
@@ -392,6 +412,16 @@ forAll { (s: String, c: Charset) =>
 > ARG_0: "돪"
 > ARG_1: windows-1252
 </pre>
+
+---
+
+## JSON
+
+```scala
+def toJson(user: User): Json
+
+def fromJson(Json): Either[Exception, User]
+```
 
 ---
 
@@ -414,6 +444,21 @@ forAll { user: User =>
 ## Database
 
 ```scala
+def insert(u: User): UserId
+
+def get(u: UserId): Option[User]
+```
+
+---
+
+## Database
+
+```scala
+def insert(u: User): UserId
+
+def get(u: UserId): Option[User]
+
+
 forAll { u: User =>
 
   val id = userDb.insert(u)
@@ -428,6 +473,11 @@ template: boom
 ## Database
 
 ```scala
+def insert(u: User): UserId
+
+def get(u: UserId): Option[User]
+
+
 forAll { u: User =>
 
   val id = userDb.insert(u)
@@ -483,6 +533,18 @@ def sum(l: List[Int]): Int = {
   l.foreach ( i => v += i )
   v
 }
+```
+
+---
+
+## Performance
+
+```scala
+def sum(l: List[Int]): Int = {
+  var v = 0
+  l.foreach ( i => v += i )
+  v
+}
 
 
 forAll { l: List[Int] =>
@@ -496,10 +558,35 @@ forAll { l: List[Int] =>
 ## Sorting
 
 ```scala
+def timSort(l: List[Int]): List[Int]
+```
+
+---
+
+## Sorting
+
+```scala
+def timSort(l: List[Int]): List[Int]
+
+
 forAll { l: List[Int] =>
 
   timSort(l) == bubbleSort(l)
 }
+```
+
+---
+template: ambiata
+
+## Date
+
+```scala
+case class Date(value: Int)
+
+
+def toJoda(date: Date): JodaDate
+
+def fromJoda(date: JodaDate): Date
 ```
 
 ---
@@ -530,6 +617,17 @@ forAll { d: Date =>
 def dayPlus(d: Date, i: Int): Date = {
   ...
 }
+```
+
+---
+
+## Test Oracle
+
+```scala
+def dayPlus(d: Date, i: Int): Date = {
+  ...
+}
+
 
 forAll { (d: Date, i: Int) =>
 
@@ -547,6 +645,7 @@ template: boom
 def dayPlus(d: Date, i: Int): Date = {
   ...
 }
+
 
 forAll { (d: Date, i: Int) =>
 
@@ -670,6 +769,14 @@ forAll { l: List[Int] =>
 
   l.filter(_ => false) == Nil
 }
+```
+
+---
+
+## Database Invariants
+
+```scala
+def insert(u: User): Either[UserError, UserId]
 ```
 
 ---
