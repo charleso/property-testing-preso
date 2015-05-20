@@ -156,6 +156,13 @@
       .top h1 {
         top: 0px;
       }
+      .toc {
+         color: #777;
+         margin-top: 135px;
+      }
+      .toc-selected {
+         color: #000;
+      }
       /*
       .ambiata-full h2 {
         position: absolute;
@@ -273,6 +280,10 @@ template: ambiata
 - We have a majority of property-based tests
 - Need a compelling argument to write unit tests
 
+???
+
+- "Hardline"
+
 ---
 template: starwars
 
@@ -290,6 +301,12 @@ template: image
 
 # Today
 
+???
+
+- Have found it to live up the hype 
+- Surprising thing is that I now find it _easier_ to write properties
+  - Counterintuitive
+
 ---
 template: ambiata
 
@@ -304,60 +321,86 @@ template: inverse
 
 ## What Have I Learned?
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-template: image-white
-
-<img src="images/patterns.jpg" style="width: 50%; left: 25%" />
-
-# Patterns
-
 ---
 layout: false
 
-## Patterns
+## Overview
 
-- Symmetry
-- Model-based
-- Invariants
-  - Idempotence
-  - Consistency
+<ul>
+<li>
+  Properties
+  <ul>
+    <li>Patterns</li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
-template: inverse
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li class="toc-selected">Patterns</li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
 
-## Symmetry
+<img src="images/patterns.jpg" style="position: absolute; width: 50%; top: 30px; right: 30px" />
 
 ---
-template: image-white
 
-<img src="images/property-inverse.png" style="margin-top: 150px" />
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns
+      <ul>
+        <li class="toc-selected">Symmetry</li>
+        <li>Model-based</li>
+        <li>Invariants</li>
+      </ul>
+    </li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
+
+<img src="images/property-inverse.png" style="position: absolute; top: 180px; right: 0px; width: 600px;" />
 
 ---
 
@@ -420,7 +463,7 @@ forAll { (s: String, c: Charset) =>
 ```scala
 def toJson(user: User): Json
 
-def fromJson(Json): Either[Exception, User]
+def fromJson(json: Json): Either[Exception, User]
 ```
 
 ---
@@ -430,7 +473,7 @@ def fromJson(Json): Either[Exception, User]
 ```scala
 def toJson(user: User): Json
 
-def fromJson(Json): Either[Exception, User]
+def fromJson(json: Json): Either[Exception, User]
 
 
 forAll { user: User =>
@@ -497,6 +540,10 @@ template: image
 
 ## Symmetry is your golden ticket
 
+???
+
+- Actually a bad analogy
+  - _Lots_ of examples/uses
 
 
 
@@ -514,14 +561,25 @@ template: image
 
 ---
 
-template: inverse
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns
+      <ul>
+        <li>Symmetry</li>
+        <li class="toc-selected">Model-based</li>
+        <li>Invariants</li>
+      </ul>
+    </li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
 
-# Model-based
-
----
-template: image-white
-
-<img src="images/model-based.png" style="margin-top: 120px;"/>
+<img src="images/model-based.png" style="position: absolute; width: 550px; top: 200px; right: 0px;"/>
 
 ---
 
@@ -665,6 +723,17 @@ ARG_1: 1
 ## Database
 
 ```scala
+def listSortByName: List[User] =
+  "SELECT * FROM user ORDER BY name ASC"
+```
+
+---
+## Database
+
+```scala
+def listSortByName: List[User]
+
+
 forAll { users: List[User] =>
 
   users.foreach(u => userDb.insert(u))
@@ -672,6 +741,57 @@ forAll { users: List[User] =>
   val l = userDb.listSortByName
 
   l == users.sortBy(_.name.toLowerCase)
+}
+```
+
+---
+## Database 2
+
+```scala
+def findByPostCode(postcode: Int): List[User] =
+  "SELECT * FROM user WHERE postcode = ?"
+```
+
+---
+## Database 2
+
+```scala
+def findByPostCode(postcode: Int): List[User]
+
+
+forAll { (postcode: Int, users: List[User]) =>
+
+  users.foreach(u => userDb.insert(u))
+
+  val has = users.filter(_.postcode == postcode)
+
+  userDb.findByPostCode(postcode) == has
+}
+```
+
+???
+
+- God forbid you're not using prepared statements
+  this would find a bug pretty quick
+
+---
+## Database 2
+
+```scala
+def findByPostCode(postcode: Int): List[User]
+
+
+forAll { (postcode: Int, u1: List[User], u2: List[User]) =>
+
+  val has = u1.map(_.copy(postcode = postcode))
+
+  val without = u2.filter(_.postcode != postcode)
+
+
+  (has ++ without).foreach(u => userDb.insert(u))
+
+
+  userDb.findByPostCode(postcode) == has
 }
 ```
 
@@ -693,6 +813,11 @@ forAll { users: List[Users] =>
   out == expected
 }
 ```
+
+???
+
+- Horrible Java APIs
+- Byte manipulation
 
 ---
 
@@ -746,9 +871,23 @@ forAll { users: List[Users] =>
 
 ---
 
-template: inverse
-
-# Invariants
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns
+      <ul>
+        <li>Symmetry</li>
+        <li>Model-based</li>
+        <li class="toc-selected">Invariants</li>
+      </ul>
+    </li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
 
 ---
 
@@ -771,45 +910,66 @@ forAll { l: List[Int] =>
 }
 ```
 
+???
+
+- Need to be combined with multiple properties
+  to test the entire function
+
 ---
 
-## Database Invariants
+## User Invariants
 
 ```scala
-def insert(u: User): Either[UserError, UserId]
+def tax(u: User): Tax
+
 ```
 
 ---
 
-## Database Invariants
+## User Invariants - Eek
 
 ```scala
-def insert(u: User): Either[UserError, UserId]
+def tax(u: User): Tax
 
 
 forAll { u: User =>
 
-  val i1 = userDb.insert(u)
+  tax(u) == ???
+}
+```
 
-  val i2 = userDb.insert(u)
+???
 
-  (i1.isRight, i2) ==
-    (true, Left(DuplicateUsername)) 
+- This is _hard_ to model
+  without rewriting
+
+---
+
+## User Invariants
+
+```scala
+def tax(u: User): Tax
+
+
+forAll { (u: User, wage: Int) =>
+  wage &lt; 10000 ==>
+
+  tax(u.copy(wage = wage)) == 0%
 }
 ```
 
 ---
 
-## Database Consistency
+## User Invariants
 
 ```scala
-forAll { u1: User =>
+def tax(u: User): Tax
 
-  val i = userDb.insert(u1)
 
-  userDb.delete(i)
+forAll { (u: User, wage: Int) =>
+  wage &gt; 1000000 ==>
 
-  userDb.get(i) == None
+  tax(u.copy(wage = wage)) == 45%
 }
 ```
 
@@ -935,9 +1095,19 @@ template: inverse
 
 
 ---
-template: inverse
+template: inverse-toc
 
-## Laws
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns</li>
+    <li class="toc-selected">Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
 
 ---
 
@@ -958,11 +1128,63 @@ property("db monad")
   scalaz.scalacheck.monad.laws[DB]
 ```
 
+???
+
+- Most people have seen a Monad tutorial
+  - Mentioned the laws at some point
+
+
 ---
 
 ## JSON
 
 ```scala
+def toJson(user: User): Json
+
+def fromJson(json: Json): Either[Exception, User]
+
+  forAll { a: User =>
+
+    fromJson(toJson(a)) == Right(a)
+  }
+```
+
+---
+
+## JSON
+
+```scala
+def toJson[A: EncodeJson](user: A): Json
+
+def fromJson[A: DecodeJson](json: Json)
+
+  forAll { a: User =>
+
+    fromJson(toJson(a)) == Right(a)
+  }
+```
+
+---
+
+## JSON
+
+```scala
+
+def toFromJSON
+  [A: EncodeJson: DecodeJson: Arbitrary]: Prop =
+
+  forAll { a: A =>
+
+    fromJson(toJson(a)) == Right(a)
+  }
+```
+
+---
+
+## JSON
+
+```scala
+
 def toFromJSON
   [A: EncodeJson: DecodeJson: Arbitrary]: Prop =
 
@@ -986,12 +1208,69 @@ trait DB {
   def read(id: UserId): Option[UserId]
   ...
 }
+```
+
+???
+
+- Good abstractions are likely to have some set
+  of "laws" between functions
+
+
+---
+
+## "Abstraction"
+
+```scala
+trait DB {
+  def create(user: User): UserId
+  def read(id: UserId): Option[UserId]
+  ...
+}
 
 object PostgresDB extends DB
 object MemoryDB extends DB
 ```
 
-- Could be your Free interpreters
+???
+
+- For the "cool kids" in the room
+  - Could be your free interpreters
+
+---
+
+## Database Laws
+
+```scala
+def dbLaws(db: DB): Prop = new Properties("DB Laws") {
+```
+
+---
+
+## Database Laws
+
+```scala
+def dbLaws(db: DB): Prop = new Properties("DB Laws") {
+
+  property("symmetry") = forAll { (u: User) =>
+    db.read(db.create(u)) == Some(u)
+  }
+```
+
+---
+
+## Database Laws
+
+```scala
+def dbLaws(db: DB): Prop = new Properties("DB Laws") {
+
+  property("symmetry") = forAll { (u: User) =>
+    db.read(db.create(u)) == Some(u)
+  }
+
+  property("empty") = forAll { (id: UserId) =>
+    db.read(id) == None
+  }
+```
 
 ---
 
@@ -1030,9 +1309,19 @@ property("memory DB laws") = dbLaws(MemoryDB)
 
 ---
 
-template: inverse
+template: inverse-toc
 
-# Easy Wins
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns</li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li class="toc-selected">Generators</li>
+<li>Bug hunting</li>
+</ul>
 
 ---
 
@@ -1063,6 +1352,10 @@ forAll { (name: String, postcode: Int) =>
   db.load(id) == Some(user)
 }
 ```
+
+???
+
+- A property just waiting to get out
 
 ---
 template: boom
@@ -1108,6 +1401,23 @@ trait UserDb {
 
 ```scala
 class Postcode private(val value: Int) extends AnyVal
+```
+
+???
+
+- Preaching to the choir
+- Not strictly related to property based testing
+  - But something that makes it easier
+  - TDD
+- Deserves it's own talk
+  - Mention Eric?
+
+---
+
+## Be Precise - Types!
+
+```scala
+class Postcode private(val value: Int) extends AnyVal
 
 object Postcode {
   
@@ -1133,6 +1443,11 @@ def genPostcode: Gen[Postcode] =
     .map(Postcode.fromInt)
 ```
 
+???
+
+- Yes it doesn't compile
+  - Just ignore
+
 ---
 
 ## Invest in Generators
@@ -1153,6 +1468,10 @@ forAll { (u1: Username, u2: Username) => ... }
 
 forAll { p: List[Postcode] => ... }
 ```
+
+???
+
+- We can add more properties using the _same_ generator
 
 ---
 template: ambiata
@@ -1184,6 +1503,10 @@ def testNullUsername = {
 }
 ```
 
+???
+
+- Only tests one code-path
+
 ---
 
 ## Generators FTW
@@ -1197,6 +1520,10 @@ def genUsername: Gen[Username] =
 
   ).map(Username.fromString)
 ```
+
+???
+
+- Ideally you don't have to add any more tests
 
 ---
 
@@ -1224,9 +1551,21 @@ template: image
 
 
 
+---
+
+<ul class="toc">
+<li>
+  Properties
+  <ul>
+    <li>Patterns</li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li class="toc-selected">Bug hunting</li>
+</ul>
 
 ---
-template: inverse
 
 ## [@markhibberd](https://twitter.com/markhibberd)
 
@@ -1236,9 +1575,15 @@ bug for something they have unit tests for"
 </i>
 
 ---
-template: image-white
 
-<img src="images/challenge.jpg" />
+## [@markhibberd](https://twitter.com/markhibberd)
+
+<i style="font-size: 26px">
+"Maybe you could test a relatively well known open source library and find a
+bug for something they have unit tests for"
+</i>
+
+<img src="images/challenge.jpg" style="position: absolute; width: 600px; right: 0px; bottom: 0px;" />
 
 ---
 
@@ -1257,6 +1602,10 @@ forAll { dt: DateTime =>
   formatter.parseDateTime(s) == dt
 }
 ```
+
+???
+
+- Symmetrical
 
 ---
 template: boom
@@ -1313,6 +1662,10 @@ def archiveProp(archiver: ArchiverFactory): Prop =
     archive.loadAll() == files
   }
 ```
+
+???
+
+- Symmetrical
 
 ---
 template: boom
@@ -1400,6 +1753,10 @@ prop_time :: UTCTime -> Property
 prop_time = toFromJSON
 ```
 
+???
+
+- Symmetrical
+
 ---
 template: boom
 
@@ -1446,6 +1803,10 @@ prop_s3 key body = do
 
   assert $ r === body
 ```
+
+???
+
+- Symmetrical
 
 ---
 template: boom
@@ -1505,22 +1866,47 @@ template: ambiata
   - OrdPair
   - Aeson/Lens laws
 
+???
+
+- Under the disorder "umbrella" project
+
 ---
 
-## Summary
+<ul class="toc toc-selected">
+<li>
+  Properties
+  <ul>
+    <li>Patterns
+      <ul>
+        <li>Symmetry</li>
+        <li>Model-based</li>
+        <li>Invariants</li>
+      </ul>
+    </li>
+    <li>Laws</li>
+  </ul>
+</li>
+<li>Generators</li>
+<li>Bug hunting</li>
+</ul>
 
-<img src="images/all-the-things.png" height="60%" style="position: absolute; bottom: 0; right: -100px;" />
+???
 
 - Easy once you get started
   - Look for patterns
 - Test more with less
-  - Laws
-  - Types
-  - Generators
-- "Real World"
-- Property test all the things!
 
+---
 
+template: inverse
+
+# "Real World"
+
+<img src="images/all-the-things.png" height="60%" style="position: absolute; bottom: 0; right: -100px;" />
+
+???
+
+- Property-test all the things
 
 ---
 layout: false
