@@ -368,7 +368,7 @@ forAll { (s: String, c: Charset) =>
 
   val b = s.getBytes(c)
 
-  new String(b, c) =? s
+  new String(b, c) == s
 }
 ```
 
@@ -382,7 +382,7 @@ forAll { (s: String, c: Charset) =>
 
   val b = s.getBytes(c)
 
-  new String(b, c) =? s
+  new String(b, c) == s
 }
 ```
 
@@ -405,7 +405,7 @@ def fromJson(Json): Either[Exception, User]
 
 forAll { user: User =>
 
-  fromJson(toJson(user)) =? Right(user)
+  fromJson(toJson(user)) == Right(user)
 }
 ```
 
@@ -418,7 +418,7 @@ forAll { u: User =>
 
   val id = userDb.insert(u)
 
-  userDb.get(id) =? Some(u)
+  userDb.get(id) == Some(u)
 }
 ```
 
@@ -432,7 +432,7 @@ forAll { u: User =>
 
   val id = userDb.insert(u)
 
-  userDb.get(id) =? Some(u)
+  userDb.get(id) == Some(u)
 }
 ```
 
@@ -487,7 +487,7 @@ def sum(l: List[Int]): Int = {
 
 forAll { l: List[Int] =>
 
-  sum(l) =? l.foldLeft(0)(_ + _)
+  sum(l) == l.foldLeft(0)(_ + _)
 }
 ```
 
@@ -498,7 +498,7 @@ forAll { l: List[Int] =>
 ```scala
 forAll { l: List[Int] =>
 
-  timSort(l) =? bubbleSort(l)
+  timSort(l) == bubbleSort(l)
 }
 ```
 
@@ -518,7 +518,7 @@ def fromJoda(date: JodaDate): Date
 
 forAll { d: Date =>
 
-  d.toJoda.fromJoda =? d
+  d.toJoda.fromJoda == d
 }
 ```
 
@@ -533,7 +533,7 @@ def dayPlus(d: Date, i: Int): Date = {
 
 forAll { (d: Date, i: Int) =>
 
-  dayPlus(d, i) =?
+  dayPlus(d, i) ==
     d.toJoda.plusDays(i).fromJoda
 }
 ```
@@ -550,7 +550,7 @@ def dayPlus(d: Date, i: Int): Date = {
 
 forAll { (d: Date, i: Int) =>
 
-  dayPlus(d, i) =?
+  dayPlus(d, i) ==
     d.toJoda.plusDays(i).fromJoda
 }
 ```
@@ -572,7 +572,7 @@ forAll { users: List[User] =>
 
   val l = userDb.listSortByName
 
-  l =? users.sortBy(_.name.toLowerCase)
+  l == users.sortBy(_.name.toLowerCase)
 }
 ```
 
@@ -591,7 +591,7 @@ forAll { users: List[Users] =>
     users.groupBy(_.name)
          .mapValues(_.sortBy(_.postcode))
 
-  out =? expected
+  out == expected
 }
 ```
 
@@ -610,7 +610,7 @@ forAll { users: List[Users] =>
     users.groupBy(_.name)
          .mapValues(_.sortBy(_.postcode))
 
-  out =? expected
+  out == expected
 }
 ```
 
@@ -658,17 +658,17 @@ template: inverse
 ```scala
 forAll { l: List[Int] =>
 
-  l.map(a => a) =? l
+  l.map(a => a) == l
 }
 
 forAll { l: List[Int] =>
 
-  l.filter(_ => true) =? l
+  l.filter(_ => true) == l
 }
 
 forAll { l: List[Int] =>
 
-  l.filter(_ => false) =? Nil
+  l.filter(_ => false) == Nil
 }
 ```
 
@@ -686,7 +686,7 @@ forAll { u: User =>
 
   val i2 = userDb.insert(u)
 
-  (i1.isRight, i2) =?
+  (i1.isRight, i2) ==
     (true, Left(DuplicateUsername)) 
 }
 ```
@@ -702,7 +702,7 @@ forAll { u1: User =>
 
   userDb.delete(i)
 
-  userDb.get(i) ?= None
+  userDb.get(i) == None
 }
 ```
 
@@ -713,12 +713,12 @@ forAll { u1: User =>
 ```scala
 forAll { s: List[Int] =>
 
-  l.distinct.distinct =? l.distinct
+  l.distinct.distinct == l.distinct
 }
 
 forAll { l: List[Int] =>
 
-  l.sorted.sorted =? l.sorted
+  l.sorted.sorted == l.sorted
 }
 ```
 
@@ -733,7 +733,7 @@ forAll { u: User =>
 
   val r2 = userDb.createOrUpdate(u)
 
-  r1 =? r2
+  r1 == r2
 }
 ```
 
@@ -750,7 +750,7 @@ forAll { m: Migration =>
   db.migrate(m)
   val s2 = db.schema()
 
-  s1 =? s2
+  s1 == s2
 }
 ```
 
@@ -861,7 +861,7 @@ def toFromJSON
 
   forAll { a: A =>
 
-    fromJson(toJson(a)) =? Right(a)
+    fromJson(toJson(a)) == Right(a)
   }
 
 
@@ -894,11 +894,11 @@ object MemoryDB extends DB
 def dbLaws(db: DB): Prop = new Properties("DB Laws") {
 
   property("symmetry") = forAll { (u: User) =>
-    db.read(db.create(u)) =? Some(u)
+    db.read(db.create(u)) == Some(u)
   }
 
   property("empty") = forAll { (id: UserId) =>
-    db.read(id) =? None
+    db.read(id) == None
   }
 }
 
@@ -938,7 +938,7 @@ def testUser = {
 
   val id = db.insert(user)
 
-  db.load(id) =? Some(user)
+  db.load(id) == Some(user)
 }
 ```
 
@@ -953,7 +953,7 @@ forAll { (name: String, postcode: Int) =>
 
   val id = db.insert(user)
 
-  db.load(id) =? Some(user)
+  db.load(id) == Some(user)
 }
 ```
 
@@ -969,7 +969,7 @@ forAll { (name: String, postcode: Int) =>
 
   val id = db.insert(user)
 
-  db.load(id) =? Some(user)
+  db.load(id) == Some(user)
 }
 ```
 
@@ -1147,7 +1147,7 @@ forAll { dt: DateTime =>
 
   val s = formatter.print(dt)
 
-  formatter.parseDateTime(s) =? dt
+  formatter.parseDateTime(s) == dt
 }
 ```
 
@@ -1166,7 +1166,7 @@ forAll { dt: DateTime =>
 
   val s = formatter.print(dt)
 
-  formatter.parseDateTime(s) =? dt
+  formatter.parseDateTime(s) == dt
 }
 ```
 
@@ -1203,7 +1203,7 @@ def archiveProp(archiver: ArchiverFactory): Prop =
 
     val archive = archiver.create(files)
 
-    archive.loadAll() =? files
+    archive.loadAll() == files
   }
 ```
 
@@ -1220,7 +1220,7 @@ def archiveProp(archiver: ArchiverFactory): Prop =
 
     val archive = archiver.create(files)
 
-    archive.loadAll() =? files
+    archive.loadAll() == files
   }
 
  
@@ -1244,7 +1244,7 @@ def archiveProp(archiver: ArchiverFactory): Prop =
 
     val archive = archiver.create(files)
 
-    archive.loadAll() =? files
+    archive.loadAll() == files
   }
 
 
@@ -1268,7 +1268,7 @@ def archiveProp(archiver: ArchiverFactory): Prop =
 
     val archive = archiver.create(files)
 
-    archive.loadAll() =? files
+    archive.loadAll() == files
   }
 
  
