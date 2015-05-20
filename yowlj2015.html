@@ -599,7 +599,7 @@ forAll { users: List[Users] =>
 
 template: ambiata
 
-## Ivory: ~40 Properties
+## Hadoop
 
 ```scala
 forAll { users: List[Users] =>
@@ -613,6 +613,10 @@ forAll { users: List[Users] =>
   out =? expected
 }
 ```
+
+<h3 style="color: green">
+  Ivory: ~40 Properties
+</h3>
 
 
 
@@ -985,7 +989,7 @@ trait UserDb {
    * Inserts a user.
    *
    * The username must not be blank
-   * Postcode must be &lt; 1000 or &gt; 10000
+   * Postcode must be &gt;= 1000 or &lt; 10000
    */
   def insert(user: User): Int
 }
@@ -1038,7 +1042,7 @@ def genPostcode: Gen[Postcode] =
 
 forAll { (u: Username, p: Postcode) => ... }
 
-forAll { (u: Username, u: Username) => ... }
+forAll { (u1: Username, u2: Username) => ... }
 
 forAll { p: List[Postcode] => ... }
 ```
@@ -1050,7 +1054,7 @@ template: ambiata
 
 - Dictionary: ~100 properties
 - Date: ~110 properties
-- Fact: ~140 proprties
+- Fact: ~140 properties
 
 ---
 
@@ -1283,7 +1287,7 @@ Expected "aⲐ" "a?"
 import Data.Aeson
 
 toFromJSON :: (ToJSON a, FromJSON a, Eq a,
-  Show a, Arbitrary a) => Property
+  Show a) => a -> Property
 
 prop_time :: UTCTime -> Property
 prop_time = toFromJSON
@@ -1298,7 +1302,7 @@ template: boom
 import Data.Aeson
 
 toFromJSON :: (ToJSON a, FromJSON a, Eq a,
-  Show a, Arbitrary a) => Property
+  Show a) => a -> Property
 
 prop_time :: UTCTime -> Property
 prop_time = toFromJSON
