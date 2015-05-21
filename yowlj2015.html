@@ -932,7 +932,7 @@ def tax(u: User): Tax
 
 ---
 
-## User Invariants - Eek
+## User Invariants
 
 ```scala
 def tax(u: User): Tax
@@ -960,7 +960,8 @@ def tax(u: User): Tax
 forAll { (u: User, wage: Int) =>
   wage &lt; 10000 ==>
 
-  tax(u.copy(wage = wage)) == 0%
+  tax(u.copy(wage = wage))
+    .bracket == 0%
 }
 ```
 
@@ -975,9 +976,47 @@ def tax(u: User): Tax
 forAll { (u: User, wage: Int) =>
   wage &gt; 1000000 ==>
 
-  tax(u.copy(wage = wage)) == 45%
+  tax(u.copy(wage = wage))
+    .bracket == 45%
 }
 ```
+
+---
+
+## User Invariants
+
+```scala
+def tax(u: User): Tax
+
+
+forAll { (u: User, h: PrivateHealth) =>
+
+  tax(u.copy(privateHealth = Some(h)))
+    .surcharge == false
+}
+```
+
+---
+
+template: ambiata
+
+## Ivory
+
+<a href="https://github.com/ambiata/ivory/blob/master/ivory-storage/src/test/scala/com/ambiata/ivory/storage/plan/SnapshotPlanSpec.scala">
+<img src="images/invariants.png" width="100%" />
+</a>
+
+
+
+
+
+
+
+
+
+
+
+
 
 ---
 
