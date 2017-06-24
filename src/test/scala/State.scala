@@ -1,23 +1,28 @@
-import org.joda.time.{DateTimeZone, DateTime}
 import org.scalacheck._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen
 import org.scalacheck.Prop._
 import org.scalacheck.commands._
 
-import scala.io.Codec
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.{Success, Try}
 
 object State extends Properties("State") {
 
   property("state") =
-    MyState.property(threadCount = 2)
+    MyState.property(threadCount = 1)
 
   object MyState extends Commands {
-    type State = Map[String, String]
-    type Sut = mutable.Map[String, String]
+    type Pid = Int
+    type Name = String
+    case class State(
+        pids : List[Pid]
+      , regs : List[(Name, Pid)]
+      )
+    class Sut(
+        val pids : mutable.MutableList[Pid]
+      , val regs : mutable.Map[Name, Pid]
+      )
 
     def canCreateNewSut(s: State, init: Traversable[State], running: Traversable[Sut]): Boolean =
       true
@@ -25,57 +30,89 @@ object State extends Properties("State") {
     def destroySut(sut: Sut): Unit =
       ()
 
-    def genCommand(state: State): Gen[Command] =
+    def genName: Gen[Name] =
+      Gen.oneOf("a", "b", "c", "d")
+
+    def genCommand(state: State): Gen[Command] = {
       Gen.oneOf(
-          for {
-            k <- arbitrary[String]
-            v <- arbitrary[String]
-          } yield (Insert(k, v))
-        , arbitrary[String].map(Get(_))
+          arbitrary[Pid].map(Spawn(_))
+        , genName.map(Unregister)
+        , (if (state.pids.isEmpty) Nil else List(for {
+            n <- genName
+            p <- Gen.oneOf(state.pids)
+          } yield Register(n, p))
+        ) : _*
         )
+    }
 
     def genInitialState: Gen[State] =
-      Gen.const(Map())
+      Gen.const(State(Nil, Nil))
 
     def initialPreCondition(state: State): Boolean =
       true
 
     def newSut(state: State): Sut =
-      mutable.Map() ++ state
+      new Sut(mutable.MutableList(), mutable.Map())
 
-    case class Get(key: String) extends Command {
+    case class Spawn(pid: Pid) extends Command {
 
-      type Result = Option[String]
+      type Result = Unit
 
       def nextState(state: State): State =
-        state
+        state.copy(pids = state.pids ++ List(pid))
 
       def postCondition(state: State, result: Try[Result]): Prop =
-        result =? Success(state.get(key))
-
-      def preCondition(state: State): Boolean =
         true
-
-      def run(sut: Sut): Result =
-        sut.get(key)
-    }
-
-    case class Insert(k: String, v: String) extends Command {
-
-      type Result = Boolean
-
-      def nextState(state: State): State =
-        state + (k -> v)
-
-      def postCondition(state: State, result: Try[Result]): Prop =
-        result =? Success(true)
 
       def preCondition(state: State): Boolean =
         true
 
       def run(sut: Sut): Result = {
-        sut += (k -> v)
+        sut.pids += pid
+        ()
+      }
+    }
+
+    case class Register(name: Name, pid: Pid) extends Command {
+
+      type Result = Unit
+
+      def nextState(state: State): State =
+        state.copy(regs = state.regs ++ List(name -> pid))
+
+      def postCondition(state: State, result: Try[Result]): Prop =
         true
+
+      def preCondition(state: State): Boolean =
+        ! state.regs.exists(x => x._1 == name || x._2 == pid)
+
+      def run(sut: Sut): Result = {
+        sut.regs += (name -> pid)
+        ()
+      }
+    }
+
+    case class Unregister(name: Name) extends Command {
+
+      type Result = Unit
+
+      def nextState(state: State): State =
+        state.copy (regs = state.regs.filter(x => x._1 != name))
+
+      def postCondition(state: State, result: Try[Result]): Prop =
+        true
+
+      def preCondition(state: State): Boolean =
+        state.regs.exists(x => x._1 == name)
+
+      def run(sut: Sut): Result = {
+        sut.regs.get(name) match {
+          case None =>
+            sys.error("Not registered")
+          case Some(x) =>
+            sut.regs -= name
+            ()
+        }
       }
     }
   }
