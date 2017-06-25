@@ -106,6 +106,12 @@ class: center, middle, section-aqua, heading-white
 
 ## Example-based Testing
 
+---
+
+class: middle, center
+
+<img src="images/qa-engineer-tweet.png" />
+
 
 
 
@@ -124,6 +130,14 @@ class: middle, center
 
 ---
 
+class: middle, center
+
+### https://en.wikipedia.org/wiki/QuickCheck
+
+> 31 Languages
+
+---
+
 class: code
 
 ```scala
@@ -139,14 +153,85 @@ def testDoStuff =
 
 class: code
 
+```scala
+def doStuff(x: Bool, y: Int): String
+
+def testDoStuff =
+  forAll { (x : Bool, y: Int) =>
+    doStuff(x, y) == ???
+  }
+```
+
 <pre><code class="warning">
 + testDoStufff: OK, passed 100 tests.
-! testDoMoreStuff: Falsified after 2 passed tests.
+</code></pre>
+
+
+
+
+
+
+
+
+---
+
+class: center, middle, section-aqua, heading-white
+
+## Shrinking
+
+---
+
+class: code
+
+```scala
+def doStuff(x: Bool, y: Int): String
+
+def testDoStuff =
+  forAll { (x : Bool, y: Int) =>
+    doStuff(x, y) == ???
+  }
+```
+
+<pre><code class="warning">
+! testDoStuff: Falsified after 2 passed tests.
 > Labels of failing property:
 Expected "a" but got "b"
 > ARG_0: true
 > ARG_1: 10
 </code></pre>
+
+---
+
+class: code
+
+```scala
+def doStuff(x: Bool, y: Int): String
+
+def testDoStuff =
+  forAll { (x : Bool, y: Int) =>
+    doStuff(x, y) == ???
+  }
+```
+<pre><code class="warning">
+! testDoStuff: Falsified after 2 passed tests.
+> Labels of failing property:
+Expected "a" but got "b"
+> ARG_0: true
+> ARG_1: 10
+</code></pre>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -656,7 +741,7 @@ forAll { s: String =>
 
 class: center, middle, section-aqua, heading-white
 
-## State Testing
+## State-based Testing
 
 ???
 
@@ -768,93 +853,63 @@ class: middle, center
 
 ---
 
-class: middle, center
+class: center
 
-<img src="images/jh.png" />
+<img src="images/volvo.jpg" width="100%" />
 
-> "Finds more bugs with less effort"
+http://www.quviq.com/volvo-quickcheck/
 
 ---
 
-## Level DB
+class: middle, center
 
-LevelDB is a fast key-value storage C++ library written at Google that provides an ordered mapping from string keys to string values.
+<img src="images/leveldb.png" />
 
-A QuickCheck State Machine Model was written and tested against Google’s LevelDB.
-Within only a few minutes, QuickCheck found a failing counterexample of 17 steps.
+http://www.quviq.com/google-leveldb/
 
-Within only a few minutes after testing the fixed version, QuickCheck found a new failing counterexample of 33 steps
-
-https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 ???
+
+- LevelDB is a fast key-value storage C++ library written at Google that
+  provides an ordered mapping from string keys to string values.
+
+---
+
+class: code, thinner
+
+```sh
+1. open new database
+2. put key1 and val1
+3. close database
+4. open database
+5. delete key2
+6. delete key1
+7. close database
+4. open database
+5. delete key2
+6. delete key1
+7. close database
+11. open database
+12. put key3 and val1
+13. close database
+14. open database
+15. close database
+16. open database
+17. seek first
+```
+
+???
+
+- 17 steps.
+- THEN 33 steps
+
+https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 - Was in 2013
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-class: image
-
-<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
-
-## The same patterns everywhere
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-class: center, middle, section-yellow, heading-black
-
-## Is it too slow to run 100 times?
-
----
-
-## Configuration
-
-- Can increase/toggle runs
-- Separate build with different sizes
-- Without changing a single line of code
 
 
 
@@ -1033,35 +1088,9 @@ def genUsername: Gen[Username] =
 
 - Ideally you don't have to add any more tests
 
----
-
-class: image
-
-<img src="images/everywhere2.jpg" height="120%" style="margin-top: -60px" />
-
-## Generators for everything (with types)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
----
-
-## TODO Shrinking
 
 
 
@@ -1264,14 +1293,6 @@ archiveProp(createArchiver(Ar))
 
 ---
 
-class: middle, center
-
-### https://en.wikipedia.org/wiki/QuickCheck
-
-> 31 Languages
-
----
-
 class: center, middle, section-aqua, heading-white
 
 ## Example-based Testing
@@ -1286,30 +1307,25 @@ class: center, middle, section-aqua, heading-white
 
 class: center, middle, section-aqua, heading-white
 
-## Patterns
-
-- Symmetry
-- Test Oracle
-- Idempotence
-- Invariants
-
----
-
-class: center, middle, section-aqua, heading-white
-
-## Generators
-
----
-
-class: center, middle, section-aqua, heading-white
-
 ## Shrinking
 
 ---
 
 class: center, middle, section-aqua, heading-white
 
-## Real World
+## Patterns
+
+- Symmetry
+- Test Oracle
+- Idempotence
+- Invariants
+- State-based
+
+---
+
+class: center, middle, section-aqua, heading-white
+
+## Generators
 
 ---
 
