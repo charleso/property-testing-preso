@@ -596,29 +596,6 @@ forAll { (postcode: Int, u1: List[User], u2: List[User]) =>
 }
 ```
 
----
-
-class: code
-
-```scala
-forAll { users: List[Users] =>
-
-  val out = hadoopJob(users)
-
-  val expected =
-    users.groupBy(_.name)
-         .mapValues(_.sortBy(_.postcode))
-
-  out == expected
-}
-```
-
-???
-
-- Hadoop
-- Horrible Java APIs
-- Byte manipulation
-
 
 
 
