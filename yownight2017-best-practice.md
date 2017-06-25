@@ -12,28 +12,10 @@ class: image
 
 ## Charles O'Farrell
 
-
-
-
-
-
-
-
-
-
-
-
----
-class: ambiata
-
-## Ambiata
+???
 
 - Property-based testing is our default
 - We have a majority of property-based tests
-
-???
-
-- "Hardline"
 
 
 
@@ -114,15 +96,16 @@ def testDoStuff = {
 
 ---
 
+class: middle, center
+
+<img src="images/threads-joke.png" />
+
+---
+
 class: center, middle, section-aqua, heading-white
 
 ## Example-based Testing
 
----
-
-## TODO Concurrent tests?
-
-
 
 
 
@@ -131,13 +114,13 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: middle, center
 
-## Property-based Testing?
+<img src="images/quickcheck-paper.png" />
 
----
+???
 
-## TODO More intro code here
+- Year 2000!
 
 ---
 
@@ -146,14 +129,24 @@ class: code
 ```scala
 def doStuff(x: Bool, y: Int): String
 
-
-def testDoStuff(x: Bool, y: Int): Prop =
-  doStuff(x, y) == ???
+def testDoStuff =
+  forAll { (x : Bool, y: Int) =>
+    doStuff(x, y) == ???
+  }
 ```
 
 ---
 
-## TODO Show output of test
+class: code
+
+<pre><code class="warning">
++ testDoStufff: OK, passed 100 tests.
+! testDoMoreStuff: Falsified after 2 passed tests.
+> Labels of failing property:
+Expected "a" but got "b"
+> ARG_0: true
+> ARG_1: 10
+</code></pre>
 
 
 
@@ -674,20 +667,129 @@ class: center, middle, section-aqua, heading-white
 class: code
 
 ```scala
-// TODO TODO
 def insert(u: User): Id
 
 def get(i: Id): Option[User]
-
-case class Insert
-case class Get
-
-> ARG_0: Actions(List(Insert, Insert, Get))
 ```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+
+case class Insert(u: User) extends Commands {
+
+  def nextState(state: State, id: Id): State =
+    state + (id -> u)
+
+  def preCondition(state: State): Boolean =
+    true
+
+  def run: Id =
+    insert(u)
+}
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+
+case class Insert(u: User) extends Commands
+
+case class Get(u: Id) extends Commands
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+
+case class Insert(u: User) extends Commands
+
+case class Get(u: Id) extends Commands
+
+def genCommand: Gen[Command] =
+  Gen.oneOf(Insert, Get)
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+
+case class Insert(u: User) extends Commands
+
+case class Get(u: Id) extends Commands
+
+def genCommand: Gen[Command] =
+  Gen.oneOf(Insert, Get)
+```
+
+<pre><code class="warning">
+ARG_0: Actions(List(Insert, Insert, Get))
+</code></pre>
+
+---
+
+class: middle, center
+
+<img src="images/jh.png" />
+
+> &nbsp;
 
 ???
 
-- TODO Talk about how hard it is to reproduce with examples
+- John Hughes
+- Inventor of QuickCheck
+- Now makes money from testing other people's code
+
+- 3,000 pages of specifications
+- 20,000 lines of QuickCheck
+- 1,000,000 LOC, 6 suppliers
+- 200 problems
+- 100 problems in the standard
+
+---
+
+class: middle, center
+
+<img src="images/jh.png" />
+
+> "Finds more bugs with less effort"
+
+---
+
+## Level DB
+
+LevelDB is a fast key-value storage C++ library written at Google that provides an ordered mapping from string keys to string values.
+
+A QuickCheck State Machine Model was written and tested against Google’s LevelDB.
+Within only a few minutes, QuickCheck found a failing counterexample of 17 steps.
+
+Within only a few minutes after testing the fixed version, QuickCheck found a new failing counterexample of 33 steps
+
+https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
+
+???
+
+- Was in 2013
 
 
 
@@ -1159,57 +1261,6 @@ archiveProp(createArchiver(Ar))
 
 
 
-
----
-
-class: center, middle, section-aqua, heading-white
-
-## Real World
-
----
-
-class: middle, center
-
-<img src="images/jh.png" />
-
-> &nbsp;
-
-???
-
-- John Hughes
-- Inventor of QuickCheck
-- Now makes money from testing other people's code
-
-- 3,000 pages of specifications
-- 20,000 lines of QuickCheck
-- 1,000,000 LOC, 6 suppliers
-- 200 problems
-- 100 problems in the standard
-
----
-
-class: middle, center
-
-<img src="images/jh.png" />
-
-> "Finds more bugs with less effort"
-
----
-
-## Level DB
-
-LevelDB is a fast key-value storage C++ library written at Google that provides an ordered mapping from string keys to string values.
-
-A QuickCheck State Machine Model was written and tested against Google’s LevelDB.
-Within only a few minutes, QuickCheck found a failing counterexample of 17 steps.
-
-Within only a few minutes after testing the fixed version, QuickCheck found a new failing counterexample of 33 steps
-
-https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
-
-???
-
-- Was in 2013
 
 ---
 
