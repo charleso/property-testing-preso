@@ -586,12 +586,15 @@ class: code
 ```scala
 def findByPostCode(postcode: Int): List[User]
 
-
-forAll { (postcode: Int, users: List[User]) =>
-
-  users.foreach(u => userDb.insert(u))
+forAll { (postcode: Int
+  , users: List[User]) =>
 
   val has = users.filter(_.postcode == postcode)
+
+
+
+  users
+    .foreach(u => userDb.insert(u))
 
   userDb.findByPostCode(postcode) == has
 }
@@ -609,14 +612,15 @@ class: code
 ```scala
 def findByPostCode(postcode: Int): List[User]
 
-
-forAll { (postcode: Int, u1: List[User], u2: List[User]) =>
+forAll { (postcode: Int
+  , u1: List[User], u2: List[User]) =>
 
   val has = u1.map(_.copy(postcode = postcode))
 
-  val without = u2.filter(_.postcode != postcode)
+  val not = u2.filter(_.postcode != postcode)
 
-  (has ++ without).foreach(u => userDb.insert(u))
+  (has ++ not)
+    .foreach(u => userDb.insert(u))
 
   userDb.findByPostCode(postcode) == has
 }
