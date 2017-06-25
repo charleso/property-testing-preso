@@ -44,6 +44,12 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
+class: center, middle, section-aqua, heading-white
+
+## Example-based Testing
+
+---
+
 class: code
 
 ```scala
@@ -92,12 +98,6 @@ def testDoStuff = {
 class: middle, center
 
 <img src="images/threads-joke.png" />
-
----
-
-class: center, middle, section-aqua, heading-white
-
-## Example-based Testing
 
 ---
 
@@ -219,6 +219,7 @@ def testDoStuff =
 Expected "a" but got "b"
 > ARG_0: true
 > ARG_1: 10
+> ARG_0_ORIGINAL: ....
 </code></pre>
 
 
@@ -1302,6 +1303,12 @@ archiveProp(createArchiver(Ar))
 
 
 
+
+---
+
+class: center, middle, section-aqua, heading-white
+
+## Motivation: Writing Correct Software
 
 ---
 
