@@ -30,6 +30,11 @@ class: center, middle, section-aqua, heading-white
 
 #### Writing correct software
 
+???
+
+- Safety
+- At Ambiata it costs $$$
+
 ---
 
 class: middle
@@ -442,6 +447,27 @@ forAll { l: List[Int] =>
 class: code
 
 ```scala
+def timSort(l: List[Int]): List[Int]
+
+
+forAll { l: List[Int] =>
+
+  timSort(l) == bubbleSort(l)
+}
+```
+
+<pre><code class="warning">
+https://bugs.openjdk.java.net/browse/JDK-8072909
+
+TimSort fails with ArrayIndexOutOfBounds
+on worst case long arrays
+</code></pre>
+
+---
+
+class: code
+
+```scala
 case class Date(value: Int)
 
 
@@ -736,6 +762,17 @@ class: center, middle, section-aqua, heading-white
 ???
 
 - "State of the art"
+- Unit test vs integration testing
+- Generate the whole test
+
+---
+
+## State-based Testing
+
+1. Describe the possible states
+2. Describe what actions can take place in each state
+3. Describe how to tell if the state is correct
+4. Have the computer try lots of random actions – look for a breaking combination
 
 ---
 
@@ -753,6 +790,16 @@ class: code
 
 ```scala
 case class State(users: Map[Id, User])
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[Id, User])
+
+case class Insert(u: User) extends Commands
 ```
 
 ---
