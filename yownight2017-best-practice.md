@@ -1,16 +1,9 @@
-class: center, middle
+class: center, bottom, heading-black
+background-image: url("images/chopsticks.jpg")
 
-<img src="images/love-the-bomb.jpg" height="100%" />
+# Finding More Bugs With Less Effort
 
-# Property Based Testing - A Best Practice for Better Software
-
----
-
-class: image
-
-<img src="images/chopsticks.jpg" />
-
-## Charles O'Farrell
+## @charlesofarrell
 
 ???
 
@@ -262,9 +255,11 @@ class: center
 
 ---
 
-## Symmetry
+class: middle, center
 
-<img src="images/property-inverse.png" style="width: 600px;" />
+## Round-trip
+
+<img src="images/property-inverse.png" />
 
 ---
 
@@ -389,18 +384,6 @@ forAll { u: User =>
 <pre><code class="warning">Some(User(\NULL)) != Some(User())
 </code></pre>
 
----
-class: image
-
-<img src="images/golden-ticket.jpg" />
-
-## Symmetry is your golden ticket
-
-???
-
-- Actually a bad analogy
-  - _Lots_ of examples/uses
-
 
 
 
@@ -417,9 +400,11 @@ class: image
 
 ---
 
-## Model-based
+class: middle, center
 
-<img src="images/model-based.png" style="width: 550px;"/>
+## Test Oracle
+
+<img src="images/model-based.png" />
 
 ---
 
@@ -642,9 +627,11 @@ forAll { users: List[Users] =>
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle
 
 ## Idempotence
+
+<img src="images/idempotence.png" />
 
 ---
 
@@ -708,6 +695,8 @@ forAll { m: Migration =>
 
 
 ---
+
+class: center, middle, section-aqua, heading-white
 
 ## Invariants
 
@@ -943,7 +932,7 @@ https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 ---
 
-class: center, middle, section-yellow, heading-black
+class: center, middle
 
 ## Getting Started
 
@@ -994,7 +983,7 @@ Invalid postcode: -1
 
 ---
 
-class: center, middle, section-yellow, heading-black
+class: center, middle, section-aqua, heading-white
 
 ## Generators
 
@@ -1315,7 +1304,7 @@ class: center, middle, section-aqua, heading-white
 
 ## Patterns
 
-- Symmetry
+- Round-trip
 - Test Oracle
 - Idempotence
 - Invariants
