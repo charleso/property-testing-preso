@@ -135,6 +135,14 @@ class: code
 
 ```scala
 def doStuff(x: Bool, y: Int): String
+```
+
+---
+
+class: code
+
+```scala
+def doStuff(x: Bool, y: Int): String
 
 def testDoStuff =
   forAll { (x : Bool, y: Int) =>
@@ -715,7 +723,22 @@ forAll { s: String =>
 }
 ```
 
-???
+---
+
+class: code
+
+```scala
+forAll { s: String =>
+  s.toLowerCase.length == s.length
+}
+```
+
+<pre><code class="warning">
+Expected 2 but got 1
+ARG_0: "İ"
+</code></pre>
+
+---
 
 - TODO MORE EXAMPLES
 
@@ -1296,6 +1319,12 @@ class: center, middle, section-aqua, heading-white
 
 class: center, middle, section-aqua, heading-white
 
+## One Property Can Find Multiple Bugs
+
+---
+
+class: center, middle, section-aqua, heading-white
+
 ## Shrinking
 
 ---
@@ -1308,7 +1337,12 @@ class: center, middle, section-aqua, heading-white
 - Test Oracle
 - Idempotence
 - Invariants
-- State-based
+
+---
+
+class: center, middle, section-aqua, heading-white
+
+## State-based
 
 ---
 
@@ -1326,6 +1360,14 @@ class: center, middle, section-aqua, heading-white
 
 - No longer feels like you're writing tests for test sake
 - Enjoyable tot think about your system invariants
+
+---
+
+class: middle, center
+
+### https://en.wikipedia.org/wiki/QuickCheck
+
+> 31 Languages
 
 ---
 
