@@ -132,11 +132,9 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
 
     reverse(?) == ???
-
-}
 ```
 
 ---
@@ -150,18 +148,16 @@ class: code
 
 
 
-
 def forAll[A](g: Gen[A], a => Prop): Prop
 </code></pre>
 
 ```scala-bg
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (???)             { l =>
     reverse(l) == ???
   }
-}
 
 def forAll[A](g: Gen[A], a => Prop): Prop
 ```
@@ -179,18 +175,16 @@ class: code
 
 
 
-
 def genList[A](g: Gen[A]): Gen[List[A]]
 </code></pre>
 
 ```scala-bg
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(???))    { l =>
     reverse(l) == ???
   }
-}
 
 def forAll[A](g: Gen[A], a => Prop): Prop
 
@@ -212,18 +206,16 @@ class: code
 
 
 
-
 def genInt: Gen[Int]
 </code></pre>
 
 ```scala-bg
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(l) == ???
   }
-}
 
 def forAll[A](g: Gen[A], a => Prop): Prop
 
@@ -239,11 +231,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(l) == ???
   }
-}
 ```
 
 ---
@@ -253,11 +244,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(reverse(l)) == l
   }
-}
 ```
 
 ---
@@ -267,11 +257,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(reverse(l)) == l
   }
-}
 ```
 
 <pre><code class="warning">
@@ -285,11 +274,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(reverse(l)) == l
   }
-}
 ```
 
 <pre><code class="warning">
@@ -321,11 +309,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(reverse(l)) == l
   }
-}
 ```
 
 <pre><code class="warning">
@@ -344,11 +331,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(reverse(l)) == l
   }
-}
 ```
 <pre><code class="warning">
 ! testReverse: Falsified after 2 passed tests.
