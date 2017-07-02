@@ -1057,7 +1057,12 @@ class: middle, center
 
 <img src="images/jh.png" />
 
-> &nbsp;
+---
+
+class: middle, center
+
+<img src="images/jh.png" />
+<img src="https://image.flaticon.com/icons/png/128/126/126157.png" />
 
 ???
 
@@ -1078,6 +1083,16 @@ class: center
 <img src="images/volvo.jpg" width="100%" />
 
 http://www.quviq.com/volvo-quickcheck/
+
+---
+
+class: center, middle
+
+<img src="http://blog.trifork.com/wp-content/uploads/2013/06/Riak_product_logo.png" />
+
+> Poolboy had 85% test coverage (and most of the remaining 15% was irrelevant boilerplate) when I started QuickChecking it, and I felt pretty happy with its solidity, so I didn’t expect to find many bugs, if any. I was very wrong.
+
+http://basho.com/posts/technical/quickchecking-poolboy-for-fun-and-profit/
 
 ---
 
@@ -1188,8 +1203,8 @@ class: code
 
 ```scala
 def testUser = {
-  forAll(getString) { name =>
-  forAll(getInt) { postcode =>
+  forAll(genString) { name =>
+  forAll(genInt) { postcode =>
 
     val user = User(name, postcode)
 
@@ -1204,8 +1219,8 @@ class: code
 
 ```scala
 def testUser = {
-  forAll(getString) { name =>
-  forAll(getInt) { postcode =>
+  forAll(genString) { name =>
+  forAll(genInt) { postcode =>
 
     val user = User(name, postcode)
 
@@ -1310,15 +1325,48 @@ def testMigration = {
 }
 
 def genUsername: Gen[String] =
-  genFrequency(
-    19 -> genList(genAlphaNum)
-  , 1  -> genConst("null")
+
+          genList(genAlphaNum)
+
   )
 ```
 
 ???
 
 - Ideally you don't have to add any more tests
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+
+
+
+  genFrequency(
+
+    1  -> genConst("null")
+  )
+</code></pre>
+
+```scala-bg
+def testMigration = {
+  forAll(genUsername) { u =>
+
+    migrateUser(u)
+  }
+}
+
+def genUsername: Gen[String] =
+  genFrequency(
+    19 -> genList(genAlphaNum)
+  , 1  -> genConst("null")
+  )
+```
 
 ---
 
