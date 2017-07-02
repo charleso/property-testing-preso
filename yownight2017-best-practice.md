@@ -1429,7 +1429,6 @@ forAll(genDate) { dt =>
   val formatter = DateTimeFormat.fullDateTime()
 
   val s = formatter.print(dt)
-
   formatter.parseDateTime(s) == dt
 }
 ```
@@ -1451,7 +1450,6 @@ forAll(genDate) { dt =>
   val formatter = DateTimeFormat.fullDateTime()
 
   val s = formatter.print(dt)
-
   formatter.parseDateTime(s) == dt
 }
 ```
@@ -1631,22 +1629,16 @@ background-image: url(images/generators.jpeg)
 
 ---
 
-class: center, middle, section-aqua, heading-white
-
-## Fun!
-
-???
-
-- No longer feels like you're writing tests for test sake
-- Enjoyable tot think about your system invariants
-
----
-
 class: middle, center
 
 ### https://en.wikipedia.org/wiki/QuickCheck
 
 > 31 Languages
+
+???
+
+- No longer feels like you're writing tests for test sake
+- Enjoyable tot think about your system invariants
 
 ---
 
