@@ -43,7 +43,8 @@ class: middle
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-black
+background-image: url(images/example-based.jpeg)
 
 ## Example-based Testing
 
@@ -320,8 +321,8 @@ List(6569, 2147, 14801, 0, 1852, -9217, 0)
 
 ---
 
-class: right, bottom, heading-black
-background-image: url(http://media.istockphoto.com/photos/one-small-dollar-picture-id172411676)
+class: right, bottom, heading-white
+background-image: url(images/shrink.jpeg)
 
 ## Shrinking
 
@@ -384,7 +385,7 @@ def testReverse = {
 
 ---
 
-background-image: url(http://media.istockphoto.com/photos/climber-woman-standing-in-front-of-a-stone-rock-outdoor-picture-id480310380?s=2048x2048)
+background-image: url(images/steep.jpeg)
 
 ---
 
@@ -924,7 +925,8 @@ forAll(genString) { s =>
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-black
+background-image: url(images/state-based.jpeg)
 
 ## State-based Testing
 
@@ -1238,7 +1240,7 @@ NullPointerException
 ---
 
 class: center, middle, heading-white
-background-image: url(http://media.istockphoto.com/photos/power-generating-wind-turbines-picture-id514052448?s=2048x2048)
+background-image: url(images/generators.jpeg)
 
 ## Generators
 
@@ -1601,14 +1603,14 @@ class: center, middle, section-aqua, heading-white
 ---
 
 class: center, middle, heading-black
-background-image: url(https://images.unsplash.com/photo-1414322058660-a4c56ab6c1e2)
+background-image: url(images/example-based.jpeg)
 
 ## Example-based Testing
 
 ---
 
 class: center, middle, section-aqua, heading-white
-background-image: url(https://images.unsplash.com/photo-1436380921399-9c9a7d6697db)
+background-image: url(images/property-based.jpeg)
 
 ## Property-based Testing
 
@@ -1619,33 +1621,34 @@ background-image: url(https://images.unsplash.com/photo-1436380921399-9c9a7d6697
 ---
 
 class: center, middle, heading-white
-background-image: url(https://d2lm6fxwu08ot6.cloudfront.net/img-thumbs/960w/2O4DGFJ1Y5.jpg)
+background-image: url(images/learning.jpeg)
 
 ## Learning
 
 ---
 
-class: center, middle, heading-white
-background-image: url(http://media.istockphoto.com/photos/one-small-dollar-picture-id172411676)
+class: right, bottom, heading-white
+background-image: url(images/shrink.jpeg)
 
 ## Shrinking
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
 
 <img src="images/patterns.jpg" style="width: 70%;" />
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
+background-image: url(images/state-based.jpeg)
 
 ## State-based
 
 ---
 
 class: center, middle, heading-white
-background-image: url(http://media.istockphoto.com/photos/power-generating-wind-turbines-picture-id514052448?s=2048x2048)
+background-image: url(images/generators.jpeg)
 
 ## Generators
 
