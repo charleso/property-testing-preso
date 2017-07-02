@@ -1600,15 +1600,15 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
-class: center, middle, section-aqua, heading-white
-background-image: url(http://media.istockphoto.com/photos/black-fly-with-dark-eyes-on-a-leaf-picture-id533864152?s=2048x2048)
+class: center, middle, heading-black
+background-image: url(https://images.unsplash.com/photo-1414322058660-a4c56ab6c1e2)
 
 ## Example-based Testing
 
 ---
 
 class: center, middle, section-aqua, heading-white
-background-image: url(http://media.istockphoto.com/photos/spoonful-fo-crickets-picture-id531090263?s=2048x2048)
+background-image: url(https://images.unsplash.com/photo-1436380921399-9c9a7d6697db)
 
 ## Property-based Testing
 
@@ -1632,7 +1632,7 @@ background-image: url(http://media.istockphoto.com/photos/one-small-dollar-pictu
 
 ---
 
-class: center, middle, heading-white
+class: center, middle, section-aqua, heading-white
 
 <img src="images/patterns.jpg" style="width: 70%;" />
 
