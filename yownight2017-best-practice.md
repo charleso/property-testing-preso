@@ -158,7 +158,7 @@ class: code
 
 
 
-def forAll[A](g: Gen[A], a => Result): Result
+def forAll[A](g: Gen[A], a => Prop): Prop
 </code></pre>
 
 ```scala-bg
@@ -170,7 +170,7 @@ def testReverse = {
   }
 }
 
-def forAll[A](g: Gen[A], a => Result): Result
+def forAll[A](g: Gen[A], a => Prop): Prop
 ```
 
 ---
@@ -199,7 +199,7 @@ def testReverse = {
   }
 }
 
-def forAll[A](g: Gen[A], a => Result): Result
+def forAll[A](g: Gen[A], a => Prop): Prop
 
 def genList[A](g: Gen[A]): Gen[List[A]]
 ```
@@ -232,7 +232,7 @@ def testReverse = {
   }
 }
 
-def forAll[A](g: Gen[A], a => Result): Result
+def forAll[A](g: Gen[A], a => Prop): Prop
 
 def genList[A](g: Gen[A]): Gen[List[A]]
 
@@ -1046,7 +1046,7 @@ class: code
 ```scala
 trait Commands {
 
-  def property(threadCount: Int): Result
+  def property(threadCount: Int): Prop
 }
 ```
 
@@ -1434,7 +1434,7 @@ class: code
 import org.joda.time._
 
 
-forAll { dt: DateTime =>
+forAll(genDate) { dt =>
 
   val formatter = DateTimeFormat.fullDateTime()
 
@@ -1456,7 +1456,7 @@ class: code
 import org.joda.time._
 
 
-forAll { dt: DateTime =>
+forAll(genDate) { dt =>
 
   val formatter = DateTimeFormat.fullDateTime()
 
@@ -1495,12 +1495,11 @@ class: code
 import org.rauschig.jarchivelib._
 
 
-def archiveProp(archiver: ArchiverFactory): Prop =
+def archiveProp(archiver: Archiver): Prop =
 
-  forAll { files: Map[FilePath, Array[Byte]] =>
+  forAll(genFiles) { files =>
 
     val archive = archiver.create(files)
-
     archive.loadAll() == files
   }
 ```
@@ -1517,12 +1516,11 @@ class: code
 import org.rauschig.jarchivelib._
 
 
-def archiveProp(archiver: ArchiverFactory): Prop =
+def archiveProp(archiver: Archiver): Prop =
 
-  forAll { files: Map[FilePath, Array[Byte]] =>
+  forAll(genFiles) { files =>
 
     val archive = archiver.create(files)
-
     archive.loadAll() == files
   }
 
@@ -1540,12 +1538,11 @@ class: code
 import org.rauschig.jarchivelib._
 
 
-def archiveProp(archiver: ArchiverFactory): Prop =
+def archiveProp(archiver: Archiver): Prop =
 
-  forAll { files: Map[FilePath, Array[Byte]] =>
+  forAll(genFiles) { files =>
 
     val archive = archiver.create(files)
-
     archive.loadAll() == files
   }
 
@@ -1563,12 +1560,11 @@ class: code
 import org.rauschig.jarchivelib._
 
 
-def archiveProp(archiver: ArchiverFactory): Prop =
+def archiveProp(archiver: Archiver): Prop =
 
-  forAll { files: Map[FilePath, Array[Byte]] =>
+  forAll(genFiles) { files =>
 
     val archive = archiver.create(files)
-
     archive.loadAll() == files
   }
 
