@@ -367,11 +367,10 @@ class: code
 ```scala
 def reverse[A](l: List[A]): List[A]
 
-def testReverse = {
+def testReverse =
   forAll (genList(genInt)) { l =>
     reverse(l) == ???
   }
-}
 ```
 
 <pre><code class="warning">
