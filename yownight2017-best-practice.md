@@ -139,7 +139,25 @@ class: middle, center
 class: code
 
 ```scala
-def doStuff(x: Bool, y: Int): String
+def reverse[A](l: List[A]): List[A]
+```
+
+???
+
+- The "Hello World" of property based testing
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  reverse(List(1, 2, 3)) == List(3, 2, 1)
+
+
+}
 ```
 
 ---
@@ -147,12 +165,13 @@ def doStuff(x: Bool, y: Int): String
 class: code
 
 ```scala
-def doStuff(x: Bool, y: Int): String
+def reverse[A](l: List[A]): List[A]
 
-def testDoStuff =
-  forAll { (x : Bool, y: Int) =>
-    doStuff(x, y) == ???
-  }
+def testReverse = {
+  reverse(List(1, 2, 3)) == List(3, 2, 1)
+  reverse(List()) == List()
+
+}
 ```
 
 ---
@@ -160,16 +179,86 @@ def testDoStuff =
 class: code
 
 ```scala
-def doStuff(x: Bool, y: Int): String
+def reverse[A](l: List[A]): List[A]
 
-def testDoStuff =
-  forAll { (x : Bool, y: Int) =>
-    doStuff(x, y) == ???
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(l) == ???
   }
+}
+```
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(l) == ???
+  }
+}
 ```
 
 <pre><code class="warning">
-+ testDoStufff: OK, passed 100 tests.
+1. Property Testing
+2. ???
+3. Profit
+</code></pre>
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
+  }
+}
+```
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
+  }
+}
+```
+
+<pre><code class="warning">
++ testReverse: OK, passed 100 tests.
+</code></pre>
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
+  }
+}
+```
+
+<pre><code class="warning">
+List()
+List(2147483647, 1)
+List(-2147483648, 1, -1094275287)
+List(6569, 2147, 14801, 0, 1852, -9217, 0)
 </code></pre>
 
 
@@ -181,29 +270,33 @@ def testDoStuff =
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: right, bottom, heading-black
+background-image: url(http://media.istockphoto.com/photos/one-small-dollar-picture-id172411676)
 
 ## Shrinking
 
+
 ---
 
 class: code
 
 ```scala
-def doStuff(x: Bool, y: Int): String
+def reverse[A](l: List[A]): List[A]
 
-def testDoStuff =
-  forAll { (x : Bool, y: Int) =>
-    doStuff(x, y) == ???
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
   }
+}
 ```
 
 <pre><code class="warning">
-! testDoStuff: Falsified after 2 passed tests.
-> Labels of failing property:
-Expected "a" but got "b"
-> ARG_0: true
-> ARG_1: 10
+! testReverse: Falsified after 2 passed tests.
+
+  List(0, -1, 2147, 2090, -1, 0) !=
+  List(-2147, -1, -1, 0, 0, 2090)
+
+> ARG_0: List(0, -1, 2090, -2147, -1, 0)
 </code></pre>
 
 ---
@@ -211,20 +304,21 @@ Expected "a" but got "b"
 class: code
 
 ```scala
-def doStuff(x: Bool, y: Int): String
+def reverse[A](l: List[A]): List[A]
 
-def testDoStuff =
-  forAll { (x : Bool, y: Int) =>
-    doStuff(x, y) == ???
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
   }
+}
 ```
 <pre><code class="warning">
-! testDoStuff: Falsified after 2 passed tests.
-> Labels of failing property:
-Expected "a" but got "b"
-> ARG_0: true
-> ARG_1: 10
-> ARG_0_ORIGINAL: ....
+! testReverse: Falsified after 2 passed tests.
+
+  List(0, -1) !=
+  List(-1, 0)
+
+> ARG_0: List(0, -1)
 </code></pre>
 
 
@@ -280,9 +374,9 @@ class: middle, center
 class: code
 
 ```scala
-def toBytes(s: String, c: Charset): Array[Byte]
+def toBytes(s: String): Array[Byte]
 
-def fromBytes(b: Array[Bytes], c: Charset): String
+def fromBytes(b: Array[Bytes]): String
 ```
 
 ---
@@ -290,14 +384,14 @@ def fromBytes(b: Array[Bytes], c: Charset): String
 class: code
 
 ```scala
-def toBytes(s: String, c: Charset): Array[Byte]
+def toBytes(s: String): Array[Byte]
 
-def fromBytes(b: Array[Bytes], c: Charset): String
+def fromBytes(b: Array[Bytes]): String
 
 
-forAll { (s: String, c: Charset) =>
-  val b = toBytes(s, c)
-  fromBytes(b, c) == s
+forAll(genString) { s =>
+  val b = toBytes(s)
+  fromBytes(b) == s
 }
 ```
 
@@ -306,21 +400,20 @@ forAll { (s: String, c: Charset) =>
 class: code
 
 ```scala
-def toBytes(s: String, c: Charset): Array[Byte]
+def toBytes(s: String): Array[Byte]
 
-def fromBytes(b: Array[Bytes], c: Charset): String
+def fromBytes(b: Array[Bytes]): String
 
 
-forAll { (s: String, c: Charset) =>
-  val b = toBytes(s, c)
-  fromBytes(b, c) == s
+forAll(genString) { s =>
+  val b = toBytes(s)
+  fromBytes(b) == s
 }
 ```
 
 <pre><code class="warning">"돪" != "?"
 
 > ARG_0: "돪"
-> ARG_1: windows-1252
 </code></pre>
 
 ---
@@ -397,6 +490,10 @@ forAll { u: User =>
 
 <pre><code class="warning">Some(User(\NULL)) != Some(User())
 </code></pre>
+
+---
+
+background-image: url(https://d2lm6fxwu08ot6.cloudfront.net/img-thumbs/960w/2O4DGFJ1Y5.jpg)
 
 
 
@@ -986,7 +1083,7 @@ https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 class: center, middle
 
-## Getting Started
+## Fuzzing
 
 ---
 
@@ -995,9 +1092,11 @@ class: code
 ```scala
 def testUser = {
 
-  val user = User("bob", 2000)
 
-  db.insert(user)
+
+    val user = User("bob", 2000)
+
+    db.insert(user)
 }
 ```
 
@@ -1006,12 +1105,14 @@ def testUser = {
 class: code
 
 ```scala
-forAll { (name: String, postcode: Int) =>
+def testUser = {
+  forAll(getString) { name =>
+  forAll(getInt) { postcode =>
 
-  val user = User(name, postcode)
+    val user = User(name, postcode)
 
-  db.insert(user)
-}
+    db.insert(user)
+}}}
 ```
 
 ---
@@ -1020,17 +1121,21 @@ class: code
 
 
 ```scala
-forAll { (name: String, postcode: Int) =>
+def testUser - {
+  forAll(getString) { name =>
+  forAll(getInt) { postcode =>
 
-  val user = User(name, postcode)
+    val user = User(name, postcode)
 
-  db.insert(user)
+    db.insert(user)
 }
 ```
 
 <pre><code class="warning">
-Invalid username: ""
-Invalid postcode: -1
+! testUser: Falsified after 21 passed tests.
+NullPointerException
+> ARG_0: ""
+> ARG_1: 0
 </code></pre>
 
 ---
@@ -1048,13 +1153,11 @@ class: center, middle, section-aqua, heading-white
 class: code
 
 ```scala
-def genUsername: Gen[Username] =
+def genUsername: Gen[String] =
   Gen.nonEmptyListOf(Gen.alphaChar)
-    .map(Username.fromString)
 
-def genPostcode: Gen[Postcode] =
+def genPostcode: Gen[Int] =
   Gen.choose(1000, 9999)
-    .map(Postcode.fromInt)
 ```
 
 ???
@@ -1067,20 +1170,18 @@ def genPostcode: Gen[Postcode] =
 class: code
 
 ```scala
-def genUsername: Gen[Username] =
+def genUsername: Gen[String] =
   Gen.nonEmptyListOf(Gen.alphaChar)
-    .map(Username.fromString)
 
-def genPostcode: Gen[Postcode] =
+def genPostcode: Gen[Int] =
   Gen.choose(1000, 9999)
-    .map(Postcode.fromInt)
 
 
-forAll { (u: Username, p: Postcode) => ... }
+forAll(genUsername, genPostcode) { ... }
 
-forAll { (u1: Username, u2: Username) => ... }
+forAll(genUsername, genUsername) { ... }
 
-forAll { p: List[Postcode] => ... }
+forAll(genList(genUsername)) { ... }
 ```
 
 ???
@@ -1102,8 +1203,14 @@ class: middle, center
 class: code
 
 ```scala
-def testNullUsername = {
+def testMigration = {
 
+
+    dbMigration.migrate("bob")
+
+}
+
+def testNullUsername = {
   dbMigration.migrate("null")
 }
 ```
@@ -1117,17 +1224,43 @@ def testNullUsername = {
 class: code
 
 ```scala
-def genUsername: Gen[Username] =
+def testMigration = {
+  forAll(genUsername) { u =>
 
+    dbMigration.migrate(u)
+  }
+}
+
+def genUsername: Gen[String] =
   Gen.frequency(
     19 -> Gen.alphaStr
   , 1  -> Gen.const("null")
-  ).map(Username.fromString)
+  )
 ```
 
 ???
 
 - Ideally you don't have to add any more tests
+
+---
+
+class: code
+
+```scala
+def testMigration = {
+  forAll(genUsername) { u =>
+
+    dbMigration.migrate(u)
+  }
+}
+
+def testInsert = {
+  forAll(genUsername) { u =>
+
+    dbUser.insert(u)
+  }
+}
+```
 
 
 
@@ -1358,6 +1491,13 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
+class: center, middle, heading-white
+background-image: url(https://d2lm6fxwu08ot6.cloudfront.net/img-thumbs/960w/2O4DGFJ1Y5.jpg)
+
+## Learning
+
+---
+
 class: center, middle, section-aqua, heading-white
 
 ## Shrinking
@@ -1367,11 +1507,6 @@ class: center, middle, section-aqua, heading-white
 class: center, middle, section-aqua, heading-white
 
 ## Patterns
-
-- Round-trip
-- Test Oracle
-- Idempotence
-- Invariants
 
 ---
 
