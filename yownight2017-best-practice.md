@@ -37,12 +37,6 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
-class: middle
-
-> "Program testing can be used to show the presence of bugs, but never to show their absence!" - Edsger W. Dijkstra
-
----
-
 class: center, middle, heading-black
 background-image: url(images/example-based.jpeg)
 
@@ -575,7 +569,7 @@ forAll(genUser) { user =>
 
 ---
 
-background-image: url(https://d2lm6fxwu08ot6.cloudfront.net/img-thumbs/960w/2O4DGFJ1Y5.jpg)
+background-image: url(images/learning.jpeg)
 
 
 
@@ -925,7 +919,7 @@ forAll(genString) { s =>
 
 ---
 
-class: center, middle, heading-black
+class: bottom, right, heading-white
 background-image: url(images/state-based.jpeg)
 
 ## State-based Testing
@@ -1050,7 +1044,10 @@ class: middle, center
 class: code
 
 ```scala
-final def property(threadCount: Int): Prop
+trait Commands {
+
+  def property(threadCount: Int): Prop
+}
 ```
 
 ---
