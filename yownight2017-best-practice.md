@@ -1210,44 +1210,6 @@ background-image: url(images/generators.jpeg)
 
 ---
 
-class: code
-
-```scala
-def genUsername: Gen[String] =
-  genString
-```
-
----
-
-class: code
-
-```scala
-def genUsername: Gen[String] =
-  genList(genAlphaNum)
-```
-
----
-
-class: code
-
-```scala
-def genUsername: Gen[String] =
-  genList(genAlphaNum)
-
-
-forAll(genUsername) { ... }
-
-forAll(genUsername, genUsername) { ... }
-
-forAll(genList(genUsername)) { ... }
-```
-
-???
-
-- We can add more properties using the _same_ generator
-
----
-
 class: middle, center
 
 <img src="images/exploits_of_a_mom.png" />
