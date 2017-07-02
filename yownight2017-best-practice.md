@@ -1225,7 +1225,7 @@ def testUser = {
     val user = User(name, postcode)
 
     db.insert(user)
-}
+}}}
 ```
 
 <pre><code class="warning">
@@ -1237,7 +1237,8 @@ NullPointerException
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
+background-image: url(http://media.istockphoto.com/photos/power-generating-wind-turbines-picture-id514052448?s=2048x2048)
 
 ## Generators
 
@@ -1271,6 +1272,8 @@ class: code
 def genUsername: Gen[String] =
   genList(genAlphaNum)
 
+
+forAll(genUsername) { ... }
 
 forAll(genUsername, genUsername) { ... }
 
@@ -1327,8 +1330,6 @@ def testMigration = {
 def genUsername: Gen[String] =
 
           genList(genAlphaNum)
-
-  )
 ```
 
 ???
@@ -1600,20 +1601,20 @@ class: center, middle, section-aqua, heading-white
 ---
 
 class: center, middle, section-aqua, heading-white
+background-image: url(http://media.istockphoto.com/photos/black-fly-with-dark-eyes-on-a-leaf-picture-id533864152?s=2048x2048)
 
 ## Example-based Testing
 
 ---
 
 class: center, middle, section-aqua, heading-white
+background-image: url(http://media.istockphoto.com/photos/spoonful-fo-crickets-picture-id531090263?s=2048x2048)
 
 ## Property-based Testing
 
----
+???
 
-class: center, middle, section-aqua, heading-white
-
-## One Property Can Find Multiple Bugs
+## One Property / Many Bugs
 
 ---
 
@@ -1624,15 +1625,16 @@ background-image: url(https://d2lm6fxwu08ot6.cloudfront.net/img-thumbs/960w/2O4D
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
+background-image: url(http://media.istockphoto.com/photos/one-small-dollar-picture-id172411676)
 
 ## Shrinking
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
 
-## Patterns
+<img src="images/patterns.jpg" style="width: 70%;" />
 
 ---
 
@@ -1642,7 +1644,8 @@ class: center, middle, section-aqua, heading-white
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-white
+background-image: url(http://media.istockphoto.com/photos/power-generating-wind-turbines-picture-id514052448?s=2048x2048)
 
 ## Generators
 
