@@ -842,21 +842,16 @@ background-image: url(images/shrink.jpeg)
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
-
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
+forAll(genString) { s =>
+  s.toLowerCase.length == s.length
+}
 ```
 
 <pre><code class="warning">
-! testReverse: Falsified after 2 passed tests.
+! testLowerCase: Falsified after 89 passed tests.
 
-  List(0, -1, 2147, 2090, -1, 0) !=
-  List(-2147, -1, -1, 0, 0, 2090)
-
-> ARG_0: List(0, -1, 2090, -2147, -1, 0)
+Expected 15 but got 14
+ARG_0: "()*@#%KFPSDlİDcx;lk1&(#"
 </code></pre>
 
 ---
@@ -864,21 +859,19 @@ def testReverse =
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
-
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
+forAll(genString) { s =>
+  s.toLowerCase.length == s.length
+}
 ```
+
 <pre><code class="warning">
-! testReverse: Falsified after 2 passed tests.
+! testLowerCase: Falsified after 89 passed tests.
 
-  List(0, -1) !=
-  List(-1, 0)
-
-> ARG_0: List(0, -1)
+Expected 2 but got 1
+ARG_0: "İ"
+ARG_0_ORIGINAL: "()*@#%KFPSDlİDcx;lk1&(#"
 </code></pre>
+
 
 
 
