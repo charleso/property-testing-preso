@@ -658,7 +658,7 @@ class: code
 def listSortByName: List[User]
 
 
-forAll(genList(genUsers)) { users =>
+forAll(genList(genUser)) { users =>
 
   users.foreach(u => userDb.insert(u))
 
@@ -685,7 +685,7 @@ class: code
 def findByPostCode(postcode: Int): List[User]
 
 forAll(genPostcode) { postcode =>
-forAll(genList(genUsers)) { users =>
+forAll(genList(genUser)) { users =>
 
 
   val has = users.filter(_.postcode == postcode)
@@ -712,8 +712,8 @@ class: code
 def findByPostCode(postcode: Int): List[User]
 
 forAll(genPostcode) { postcode =>
-forAll(genList(genUsers)) { u1 =>
-forAll(genList(genUsers)) { u2 =>
+forAll(genList(genUser)) { u1 =>
+forAll(genList(genUser)) { u2 =>
 
   val has = u1.map(_.copy(postcode = postcode))
 
