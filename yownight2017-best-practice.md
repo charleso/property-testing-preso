@@ -437,7 +437,8 @@ def fromJson(json: Json): Option[User]
 
 forAll(genUser) { user =>
 
-  fromJson(toJson(user)) == Some(user)
+  val json = toJson(user)
+  fromJson(json) == Some(user)
 }
 ```
 
@@ -446,9 +447,9 @@ forAll(genUser) { user =>
 class: code
 
 ```scala
-def insert(u: User): UserId
+def insertUser(u: User): UserId
 
-def get(u: UserId): Option[User]
+def getUser(u: UserId): Option[User]
 ```
 
 ---
@@ -456,16 +457,15 @@ def get(u: UserId): Option[User]
 class: code
 
 ```scala
-def insert(u: User): UserId
+def insertUser(u: User): UserId
 
-def get(u: UserId): Option[User]
+def getUser(u: UserId): Option[User]
 
 
 forAll(genUser) { user =>
 
-  val id = userDb.insert(user)
-
-  userDb.get(id) == Some(user)
+  val id = insertUser(user)
+  getUser(id) == Some(user)
 }
 ```
 
@@ -474,16 +474,15 @@ forAll(genUser) { user =>
 class: code
 
 ```scala
-def insert(u: User): UserId
+def insertUser(u: User): UserId
 
-def get(u: UserId): Option[User]
+def getUser(u: UserId): Option[User]
 
 
 forAll(genUser) { user =>
 
-  val id = userDb.insert(user)
-
-  userDb.get(id) == Some(user)
+  val id = insertUser(user)
+  getUser(id) == Some(user)
 }
 ```
 
@@ -646,7 +645,7 @@ ARG_1: 1
 class: code
 
 ```scala
-def listSortByName: List[User] =
+def listUsersSortByName: List[User] =
   "SELECT * FROM user ORDER BY name ASC"
 ```
 
@@ -655,14 +654,14 @@ def listSortByName: List[User] =
 class: code
 
 ```scala
-def listSortByName: List[User]
+def listUsersSortByName: List[User]
 
 
 forAll(genList(genUser)) { users =>
 
-  users.foreach(u => userDb.insert(u))
+  users.foreach(u => insertUser(u))
 
-  val l = userDb.listSortByName
+  val l = listUsersSortByName
 
   l == users.sortBy(_.name.toLowerCase)
 }
@@ -673,7 +672,7 @@ forAll(genList(genUser)) { users =>
 class: code
 
 ```scala
-def findByPostCode(postcode: Int): List[User] =
+def findUsersByPostCode(code: Int): List[User] =
   "SELECT * FROM user WHERE postcode = ?"
 ```
 
@@ -682,7 +681,7 @@ def findByPostCode(postcode: Int): List[User] =
 class: code
 
 ```scala
-def findByPostCode(postcode: Int): List[User]
+def findUsersByPostCode(code: Int): List[User]
 
 forAll(genPostcode) { postcode =>
 forAll(genList(genUser)) { users =>
@@ -695,7 +694,7 @@ forAll(genList(genUser)) { users =>
   users
     .foreach(u => userDb.insert(u))
 
-  userDb.findByPostCode(postcode) == has
+  userDb.findUsersByPostCode(postcode) == has
 }}
 ```
 
@@ -765,11 +764,13 @@ forAll(genList(genInt)) { s =>
 class: code
 
 ```scala
+def createOrUpdateUser(u: User): UserId
+
 forAll(genUser) { u =>
 
-  val r1 = userDb.createOrUpdate(u)
+  val r1 = createOrUpdateUser(u)
 
-  val r2 = userDb.createOrUpdate(u)
+  val r2 = createOrUpdateUser(u)
 
   r1 == r2
 }
@@ -824,15 +825,6 @@ Expected 2 but got 1
 ARG_0: "İ"
 </code></pre>
 
----
-
-class: code
-
-```scala
-forAll(genString) { s =>
-  s.toLowerCase(Locale.US).length == s.length
-}
-```
 
 
 
@@ -922,9 +914,9 @@ background-image: url(images/state-based.jpeg)
 class: code
 
 ```scala
-def insert(u: User): Id
+def insertUser(u: User): UserId
 
-def get(i: Id): Option[User]
+def getUser(i: UserId): Option[User]
 ```
 
 ---
@@ -932,7 +924,7 @@ def get(i: Id): Option[User]
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 ```
 
 ---
@@ -940,7 +932,7 @@ case class State(users: Map[Id, User])
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 
 case class Insert(u: User) extends Commands
 ```
@@ -950,18 +942,18 @@ case class Insert(u: User) extends Commands
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 
 case class Insert(u: User) extends Commands {
 
-  def nextState(state: State, id: Id): State =
+  def nextState(state: State, id: UserId): State =
     state + (id -> u)
 
   def preCondition(state: State): Boolean =
     true
 
-  def run: Id =
-    insert(u)
+  def run: UserId =
+    insertUser(u)
 }
 ```
 
@@ -970,11 +962,11 @@ case class Insert(u: User) extends Commands {
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 
 case class Insert(u: User) extends Commands
 
-case class Get(u: Id) extends Commands
+case class Get(u: UserId) extends Commands
 ```
 
 ---
@@ -982,11 +974,11 @@ case class Get(u: Id) extends Commands
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 
 case class Insert(u: User) extends Commands
 
-case class Get(u: Id) extends Commands
+case class Get(u: UserId) extends Commands
 
 def genCommand: Gen[Command] =
   genOneOf(Insert, Get)
@@ -997,11 +989,11 @@ def genCommand: Gen[Command] =
 class: code
 
 ```scala
-case class State(users: Map[Id, User])
+case class State(users: Map[UserId, User])
 
 case class Insert(u: User) extends Commands
 
-case class Get(u: Id) extends Commands
+case class Get(u: UserId) extends Commands
 
 def genCommand: Gen[Command] =
   genOneOf(Insert, Get)
@@ -1170,7 +1162,7 @@ def testUser = {
 
     val user = User("bob", 2000)
 
-    db.insert(user)
+    insertUser(user)
 }
 ```
 
@@ -1185,7 +1177,7 @@ def testUser = {
 
     val user = User(name, postcode)
 
-    db.insert(user)
+    insertUser(user)
 }}}
 ```
 
@@ -1201,7 +1193,7 @@ def testUser = {
 
     val user = User(name, postcode)
 
-    db.insert(user)
+    insertUser(user)
 }}}
 ```
 
