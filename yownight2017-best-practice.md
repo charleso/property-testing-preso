@@ -1046,7 +1046,7 @@ class: code
 ```scala
 trait Commands {
 
-  def property(threadCount: Int): Prop
+  def property(threadCount: Int): Result
 }
 ```
 
@@ -1298,16 +1298,14 @@ class: middle, center
 class: code
 
 ```scala
-def testMigrateUser = {
+def testMigrateUser =
 
 
     migrateUser("bob")
 
-}
 
-def testNullUsername = {
+def testNullUsername =
   migrateUser("null")
-}
 ```
 
 ???
@@ -1319,12 +1317,11 @@ def testNullUsername = {
 class: code
 
 ```scala
-def testMigration = {
+def testMigration =
   forAll(genUsername) { u =>
 
     migrateUser(u)
   }
-}
 
 def genUsername: Gen[String] =
 
@@ -1346,7 +1343,6 @@ class: code
 
 
 
-
   genFrequency(
 
     1  -> genConst("null")
@@ -1354,12 +1350,11 @@ class: code
 </code></pre>
 
 ```scala-bg
-def testMigration = {
+def testMigration =
   forAll(genUsername) { u =>
 
     migrateUser(u)
   }
-}
 
 def genUsername: Gen[String] =
   genFrequency(
@@ -1373,19 +1368,17 @@ def genUsername: Gen[String] =
 class: code
 
 ```scala
-def testMigration = {
+def testMigration =
   forAll(genUsername) { u =>
 
     migrateUser(u)
   }
-}
 
-def testInsert = {
+def testInsert =
   forAll(genUsername) { u =>
 
     insertUser(u)
   }
-}
 ```
 
 
@@ -1637,10 +1630,10 @@ class: center, middle, heading-white
 
 ---
 
-class: center, middle, heading-white
+class: bottom, right, heading-white
 background-image: url(images/state-based.jpeg)
 
-## State-based
+## State-based Test
 
 ---
 
