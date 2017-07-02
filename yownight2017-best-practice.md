@@ -45,94 +45,7 @@ class: middle
 
 class: center, middle, section-aqua, heading-white
 
-## Why is testing hard?
-
----
-
-class: center, middle, section-aqua, heading-white
-
 ## Example-based Testing
-
----
-
-class: code
-
-```scala
-def doStuff(x: Bool): String
-```
-
-<pre><code class="warning">2 possible inputs
-</code></pre>
-
----
-
-class: code
-
-```scala
-def doStuff(x: Bool): String
-
-def testDoStuff = {
-  doStuff(true) == ...
-  doStuff(false) == ...
-}
-```
-
-<pre><code class="warning">2 possible inputs
-</code></pre>
-
----
-
-class: code
-
-```scala
-def doStuff(x: Bool, y: Int): String
-
-def testDoStuff = {
-  doStuff(true, 0) == ...
-  doStuff(true, -1) == ...
-  doStuff(true, 1) == ...
-  doStuff(false, 1) == ...
-}
-```
-
-<pre><code class="warning">2 * 4.3e9 possible inputs
-</code></pre>
-
----
-
-class: middle, center
-
-<img src="images/threads-joke.png" />
-
----
-
-class: middle, center
-
-<img src="images/qa-engineer-tweet.png" />
-
-
-
-
-
-
-
----
-
-class: middle, center
-
-<img src="images/quickcheck-paper.png" />
-
-???
-
-- Year 2000!
-
----
-
-class: middle, center
-
-### https://en.wikipedia.org/wiki/QuickCheck
-
-> 31 Languages
 
 ---
 
@@ -182,10 +95,152 @@ class: code
 def reverse[A](l: List[A]): List[A]
 
 def testReverse = {
+  reverse(List(1, 2, 3)) == List(3, 2, 1)
+  reverse(List()) == List()
+  reverse(List(1, 1, 3)) == List(3, 1, 1)
+}
+```
+
+---
+
+class: middle, center
+
+<img src="images/qa-engineer-tweet.png" />
+
+
+
+
+
+
+
+---
+
+class: middle, center
+
+<img src="images/quickcheck-paper.png" />
+
+???
+
+- Year 2000!
+
+---
+
+class: middle, center
+
+### https://en.wikipedia.org/wiki/QuickCheck
+
+> 31 Languages
+
+---
+
+class: center, middle, section-aqua, heading-white
+
+## Hello World
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+
+    reverse(?) == ???
+}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+  forAll (???)
+
+
+
+
+def forAll[A](g: Gen[A], a => Result): Result
+</code></pre>
+
+```scala-bg
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (???)             { l =>
+    reverse(l) == ???
+  }
+}
+
+def forAll[A](g: Gen[A], a => Result): Result
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+          genList(???)
+
+
+
+
+
+
+def genList[A](g: Gen[A]): Gen[List[A]]
+</code></pre>
+
+```scala-bg
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(???))    { l =>
+    reverse(l) == ???
+  }
+}
+
+def forAll[A](g: Gen[A], a => Result): Result
+
+def genList[A](g: Gen[A]): Gen[List[A]]
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+                  genInt
+
+
+
+
+
+
+
+
+def genInt: Gen[Int]
+</code></pre>
+
+```scala-bg
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
   forAll (genList(genInt)) { l =>
     reverse(l) == ???
   }
 }
+
+def forAll[A](g: Gen[A], a => Result): Result
+
+def genList[A](g: Gen[A]): Gen[List[A]]
+
+def genInt: Gen[Int]
 ```
 
 ---
@@ -201,12 +256,6 @@ def testReverse = {
   }
 }
 ```
-
-<pre><code class="warning">
-1. Property Testing
-2. ???
-3. Profit
-</code></pre>
 
 ---
 
@@ -324,6 +373,37 @@ def testReverse = {
 
 
 
+
+
+
+
+
+
+
+
+---
+
+background-image: url(http://media.istockphoto.com/photos/climber-woman-standing-in-front-of-a-stone-rock-outdoor-picture-id480310380?s=2048x2048)
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse = {
+  forAll (genList(genInt)) { l =>
+    reverse(l) == ???
+  }
+}
+```
+
+<pre><code class="warning">
+1. Property Testing
+2. ???
+3. Profit
+</code></pre>
 
 
 
@@ -973,6 +1053,20 @@ ARG_0: Actions(List(Insert, Insert, Get))
 
 class: middle, center
 
+<img src="images/threads-joke.png" />
+
+---
+
+class: code
+
+```scala
+final def property(threadCount: Int): Prop
+```
+
+---
+
+class: middle, center
+
 <img src="images/jh.png" />
 
 > &nbsp;
@@ -1121,7 +1215,7 @@ class: code
 
 
 ```scala
-def testUser - {
+def testUser = {
   forAll(getString) { name =>
   forAll(getInt) { postcode =>
 
