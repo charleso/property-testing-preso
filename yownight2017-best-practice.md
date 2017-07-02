@@ -148,7 +148,7 @@ class: code
 
 
 
-def forAll[A](g: Gen[A], a => Prop): Prop
+def forAll[A](Gen[A], A => Prop): Prop
 </code></pre>
 
 ```scala-bg
@@ -159,7 +159,7 @@ def testReverse =
     reverse(l) == ???
   }
 
-def forAll[A](g: Gen[A], a => Prop): Prop
+def forAll[A](Gen[A], A => Prop): Prop
 ```
 
 ---
@@ -175,7 +175,7 @@ class: code
 
 
 
-def genList[A](g: Gen[A]): Gen[List[A]]
+def genList[A](Gen[A]): Gen[List[A]]
 </code></pre>
 
 ```scala-bg
@@ -186,9 +186,9 @@ def testReverse =
     reverse(l) == ???
   }
 
-def forAll[A](g: Gen[A], a => Prop): Prop
+def forAll[A](Gen[A], A => Prop): Prop
 
-def genList[A](g: Gen[A]): Gen[List[A]]
+def genList[A](Gen[A]): Gen[List[A]]
 ```
 
 ---
@@ -217,9 +217,9 @@ def testReverse =
     reverse(l) == ???
   }
 
-def forAll[A](g: Gen[A], a => Prop): Prop
+def forAll[A](Gen[A], A => Prop): Prop
 
-def genList[A](g: Gen[A]): Gen[List[A]]
+def genList[A](Gen[A]): Gen[List[A]]
 
 def genInt: Gen[Int]
 ```
@@ -294,56 +294,6 @@ List(6569, 2147, 14801, 0, 1852, -9217, 0)
 
 
 
----
-
-class: right, bottom, heading-white
-background-image: url(images/shrink.jpeg)
-
-## Shrinking
-
-
----
-
-class: code
-
-```scala
-def reverse[A](l: List[A]): List[A]
-
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
-```
-
-<pre><code class="warning">
-! testReverse: Falsified after 2 passed tests.
-
-  List(0, -1, 2147, 2090, -1, 0) !=
-  List(-2147, -1, -1, 0, 0, 2090)
-
-> ARG_0: List(0, -1, 2090, -2147, -1, 0)
-</code></pre>
-
----
-
-class: code
-
-```scala
-def reverse[A](l: List[A]): List[A]
-
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
-```
-<pre><code class="warning">
-! testReverse: Falsified after 2 passed tests.
-
-  List(0, -1) !=
-  List(-1, 0)
-
-> ARG_0: List(0, -1)
-</code></pre>
 
 
 
@@ -354,11 +304,6 @@ def testReverse =
 
 
 
-
-
----
-
-background-image: url(images/steep.jpeg)
 
 ---
 
@@ -888,6 +833,61 @@ forAll(genString) { s =>
   s.toLowerCase(Locale.US).length == s.length
 }
 ```
+
+
+
+
+---
+
+class: right, bottom, heading-white
+background-image: url(images/shrink.jpeg)
+
+## Shrinking
+
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse =
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
+  }
+```
+
+<pre><code class="warning">
+! testReverse: Falsified after 2 passed tests.
+
+  List(0, -1, 2147, 2090, -1, 0) !=
+  List(-2147, -1, -1, 0, 0, 2090)
+
+> ARG_0: List(0, -1, 2090, -2147, -1, 0)
+</code></pre>
+
+---
+
+class: code
+
+```scala
+def reverse[A](l: List[A]): List[A]
+
+def testReverse =
+  forAll (genList(genInt)) { l =>
+    reverse(reverse(l)) == l
+  }
+```
+<pre><code class="warning">
+! testReverse: Falsified after 2 passed tests.
+
+  List(0, -1) !=
+  List(-1, 0)
+
+> ARG_0: List(0, -1)
+</code></pre>
+
 
 
 
