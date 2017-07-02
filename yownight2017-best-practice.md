@@ -16,19 +16,10 @@ background-image: url("images/chopsticks.jpg")
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-black
+background-image: url(images/goal.jpeg)
 
 ## Motivation?
-
-#### &nbsp;
-
----
-
-class: center, middle, section-aqua, heading-white
-
-## Motivation?
-
-#### Writing correct software
 
 ???
 
@@ -128,9 +119,11 @@ class: middle, center
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: code, middle, center
 
-## Hello World
+```scala
+println("Hello World")
+```
 
 ---
 
@@ -1402,27 +1395,24 @@ def testInsert =
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: bottom, left, heading-white
+background-image: url(images/hunt.jpeg)
 
 ## Bug hunting
 
 ---
 
-## [@markhibberd](https://twitter.com/markhibberd)
+class: top, center
 
-<i style="font-size: 26px">
-"Maybe you could test a relatively well known open source library and find a
-bug for something they have unit tests for"
-</i>
+> "Maybe you could test a relatively well known open source library and find a
+bug for something they have unit tests for" [@markhibberd](https://twitter.com/markhibberd)
 
 ---
 
-## [@markhibberd](https://twitter.com/markhibberd)
+class: top, center
 
-<i style="font-size: 26px">
-"Maybe you could test a relatively well known open source library and find a
-bug for something they have unit tests for"
-</i>
+> "Maybe you could test a relatively well known open source library and find a
+bug for something they have unit tests for" [@markhibberd](https://twitter.com/markhibberd)
 
 <img src="images/challenge.jpg" style="position: absolute; width: 600px; right: 0px; bottom: 0px;" />
 
@@ -1582,9 +1572,10 @@ archiveProp(createArchiver(Ar))
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: center, middle, heading-black
+background-image: url(images/goal.jpeg)
 
-## Motivation: Writing Correct Software
+## Motivation
 
 ---
 
