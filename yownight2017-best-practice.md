@@ -324,6 +324,9 @@ def testReverse =
 3. Profit
 </code></pre>
 
+---
+
+- TODO Show writing original function
 
 
 
@@ -417,6 +420,11 @@ forAll(genString) { s =>
 
 ---
 
+class: center, middle, heading-white
+background-image: url(images/learning.jpeg)
+
+---
+
 class: code
 
 ```scala
@@ -441,6 +449,26 @@ forAll(genUser) { user =>
   fromJson(json) == Some(user)
 }
 ```
+
+---
+
+class: code
+
+```scala
+def toJson(user: User): Json
+
+def fromJson(json: Json): Option[User]
+
+
+forAll(genUser) { user =>
+
+  val json = toJson(user)
+  fromJson(json) == Some(user)
+}
+```
+
+- TODO TODO AESON
+
 
 ---
 
@@ -639,6 +667,11 @@ forAll(genInt) { i =>
 ARG_0: Date(2004,2,28)
 ARG_1: 1
 </code></pre>
+
+---
+
+class: center, middle, section-aqua, heading-white
+background-image: url(images/property-based.jpeg)
 
 ---
 
@@ -994,6 +1027,26 @@ def genCommand: Gen[Command] =
 
 <pre><code class="warning">
 ARG_0: Actions(List(Insert, Insert, Get))
+</code></pre>
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(u: User) extends Commands
+
+case class Get(u: UserId) extends Commands
+
+def genCommand: Gen[Command] =
+  genOneOf(Insert, Get)
+```
+
+<pre><code class="warning">
+ARG_0: Actions(List(Insert, Insert, Get))
+ARG_0_ORIGINAL: Actions(List(Insert, Insert, Get, Get, Insert, Get))
 </code></pre>
 
 ---
@@ -1534,16 +1587,16 @@ background-image: url(images/learning.jpeg)
 
 ---
 
+class: center, middle, heading-white
+
+<img src="images/patterns.jpg" style="width: 70%;" />
+
+---
+
 class: right, bottom, heading-white
 background-image: url(images/shrink.jpeg)
 
 ## Shrinking
-
----
-
-class: center, middle, heading-white
-
-<img src="images/patterns.jpg" style="width: 70%;" />
 
 ---
 
