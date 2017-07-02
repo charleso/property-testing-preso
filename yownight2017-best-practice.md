@@ -147,6 +147,7 @@ def reverse[A](l: List[A]): List[A]
 def testReverse = {
 
     reverse(?) == ???
+
 }
 ```
 
@@ -516,7 +517,7 @@ def toJson(user: User): Json
 def fromJson(json: Json): Option[User]
 
 
-forAll { user: User =>
+forAll(genUser) { user =>
 
   fromJson(toJson(user)) == Some(user)
 }
@@ -542,11 +543,11 @@ def insert(u: User): UserId
 def get(u: UserId): Option[User]
 
 
-forAll { u: User =>
+forAll(genUser) { user =>
 
-  val id = userDb.insert(u)
+  val id = userDb.insert(user)
 
-  userDb.get(id) == Some(u)
+  userDb.get(id) == Some(user)
 }
 ```
 
@@ -560,11 +561,11 @@ def insert(u: User): UserId
 def get(u: UserId): Option[User]
 
 
-forAll { u: User =>
+forAll(genUser) { user =>
 
-  val id = userDb.insert(u)
+  val id = userDb.insert(user)
 
-  userDb.get(id) == Some(u)
+  userDb.get(id) == Some(user)
 }
 ```
 
@@ -613,7 +614,7 @@ class: code
 def timSort(l: List[Int]): List[Int]
 
 
-forAll { l: List[Int] =>
+forAll(genList(genInt)) { l =>
 
   timSort(l) == bubbleSort(l)
 }
@@ -627,7 +628,7 @@ class: code
 def timSort(l: List[Int]): List[Int]
 
 
-forAll { l: List[Int] =>
+forAll(genList(genInt)) { l =>
 
   timSort(l) == bubbleSort(l)
 }
@@ -666,7 +667,7 @@ def toJoda(date: Date): JodaDate
 def fromJoda(date: JodaDate): Date
 
 
-forAll { d: Date =>
+forAll(genDate) { d =>
 
   d.toJoda.fromJoda == d
 }
@@ -691,11 +692,12 @@ def dayPlus(d: Date, i: Int): Date = {
   ...
 }
 
-forAll { (d: Date, i: Int) =>
+forAll(genDate) { d =>
+forAll(genInt) { i =>
 
   dayPlus(d, i) ==
     d.toJoda.plusDays(i).fromJoda
-}
+}}
 ```
 
 ---
@@ -707,11 +709,12 @@ def dayPlus(d: Date, i: Int): Date = {
   ...
 }
 
-forAll { (d: Date, i: Int) =>
+forAll(genDate) { d =>
+forAll(genInt) { i =>
 
   dayPlus(d, i) ==
     d.toJoda.plusDays(i).fromJoda
-}
+}}
 ```
 
 <pre><code class="warning">Date(2004,2,29) != Date(2004,3,1)
@@ -737,7 +740,7 @@ class: code
 def listSortByName: List[User]
 
 
-forAll { users: List[User] =>
+forAll(genList(genUsers)) { users =>
 
   users.foreach(u => userDb.insert(u))
 
@@ -763,8 +766,9 @@ class: code
 ```scala
 def findByPostCode(postcode: Int): List[User]
 
-forAll { (postcode: Int
-  , users: List[User]) =>
+forAll(genPostcode) { postcode =>
+forAll(genList(genUsers)) { users =>
+
 
   val has = users.filter(_.postcode == postcode)
 
@@ -774,7 +778,7 @@ forAll { (postcode: Int
     .foreach(u => userDb.insert(u))
 
   userDb.findByPostCode(postcode) == has
-}
+}}
 ```
 
 ???
@@ -789,8 +793,9 @@ class: code
 ```scala
 def findByPostCode(postcode: Int): List[User]
 
-forAll { (postcode: Int
-  , u1: List[User], u2: List[User]) =>
+forAll(genPostcode) { postcode =>
+forAll(genList(genUsers)) { u1 =>
+forAll(genList(genUsers)) { u2 =>
 
   val has = u1.map(_.copy(postcode = postcode))
 
@@ -800,7 +805,7 @@ forAll { (postcode: Int
     .foreach(u => userDb.insert(u))
 
   userDb.findByPostCode(postcode) == has
-}
+}}}
 ```
 
 
@@ -831,12 +836,7 @@ class: center, middle
 class: code
 
 ```scala
-forAll { s: List[Int] =>
-
-  l.distinct.distinct == l.distinct
-}
-
-forAll { l: List[Int] =>
+forAll(genList(genInt)) { s =>
 
   l.sorted.sorted == l.sorted
 }
@@ -847,30 +847,13 @@ forAll { l: List[Int] =>
 class: code
 
 ```scala
-forAll { u: User =>
+forAll(genUser) { u =>
 
   val r1 = userDb.createOrUpdate(u)
 
   val r2 = userDb.createOrUpdate(u)
 
   r1 == r2
-}
-```
-
----
-
-class: code
-
-```scala
-forAll { m: Migration =>
-
-  db.migrate(m)
-  val s1 = db.schema()
-
-  db.migrate(m)
-  val s2 = db.schema()
-
-  s1 == s2
 }
 ```
 
@@ -903,7 +886,7 @@ class: center, middle, section-aqua, heading-white
 class: code
 
 ```scala
-forAll { s: String =>
+forAll(genString) { s =>
   s.toLowerCase.length == s.length
 }
 ```
@@ -913,7 +896,7 @@ forAll { s: String =>
 class: code
 
 ```scala
-forAll { s: String =>
+forAll(genString) { s =>
   s.toLowerCase.length == s.length
 }
 ```
@@ -925,8 +908,13 @@ ARG_0: "İ"
 
 ---
 
-- TODO MORE EXAMPLES
+class: code
 
+```scala
+forAll(genString) { s =>
+  s.toLowerCase(Locale.US).length == s.length
+}
+```
 
 
 
@@ -1027,7 +1015,7 @@ case class Insert(u: User) extends Commands
 case class Get(u: Id) extends Commands
 
 def genCommand: Gen[Command] =
-  Gen.oneOf(Insert, Get)
+  genOneOf(Insert, Get)
 ```
 
 ---
@@ -1042,7 +1030,7 @@ case class Insert(u: User) extends Commands
 case class Get(u: Id) extends Commands
 
 def genCommand: Gen[Command] =
-  Gen.oneOf(Insert, Get)
+  genOneOf(Insert, Get)
 ```
 
 <pre><code class="warning">
@@ -1175,7 +1163,7 @@ https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 ---
 
-class: center, middle
+class: center, middle, section-aqua, heading-white
 
 ## Fuzzing
 
@@ -1248,16 +1236,8 @@ class: code
 
 ```scala
 def genUsername: Gen[String] =
-  Gen.nonEmptyListOf(Gen.alphaChar)
-
-def genPostcode: Gen[Int] =
-  Gen.choose(1000, 9999)
+  genString
 ```
-
-???
-
-- Yes it doesn't compile
-  - Just ignore
 
 ---
 
@@ -1265,13 +1245,17 @@ class: code
 
 ```scala
 def genUsername: Gen[String] =
-  Gen.nonEmptyListOf(Gen.alphaChar)
+  genList(genAlphaNum)
+```
 
-def genPostcode: Gen[Int] =
-  Gen.choose(1000, 9999)
+---
 
+class: code
 
-forAll(genUsername, genPostcode) { ... }
+```scala
+def genUsername: Gen[String] =
+  genList(genAlphaNum)
+
 
 forAll(genUsername, genUsername) { ... }
 
@@ -1297,15 +1281,15 @@ class: middle, center
 class: code
 
 ```scala
-def testMigration = {
+def testMigrateUser = {
 
 
-    dbMigration.migrate("bob")
+    migrateUser("bob")
 
 }
 
 def testNullUsername = {
-  dbMigration.migrate("null")
+  migrateUser("null")
 }
 ```
 
@@ -1321,14 +1305,14 @@ class: code
 def testMigration = {
   forAll(genUsername) { u =>
 
-    dbMigration.migrate(u)
+    migrateUser(u)
   }
 }
 
 def genUsername: Gen[String] =
-  Gen.frequency(
-    19 -> Gen.alphaStr
-  , 1  -> Gen.const("null")
+  genFrequency(
+    19 -> genList(genAlphaNum)
+  , 1  -> genConst("null")
   )
 ```
 
@@ -1344,14 +1328,14 @@ class: code
 def testMigration = {
   forAll(genUsername) { u =>
 
-    dbMigration.migrate(u)
+    migrateUser(u)
   }
 }
 
 def testInsert = {
   forAll(genUsername) { u =>
 
-    dbUser.insert(u)
+    insertUser(u)
   }
 }
 ```
