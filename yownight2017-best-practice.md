@@ -929,8 +929,10 @@ forAll(genUser) { user =>
 
 ---
 
-class: center, middle, heading-white
+class: bottom, right, heading-white
 background-image: url(images/edges.jpeg)
+
+## Edge Cases
 
 ???
 
@@ -1235,8 +1237,10 @@ ARG_1: 1
 
 ---
 
+class: bottom, left, heading-white
 background-image: url(images/property-based.jpeg)
 
+## Find More Bugs
 
 
 
@@ -1483,7 +1487,7 @@ ARG_0: "İ"
 
 ---
 
-class: right, bottom, heading-white
+Class: right, top, heading-white
 background-image: url(images/shrink.jpeg)
 
 ## Shrinking
@@ -2398,14 +2402,14 @@ background-image: url(images/rebuild.jpg)
 
 ---
 
-class: center, middle, heading-white
+class: bottom, right, heading-white
 background-image: url(images/edges.jpeg)
 
 ## Edge Cases
 
 ---
 
-class: right, bottom, heading-white
+class: right, top, heading-white
 background-image: url(images/shrink.jpeg)
 
 ## Shrinking
