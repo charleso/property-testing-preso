@@ -28,7 +28,7 @@ background-image: url("images/chopsticks.jpg")
 
 ---
 
-class: center, middle, heading-white
+class: bottom, left, heading-white
 background-image: url(https://images.unsplash.com/photo-1492515114975-b062d1a270ae)
 
 ## Motivation?
