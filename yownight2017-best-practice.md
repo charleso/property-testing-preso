@@ -1696,6 +1696,39 @@ def choose(i: Int, b: Int): Gen[Int]
 
 class: code
 
+<pre><code class="scala scala-fg">       genStringWithOffset
+
+
+
+
+
+
+def genStringWithOffset: Gen[(String, Int)] =
+  for {
+    s <- genString
+    i <- choose(0, s.length - 1)
+  } yield (s, i)
+</code></pre>
+
+```scala-bg
+forAll(genStringWithOffset) { (s, i) =>
+
+
+
+    substring(s, i)
+}}
+
+def genStringWithOffset: Gen[(String, Int)] =
+  for {
+    s <- genString
+    i <- choose(0, s.length - 1)
+  } yield (s, i)
+```
+
+---
+
+class: code
+
 ```scala
 def testInsertUser =
 
@@ -1830,11 +1863,6 @@ class: code
 
 
 
-
-
-
-
-
 def genUser: Gen[String] =
   genList1(choose('a', 'z'))
 </code></pre>
@@ -1845,11 +1873,6 @@ def testInsertUser =
 
     insert(user)
   }
-
-
-
-
-
 
 def genUser: Gen[String] =
   genList1(choose('a', 'z'))
@@ -1865,13 +1888,11 @@ class: code
 
 
 
-
-         genUser
-
-
-
 def genUser: Gen[String] =
   genList1(choose('a', 'z'))
+
+
+         genUser
 </code></pre>
 
 ```scala-bg
@@ -1881,13 +1902,44 @@ def testInsertUser =
     insert(user)
   }
 
+def genUser: Gen[String] =
+  genList1(choose('a', 'z'))
+
 def testDeleteUser =
   forAll(genUser) { user =>
     delete(user)
   }
+```
 
-def genUser: Gen[String] =
-  genList1(choose('a', 'z'))
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+         genUser
+
+
+
+
+def genUser: Gen[User] =
+  for {
+    name <- genList1(choose('a', 'z'))
+    age  <- choose(0, 100)
+  } yield User(name, age)
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genUser) { user =>
+
+    insert(user)
+  }
+
+def genUser: Gen[User] =
+  for {
+    name <- genList1(choose('a', 'z'))
+    age  <- choose(0, 100)
+  } yield User(name, age)
 ```
 
 ---
