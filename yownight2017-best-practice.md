@@ -1876,6 +1876,25 @@ class: center, middle, heading-white
 
 ---
 
+class: center, middle
+
+<img src="images/property-inverse.png" />
+
+---
+
+class: center, middle
+
+<img src="images/model-based.png" />
+
+---
+
+class: top, center, heading-black
+background-image: url(images/rebuild.jpg)
+
+<h2 style="margin-top: 17px;">Rebuild</h2>
+
+---
+
 class: right, bottom, heading-white
 background-image: url(images/shrink.jpeg)
 
