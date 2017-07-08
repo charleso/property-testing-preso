@@ -1648,6 +1648,101 @@ background-image: url(images/state-based.jpeg)
 
 ---
 
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+forAll(genUser) { user =>
+
+  val id = insertUser(user)
+  getUser(id) == Some(user)
+}
+</code></pre>
+
+```scala-bg
+def insertUser(u: User): UserId
+
+def getUser(u: UserId): Option[User]
+
+
+forAll(genUser) { user =>
+
+  val id = insertUser(user)
+  getUser(id) == Some(user)
+}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+forAll(genUser) { user =>
+
+  val id = insertUser(user)
+  getUser(id) == Some(user)
+  getUser(id) == Some(user)
+}
+</code></pre>
+
+```scala-bg
+def insertUser(u: User): UserId
+
+def getUser(u: UserId): Option[User]
+
+
+forAll(genUser) { user =>
+
+  val id = insertUser(user)
+  getUser(id) == Some(user)
+  getUser(id) == Some(user)
+}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+forAll(genUser) { user =>
+forAll(genUser) { user2 =>
+
+  val id = insertUser(user)
+  val id2 = insertUser(user2)
+  getUser(id) == Some(user)
+  getUser(id2) == Some(user2)
+}}
+</code></pre>
+
+```scala-bg
+def insertUser(u: User): UserId
+
+def getUser(u: UserId): Option[User]
+
+
+forAll(genUser) { user =>
+forAll(genUser) { user2 =>
+
+  val id = insertUser(user)
+  val id2 = insertUser(user2)
+  getUser(id) == Some(user)
+  getUser(id2) == Some(user2)
+}}
+```
+
+---
+
 ## State-based Testing
 
 1. Describe the possible states
@@ -1666,10 +1761,7 @@ class: middle, center
 class: code
 
 ```scala
-def transfer(a: Account, b: Account, i: Int) = {
-  a.total -= i
-  b.total += i
-}
+case class State(users: Map[UserId, User])
 ```
 
 ---
@@ -1677,7 +1769,9 @@ def transfer(a: Account, b: Account, i: Int) = {
 class: code
 
 ```scala
-case class State(a: Int, b: Int)
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extends Commands
 ```
 
 ---
@@ -1685,28 +1779,18 @@ case class State(a: Int, b: Int)
 class: code
 
 ```scala
-case class State(a: Int, b: Int)
+case class State(users: Map[UserId, User])
 
-case class Transfer(i: Int) extends Commands
-```
-
----
-
-class: code
-
-```scala
-case class State(a: Int, b: Int)
-
-case class Transfer(i: Int) extends Commands {
+case class Insert(user: User) extends Commands {
 
   def nextState(st: State): State =
-    State(st.a - i, st.b + i)
+    st(users.insert(user))
 
-  def run =
-    transfer(accountA, accountB, i)
+  def run: Unit =
+    insertUser(user)
 
-  def postCondition(st: State, r: Int): Prop =
-    r == st.a + st.b
+  def postCondition(st: State, r: Unit): Prop =
+    true
 }
 ```
 
@@ -1715,12 +1799,48 @@ case class Transfer(i: Int) extends Commands {
 class: code
 
 ```scala
-case class State(a: Int, b: Int)
+case class State(users: Map[UserId, User])
 
-case class Transfer(i: Int) extends Commands
+case class Insert(user: User) extends Commands
+
+case class Get(id: UserId) extends Commands
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extends Commands
+
+case class Get(id: UserId) extends Commands {
+
+  def nextState(st: State): State =
+    st
+
+  def run: Option[User] =
+    getUser(id)
+
+  def postCondition(st: State, r: User): Prop =
+    st.get(id) == r
+}
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extends Commands
+
+case class Get(id: UserId) extends Commands
 
 def genCommand: Gen[Command] =
-  genInt.map(Transfer)
+  oneOf(Insert(..), Get(..))
 ```
 
 ---
@@ -1728,64 +1848,22 @@ def genCommand: Gen[Command] =
 class: code
 
 ```scala
-case class State(a: Int, b: Int)
+case class State(users: Map[UserId, User])
 
-case class Transfer(i: Int) extends Commands
+case class Insert(user: User) extends Commands
 
-def genCommand: Gen[Command] =
-  genInt.map(Transfer)
+case class Get(id: UserId) extends Commands
 ```
 
-<pre><code class="success">
-transfer: OK, passed 100 tests.
+<pre><code class="warning">! Falsified after 11 passed tests.
+
+Expected User("a") but got User("b")
+
+Steps:
+  Insert(User("a"))
+  Insert(User("b"))
+  Get(1)
 </code></pre>
-
----
-
-class: middle, center
-
-<img src="images/threads-joke.png" />
-
----
-
-class: code
-
-```scala
-def property(threadCount: Int): Prop
-```
-
----
-
-class: code
-
-```scala
-def property(threadCount: Int): Prop
-```
-
-<pre><code class="warning">
-! transfer: Falsified after 0 passed tests.
-
-Expected Success(1) but got Success(0)
-
-Intital:
-  State(0,0)
-
-Parallel:
-  1. Deposit(1) => 1
-  2. Deposit(2) => 1
-</code></pre>
-
----
-
-## Learning from mistakes
-### A comprehensive study on real world concurrency bug characteristics
-
-http://dl.acm.org/citation.cfm?id=1346323
-
-- MySQL, Apache, Mozilla, OpenOffice
-- 105 concurrency bugs
-
-> "96% of the bugs can be reproduced every time with a certain partial order between only two threads"
 
 ---
 
@@ -1834,6 +1912,53 @@ class: code, thinner
 https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 - Was in 2013
+---
+
+class: middle, center
+
+<img src="images/threads-joke.png" />
+
+---
+
+class: code
+
+```scala
+def property(threadCount: Int): Prop
+```
+
+---
+
+class: code
+
+```scala
+def property(threadCount: Int): Prop
+```
+
+<pre><code class="warning">
+! transfer: Falsified after 9 passed tests.
+
+Expected User("a") but got User("b")
+
+Intital:
+  State(Map())
+
+Parallel:
+  1. Insert(User("a")) => 1
+  2. Insert(User("a")) => 2
+</code></pre>
+
+---
+
+## Learning from mistakes
+### A comprehensive study on real world concurrency bug characteristics
+
+http://dl.acm.org/citation.cfm?id=1346323
+
+- MySQL, Apache, Mozilla, OpenOffice
+- 105 concurrency bugs
+
+> "96% of the bugs can be reproduced every time with a certain partial order between only two threads"
+
 
 
 
