@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Property Based Testing - A Best Practice for Better Software</title>
+    <meta charset="utf-8">
+    <style>
+
+      /* -- font imports --- */
+
+      /* latin-ext */
+      @font-face {
+        font-family: 'Raleway';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Raleway'), local('Raleway-Regular'), url(fonts/YZaO6llzOP57DpTBv2GnyFKPGs1ZzpMvnHX-7fPOuAc.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Raleway';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Raleway'), local('Raleway-Regular'), url(fonts/QAUlVt1jXOgQavlW5wEfxQLUuEpTyoUstqEm5AMlJo4.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+      }
+      /* latin-ext */
+      @font-face {
+        font-family: 'Raleway';
+        font-style: normal;
+        font-weight: 700;
+        src: local('Raleway Bold'), local('Raleway-Bold'), url(fonts/WmVKXVcOuffP_qmCpFuyzQsYbbCjybiHxArTLjt7FRU.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+1E00-1EFF, U+20A0-20AB, U+20AD-20CF, U+2C60-2C7F, U+A720-A7FF;
+      }
+      /* latin */
+      @font-face {
+        font-family: 'Raleway';
+        font-style: normal;
+        font-weight: 700;
+        src: local('Raleway Bold'), local('Raleway-Bold'), url(fonts/JbtMzqLaYbbbCL9X6EvaIwzyDMXhdD8sAj6OAJTFsBI.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+      }
+      @font-face {
+        font-family: 'Ubuntu Mono';
+        font-style: normal;
+        font-weight: 400;
+        src: local('Ubuntu Mono'), local('UbuntuMono-Regular'), url(fonts/ViZhet7Ak-LRXZMXzuAfkYgp9Q8gbYrhqGlRav_IXfk.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+
+      /* -- base elements --- */
+
+      body {
+        font-family: Helvetica,Arial, sans-serif;
+        color: #000;
+      }
+
+      h1, h2, h3 {
+        font-family: 'Raleway';
+        font-weight: 700;
+        color: #1F7C8A;
+        line-height: 1.1;
+      }
+
+      li {
+        line-height: 1.9;
+      }
+
+      h1 {
+        font-size: 50px;
+      }
+
+      p {
+        line-height: 1.4;
+      }
+
+      blockquote {
+        font-family: 'Droid Serif';
+        font-style: italic;
+        margin: 1em 0;
+        padding: 0;
+      }
+
+      .code {
+        background: #282b2e;
+      }
+
+      .thinner .remark-code-line {
+        font-size: 80%;
+        min-height: 0px;
+      }
+
+      .code .remark-code {
+        font-size: 36px;
+        padding: 0px;
+      }
+
+      .code code.remark-code {
+        padding-bottom: 0px !important;
+      }
+
+      .remark-code-line {
+        min-height: 43px;
+      }
+
+      .code.remark-slide-content {
+        padding: 0px;
+      }
+
+      .code pre {
+        margin: 0px;
+      }
+
+      .warning,
+      .warning span {
+        color: #FFC039 !important;
+      }
+
+      .success,
+      .success span {
+        color: #6FAC64 !important;
+      }
+
+      code.scala-fg {
+        position: absolute;
+        background: transparent !important;
+      }
+
+      code.scala-bg,
+      code.scala-bg span {
+        color: grey !important;
+      }
+
+
+      /* -- overall container --- */
+
+      .remark-container {
+        height: 100%;
+        width: 100%;
+      }
+
+      .image {
+        padding: 0;
+      }
+
+      .remark-container {
+        background: #CCC;
+      }
+
+      /* -- sections --- */
+
+      .section-aqua {
+        background: #2691A2;
+      }
+
+      .section-lime {
+        background: #92BF43;
+      }
+
+      .section-green {
+        background: #6FAC64;
+      }
+
+      .section-yellow {
+        background: #FFC039;
+      }
+
+      .section-black {
+        background: #000;
+      }
+
+      .heading-white h1,
+      .heading-white h2 {
+        color: #fff;
+      }
+
+      .heading-black h1 {
+        color: #000;
+      }
+
+      .quote-black,
+      .quote-white {
+        font-size: 50px;
+      }
+
+      .quote-black {
+        color: #000;
+      }
+
+      .quote-white {
+        color: #fff;
+      }
+
+      /* -- content --- */
+
+      .remark-slide-content {
+        font-size: 26px;
+        background-size: cover !important;
+        background-position: 50% 50% !important;
+      }
+
+      .remark-code, .remark-inline-code {
+        font-size: 24px;
+        font-family: 'Ubuntu Mono';
+      }
+
+      .remark-code {
+        padding: 1em !important;
+        line-height: 1.2;
+      }
+
+      .remark-inline-code {
+        background: #ddd;
+        padding: .2em;
+      }
+
+      .remark-slide-number {
+        opacity: 0;
+      }
+
+      .image {
+        font-size: 0px;
+      }
+
+      .image img {
+        width: 908px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="js/remark-latest.min.js">
+    </script>
+    <script>
+
+var slideshow = remark.create({
+  highlightStyle: "obsidian"
+, sourceUrl: 'yownight2017-best-practice.md'
+});
+
+    </script>
+  </body>
+</html>

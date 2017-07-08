@@ -27,7 +27,7 @@ libraryDependencies ++= Seq(
  , "org.joda"                %  "joda-convert"                 % "1.2"
  , "org.specs2"              %% "specs2-core"                  % "2.4.8"   % "test"
  , "org.specs2"              %% "specs2-scalacheck"            % "2.4.8"   % "test"
- , "org.scalacheck"          %% "scalacheck"                   % "1.11.3"  % "test"
+ , "org.scalacheck"          %% "scalacheck"                   % "1.12.6"  % "test"
  , "com.ambiata"             %% "disorder"                     % "0.0.1-20150317050225-9c1f81e" % "test"
  , "com.googlecode.json-simple"     % "json-simple"            % "1.1"
  , "com.eclipsesource.minimal-json" % "minimal-json"           % "0.9.2"
