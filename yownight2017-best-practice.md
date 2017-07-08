@@ -1934,17 +1934,17 @@ class: code
 def property(threadCount: Int): Prop
 ```
 
-<pre><code class="warning">
-! transfer: Falsified after 9 passed tests.
+<pre><code class="warning">! transfer: Falsified after 9 passed tests.
 
 Expected User("a") but got User("b")
 
-Intital:
-  State(Map())
+Sequential:
+  1. Insert(User("a")) => 1
+  2. Insert(User("b")) => 2
 
 Parallel:
-  1. Insert(User("a")) => 1
-  2. Insert(User("a")) => 2
+  1. Get(1) => User("a")
+  2. Get(1) => User("b")
 </code></pre>
 
 ---
