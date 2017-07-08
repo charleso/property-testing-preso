@@ -1683,7 +1683,12 @@ def testInsertUser =
 
 class: code
 
-```scala
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" ==>
+</code></pre>
+
+```scala-bg
 def testInsertUser =
   forAll(genString) { user =>
   user != "" ==>
