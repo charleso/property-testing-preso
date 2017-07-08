@@ -1884,6 +1884,12 @@ forAll(genUser) { user2 =>
 
 ---
 
+class: middle, center
+
+<img src="images/qa-engineer-tweet.png" />
+
+---
+
 ## State-based Testing
 
 1. Describe the possible states
