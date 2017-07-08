@@ -2203,6 +2203,55 @@ class: middle, center
 
 > 31 Languages
 
+???
+
+- Call to arms
+- Can introduce gradually
+  - Fuzzing
+
+---
+
+## Java
+
+https://github.com/pholser/junit-quickcheck
+
+```java
+@RunWith(JUnitQuickcheck.class)
+public class StringProperties {
+
+  @Property
+  public void testSubstring(String s1, String s2) {
+    assertEquals((s1 + s2).substring(s1.length), s2);
+  }
+}
+```
+
+---
+
+## Javascript
+
+https://github.com/jsverify/jsverify
+
+```javascript
+jsc.property("substring", jsc.string, jsc.string,
+  function (s1, s2) {
+    return (s1 + s2).substring(s1.length) === s2;
+  }
+);
+```
+
+---
+
+## Python
+
+https://hypothesis.readthedocs.io/
+
+```python
+@given(text(), text())
+def test_substring(s1, s2):
+  assert substring(s1 + s2, len(s1)) == s2
+```
+
 ---
 
 class: center, middle, section-aqua, heading-white
