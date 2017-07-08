@@ -1064,8 +1064,7 @@ background-image: url(images/rebuild.jpg)
 
 class: code
 
-```scala
-def substring(s: String, i: Int): String
+<pre><code class="scala scala-fg">&nbsp;
 
 def testSubstring =
   forAll(genString) { s =>
@@ -1073,13 +1072,45 @@ def testSubstring =
 
     substring(s, i) == ???
   }}
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
 ```
 
 ---
 
 class: code
 
-```scala
+<pre><code class="scala scala-fg">&nbsp;
+
+def testSubstring =
+  forAll(genString) { s =>
+  forAll(genString) { t =>
+
+    substring(s + t, s.length) == t
+  }}
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+def testSubstring =
+  forAll(genString) { s =>
+  forAll(genString) { t =>
+
+    substring(s + t, s.length) == t
+  }}
+</code></pre>
+
+```scala-bg
 def substring(s: String, i: Int): String
 
 def testSubstring =
@@ -1090,6 +1121,11 @@ def testSubstring =
   }}
 ```
 
+<pre><code class="success">
+substring("a" + "bc", "a".length) == "bc"
+
+substring("xy" + "z", "xy".length) == "z"
+</code></pre>
 
 
 
@@ -1295,10 +1331,10 @@ class: code
 def testInsertUser =
 
 
-    insert("bob")
+    insertUser("bob")
 
 
-def insert(user: String)
+def insertUser(user: String)
 ```
 
 ---
@@ -1309,7 +1345,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1321,7 +1357,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1344,7 +1380,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
   user != "" ==>
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1356,7 +1392,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
   user != "" ==>
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1379,7 +1415,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
   user != "" && !user.contains(" ") ==>
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1396,7 +1432,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
   user != "" && !user.contains(" ") && ... ==>
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1413,7 +1449,7 @@ class: code
 def testInsertUser =
   forAll(genString) { user =>
   user != "" && !user.contains(" ") && ... ==>
-    insert(user)
+    insertUser(user)
   }
 ```
 
@@ -1441,7 +1477,7 @@ def genList1[A](g: Gen[A]): Gen[List[A]]
 def testInsertUser =
   forAll(genList1(choose('a', 'z'))) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 
 def choose(a: Char, b: Char): Gen[Char]
@@ -1467,7 +1503,7 @@ def genUser: Gen[String] =
 def testInsertUser =
   forAll(genUser) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 
 def genUser: Gen[String] =
@@ -1495,7 +1531,7 @@ def genUser: Gen[String] =
 def testInsertUser =
   forAll(genUser) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 
 def genUser: Gen[String] =
@@ -1503,7 +1539,7 @@ def genUser: Gen[String] =
 
 def testDeleteUser =
   forAll(genUser) { user =>
-    delete(user)
+    deleteUser(user)
   }
 ```
 
@@ -1528,7 +1564,7 @@ def genUser: Gen[User] =
 def testInsertUser =
   forAll(genUser) { user =>
 
-    insert(user)
+    insertUser(user)
   }
 
 def genUser: Gen[User] =
@@ -1561,7 +1597,7 @@ class: code
 
 
 
-              "null"
+                "null"
 ```
 
 ---
@@ -1569,14 +1605,14 @@ class: code
 class: code
 
 ```scala
-def testMigrateUser =
+def testMigration =
 
 
     migrateUser("bob")
 
 
-def testNullUsername =
-  migrateUser("null")
+def testMigrationNull =
+    migrateUser("null")
 ```
 
 ???
@@ -1784,7 +1820,7 @@ case class State(users: Map[UserId, User])
 case class Insert(user: User) extends Commands {
 
   def nextState(st: State): State =
-    st(users.insert(user))
+    State(st.users + user)
 
   def run: Unit =
     insertUser(user)
