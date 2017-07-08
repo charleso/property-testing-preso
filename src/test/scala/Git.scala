@@ -21,7 +21,31 @@ object Git extends Properties("Git") {
     case class State(
       working: Map[String, String]
     , index: Map[String, String]
-    )
+    , commits: List[Map[String, String]]
+    ) {
+
+      def unstaged: Set[String] =
+        working.keySet -- index.keySet
+
+      def staged: Map[String, String] =
+        commits match {
+          case Nil =>
+            index
+          case h :: _ =>
+            index.flatMap({
+              case (k, v) =>
+                h.get(k) match {
+                  case None =>
+                    Map(k -> v)
+                  case Some(v2) =>
+                    if (v == v2)
+                      Map[String, String]()
+                    else
+                      Map(k -> v)
+                }
+            })
+        }
+    }
     type Sut = File
 
     def canCreateNewSut(s: State, init: Traversable[State], running: Traversable[Sut]): Boolean =
@@ -35,15 +59,26 @@ object Git extends Properties("Git") {
     def genAscii: Gen[String] =
       Gen.nonEmptyListOf(Gen.choose('a', 'z')).map(_.mkString)
 
+    def isSubset(f: File, f2: File): Boolean = {
+      Stream.iterate(f)(_.getParentFile).takeWhile(_ != null).contains(f2)
+    }
+
     def genCommand(state: State): Gen[Command] = {
       val l = List(
           Some(for {
             i <- Gen.choose(1, 5)
-            k <- Gen.listOfN(i, genAscii).map(_.mkString("/")).filter(x => !state.working.contains(x))
+            k <- Gen.listOfN(i, genAscii).map(_.mkString("/"))
+              // .filter(x => !state.working.contains(x))
+              .filter(x => state.working.forall(a =>
+                !isSubset(new File(a._1), new File(x)) && !isSubset(new File(x), new File(a._1))
+              ))
             v <- arbitrary[String]
           } yield Write(k, v))
-        , if(state.index.isEmpty) None else Some(genAscii.map(Commit))
-        , if(state.working.isEmpty) None else Some(Gen.oneOf[String](state.working.keys.toList).map(Add))
+        , if(state.staged.isEmpty) None else Some(genAscii.map(Commit))
+        , if(state.unstaged.isEmpty) None else Some(Gen.oneOf(state.unstaged.toList).map(Add))
+        , if(state.staged.isEmpty) None else Some(Gen.oneOf(state.index.keys.toList).map(Reset))
+        , if(state.working.isEmpty) None else Some(Gen.oneOf(state.working.keys.toList).map(Delete))
+        // , if(state.commits.length < 2) None else Some(Gen.choose(1, state.commits.length - 1).map(ResetHard))
         ).flatten
       l match {
         case List(l) =>
@@ -56,7 +91,7 @@ object Git extends Properties("Git") {
     }
 
     def genInitialState: Gen[State] =
-      Gen.const(State(Map(), Map()))
+      Gen.const(State(Map(), Map(), Nil))
 
     def initialPreCondition(state: State): Boolean =
       true
@@ -90,6 +125,25 @@ object Git extends Properties("Git") {
       }
     }
 
+    case class Delete(k: String) extends Command {
+
+      type Result = Boolean
+
+      def nextState(state: State): State =
+        state.copy(working = (state.working - k))
+
+      def postCondition(state: State, result: Try[Result]): Prop =
+        result =? Success(true)
+
+      def preCondition(state: State): Boolean =
+        state.working.contains(k)
+
+      def run(sut: Sut): Result = {
+        val f = new File(sut, k)
+        f.delete()
+      }
+    }
+
     case class Add(k: String) extends Command {
 
       type Result = Int
@@ -113,7 +167,7 @@ object Git extends Properties("Git") {
       type Result = Int
 
       def nextState(state: State): State = {
-        State(Map(), Map())
+        state.copy(commits = state.index :: state.commits)
       }
 
       def postCondition(state: State, result: Try[Result]): Prop =
@@ -124,6 +178,50 @@ object Git extends Properties("Git") {
 
       def run(sut: Sut): Result = {
         Process(List("git", "commit", "-m", m), Some(sut)).!
+      }
+    }
+
+    case class Reset(k: String) extends Command {
+
+      type Result = Int
+
+      def nextState(state: State): State = {
+        state.copy(
+          index = state.index + (k -> state.staged(k))
+        )
+      }
+
+      def postCondition(state: State, result: Try[Result]): Prop =
+        result =? Success(0)
+
+      def preCondition(state: State): Boolean =
+        state.index.contains(k)
+
+      def run(sut: Sut): Result = {
+        Process(List("git", "reset", "--", k), Some(sut)).!
+      }
+    }
+
+    case class ResetHard(k: Int) extends Command {
+
+      type Result = Int
+
+      def nextState(state: State): State = {
+        State(
+          working = state.working ++ state.commits(k)
+        , index = Map()
+        , commits = state.commits.drop(k)
+        )
+      }
+
+      def postCondition(state: State, result: Try[Result]): Prop =
+        result =? Success(0)
+
+      def preCondition(state: State): Boolean =
+        0 < k && k < state.commits.length - 1
+
+      def run(sut: Sut): Result = {
+        Process(List("git", "reset", "--hard", "HEAD~" + k), Some(sut)).!
       }
     }
   }

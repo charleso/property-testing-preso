@@ -607,7 +607,9 @@ def testSubstring =
   }}
 ```
 
-<pre><code class="success">
+<pre><code class="success">&nbsp;
+
+
 + HelloWorld.substring: OK, passed 100 tests.
 </code></pre>
 
@@ -651,10 +653,9 @@ withMinSuccessfulTests(1000)
 
 ???
 
-- Same test found different edge cases (bugs?)
-- Learned about substring
 - We might lower the number of tests for databases
 - Test doesn't change
+- Could increase for a different build
 
 ---
 
@@ -2061,9 +2062,10 @@ class: code
 
 
 forAll(genUser) { user =>
+forAll(genUser) { user2 =>
 
   val id = insertUser(user)
-  val id2 = insertUser(user)
+  val id2 = insertUser(user2)
   getUser(id) == Some(user)
 }
 </code></pre>
@@ -2075,9 +2077,10 @@ def getUser(u: UserId): Option[User]
 
 
 forAll(genUser) { user =>
+forAll(genUser) { user2 =>
 
   val id = insertUser(user)
-  val id2 = insertUser(user)
+  val id2 = insertUser(user2)
   getUser(id) == Some(user)
 }
 ```
@@ -2097,7 +2100,8 @@ forAll(genUser) { user2 =>
   val id = insertUser(user)
   val id2 = insertUser(user2)
   getUser(id) == Some(user)
-  getUser(id2) == Some(user2)
+  deleteUser(id)
+  getUser(id) == None
 }}
 </code></pre>
 
@@ -2113,7 +2117,8 @@ forAll(genUser) { user2 =>
   val id = insertUser(user)
   val id2 = insertUser(user2)
   getUser(id) == Some(user)
-  getUser(id2) == Some(user2)
+  deleteUser(id)
+  getUser(id) == None
 }}
 ```
 
