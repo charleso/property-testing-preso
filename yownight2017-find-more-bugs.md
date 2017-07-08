@@ -40,6 +40,20 @@ background-image: url(images/goal.jpeg)
 
 ---
 
+class: bottom, right, heading-black
+background-image: url(images/example-based.jpeg)
+
+##  Testing
+
+---
+
+class: bottom, right, heading-black
+background-image: url(images/example-based.jpeg)
+
+## Example-based Testing
+
+---
+
 class: code
 
 ```scala
@@ -121,24 +135,16 @@ class: middle, center
 
 <img src="images/qa-engineer-tweet.png" />
 
-
-
-
-
-
-
----
-
-class: center, middle, heading-black
-background-image: url(images/example-based.jpeg)
-
-## Example-based Testing
-
-
 ???
 
 - Writing good examples means knowing about the internals of the functions
 - Doesn't help with other systems or libraries, or new edge cases
+- Let's get the computer to generate them instead!
+
+
+
+
+
 
 ---
 
@@ -184,8 +190,17 @@ http://www.quviq.com/volvo-quickcheck/
 http://www.quviq.com/volvo-quickcheck/
 
 - 3,000 pages of specifications
-- 20,000 lines of QuickCheck
 - 1,000,000 LOC, 6 suppliers
+
+---
+
+<img src="images/volvo.jpg" width="300px" />
+
+http://www.quviq.com/volvo-quickcheck/
+
+- 3,000 pages of specifications
+- 1,000,000 LOC, 6 suppliers
+- 20,000 lines of QuickCheck
 - 200 problems
 - 100 problems in the standard
 
@@ -385,6 +400,10 @@ def forAll[A](Gen[A], A => Prop): Prop
 def genString: Gen[String]
 ```
 
+???
+
+# PAUSE
+
 ---
 
 class: code
@@ -447,6 +466,10 @@ def testSubstring =
     substring(s, i)
   }}
 ```
+
+???
+
+# PAUSE
 
 ---
 
@@ -554,6 +577,44 @@ def testSubstring =
 
 <pre><code class="success">
 + HelloWorld.substring: OK, passed 100 tests.
+</code></pre>
+
+???
+
+- Same test found different edge cases (bugs?)
+- Learned about substring
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+
+
+
+
+withMinSuccessfulTests(1000)
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring =
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i >= 0 && i < s.length ==>
+    substring(s, i)
+  }}
+
+withMinSuccessfulTests(1000)
+```
+
+<pre><code class="success">
++ HelloWorld.substring: OK, passed 1000 tests.
 </code></pre>
 
 ???
@@ -844,6 +905,16 @@ class: code
 def toJson(user: User): Json
 
 def fromJson(json: Json): Option[User]
+```
+
+---
+
+class: code
+
+```scala
+def toJson(user: User): Json
+
+def fromJson(json: Json): Option[User]
 
 forAll(genUser) { user =>
   val json = toJson(user)
@@ -1008,79 +1079,6 @@ on worst case long arrays
 class: code
 
 ```scala
-def touchFile(file: File)
-
-def listFiles: List[File]
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-
-
-forAll(genList(genFile)) { files =>
-
-  files.foreach(f => touchFile(f))
-
-  listFiles == files
-}
-</code></pre>
-
-```scala-bg
-def touchFile(file: File)
-
-def listFiles: List[File]
-
-forAll(genList(genFile)) { files =>
-
-  files.foreach(f => touchFile(f))
-
-  listFiles == files
-}
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-
-
-forAll(genList(genFile)) { files =>
-
-  files.foreach(f => touchFile(f))
-
-  listFiles == files
-}
-</code></pre>
-
-```scala-bg
-def touchFile(file: File)
-
-def listFiles: List[File]
-
-forAll(genList(genFile)) { files =>
-
-  files.foreach(f => touchFile(f))
-
-  listFiles == files
-}
-```
-
-<pre><code class="warning">
-List("a", "A") != List("a")
-> ARG_1: List("a", "A")
-</code></pre>
-
----
-
-class: code
-
-```scala
 def listUsersSortByName: List[User] =
   "SELECT * FROM user ORDER BY name ASC"
 ```
@@ -1097,7 +1095,7 @@ forAll(genList(genUser)) { users =>
   users.foreach(u => insertUser(u))
 
   listUsersSortByName ==
-    users.sortBy(_.name.toLowerCase)
+    users.sortBy(_.name)
 }
 </code></pre>
 
@@ -1110,7 +1108,7 @@ forAll(genList(genUser)) { users =>
   users.foreach(u => insertUser(u))
 
   listUsersSortByName ==
-    users.sortBy(_.name.toLowerCase)
+    users.sortBy(_.name)
 }
 ```
 
@@ -1126,7 +1124,7 @@ forAll(genList(genUser)) { users =>
   users.foreach(u => insertUser(u))
 
   listUsersSortByName ==
-    users.sortBy(_.name.toLowerCase)
+    users.sortBy(_.name)
 }
 </code></pre>
 
@@ -1139,7 +1137,7 @@ forAll(genList(genUser)) { users =>
   users.foreach(u => insertUser(u))
 
   listUsersSortByName ==
-    users.sortBy(_.name.toLowerCase)
+    users.sortBy(_.name)
 }
 ```
 <pre><code class="warning">List("a", "b", "A") != List("a", "A", "b")
@@ -1281,7 +1279,11 @@ forAll(genList(genInt)) { s =>
 
 ---
 
+class: center
+
 <img src="images/github-idempotent.png" width="100%" />
+
+## "not idempotent"
 
 ---
 
@@ -1420,6 +1422,10 @@ substring("a" + "bc", "a".length) == "bc"
 
 substring("xy" + "z", "xy".length) == "z"
 </code></pre>
+
+???
+
+# PAUSE
 
 
 
@@ -2263,6 +2269,11 @@ class: middle, center
 
 <img src="images/threads-joke.png" />
 
+???
+
+- Concurrency is hard!
+- Testint concurrent programmers is _really_ hard!!!
+
 ---
 
 class: code
@@ -2368,7 +2379,7 @@ background-image: url(images/goal.jpeg)
 
 ---
 
-class: center, middle, heading-black
+class: bottom, right, heading-black
 background-image: url(images/example-based.jpeg)
 
 ## Example-based Testing
@@ -2404,13 +2415,6 @@ class: top, center, heading-black
 background-image: url(images/rebuild.jpg)
 
 <h2 style="margin-top: 17px;">Rebuild</h2>
-
----
-
-class: bottom, right, heading-white
-background-image: url(images/edges.jpeg)
-
-## Edge Cases
 
 ---
 
@@ -2507,8 +2511,16 @@ background-image: url(images/property-based.jpeg)
 
 ## Find More Bugs
 
+---
+
+class: bottom, right, heading-white
+background-image: url(images/edges.jpeg)
+
+## Edge Cases
+
 ???
 
+- Basically the same across different langauges
 - No longer feels like you're writing tests for test sake
 - Enjoyable tot think about your system invariants
 - Live longer than other tests
