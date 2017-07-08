@@ -160,6 +160,20 @@ http://www.quviq.com/volvo-quickcheck/
 
 ---
 
+class: center, middle
+
+<img src="http://blog.trifork.com/wp-content/uploads/2013/06/Riak_product_logo.png" />
+
+> Poolboy had 85% test coverage (and most of the remaining 15% was irrelevant boilerplate) when I started QuickChecking it, and I felt pretty happy with its solidity, so I didn’t expect to find many bugs, if any. I was very wrong.
+
+http://basho.com/posts/technical/quickchecking-poolboy-for-fun-and-profit/
+
+---
+
+https://jepsen.io/
+
+---
+
 class: middle, center
 
 ### https://en.wikipedia.org/wiki/QuickCheck
@@ -1320,33 +1334,6 @@ ARG_0_ORIGINAL: Actions(List(Insert, Insert, Get, Get, Insert, Get))
 
 class: middle, center
 
-<img src="images/threads-joke.png" />
-
----
-
-class: code
-
-```scala
-trait Commands {
-
-  def property(threadCount: Int): Prop
-}
-```
-
----
-
-class: center, middle
-
-<img src="http://blog.trifork.com/wp-content/uploads/2013/06/Riak_product_logo.png" />
-
-> Poolboy had 85% test coverage (and most of the remaining 15% was irrelevant boilerplate) when I started QuickChecking it, and I felt pretty happy with its solidity, so I didn’t expect to find many bugs, if any. I was very wrong.
-
-http://basho.com/posts/technical/quickchecking-poolboy-for-fun-and-profit/
-
----
-
-class: middle, center
-
 <img src="images/leveldb.png" />
 
 http://www.quviq.com/google-leveldb/
@@ -1390,6 +1377,35 @@ class: code, thinner
 https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 - Was in 2013
+
+---
+
+class: middle, center
+
+<img src="images/threads-joke.png" />
+
+---
+
+class: code
+
+```scala
+trait Commands {
+
+  def property(threadCount: Int): Prop
+}
+```
+
+---
+
+## Learning from mistakes: a comprehensive study on real world concurrency bug characteristics
+
+http://dl.acm.org/citation.cfm?id=1346323
+
+- MySQL, Apache, Mozilla, OpenOffice
+- 105 concurrency bugs
+
+> "96% of the bugs can be reproduced every time with a certain partial order between only two threads"
+
 
 
 
