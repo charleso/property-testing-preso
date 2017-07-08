@@ -627,10 +627,50 @@ background-image: url(images/learning.jpeg)
 class: code
 
 ```scala
-def toJson(user: User): Json
+import org.joda.time._
 
-def fromJson(json: Json): Option[User]
+
+forAll(genDate) { dt =>
+
+  val formatter = DateTimeFormat.fullDateTime()
+
+  val s = formatter.print(dt)
+  formatter.parseDateTime(s) == dt
+}
 ```
+
+???
+
+- Symmetrical
+
+---
+
+class: code
+
+```scala
+import org.joda.time._
+
+
+forAll(genDate) { dt =>
+
+  val formatter = DateTimeFormat.fullDateTime()
+
+  val s = formatter.print(dt)
+  formatter.parseDateTime(s) == dt
+}
+```
+
+<pre><code class="warning">Invalid format:
+"Sunday, September 22, 2148 9:08:08 PM ART"
+is malformed at "ART"
+</code></pre>
+
+
+
+
+
+
+
 
 ---
 
@@ -666,7 +706,8 @@ forAll(genUser) { user =>
 }
 ```
 
-- TODO TODO AESON
+<pre><code class="warning">TODO
+</code></pre>
 
 
 ---
@@ -969,22 +1010,21 @@ forAll(genList(genInt)) { s =>
 
 ---
 
-class: code
+<img src="images/rust-bug.png" width="100%" />
 
-```scala
-def createOrUpdateUser(u: User): UserId
+---
 
-forAll(genUser) { u =>
+<img src="images/rust-bug.png" width="100%" />
 
-  val r1 = createOrUpdateUser(u)
+<img src="images/rust-idempotent.png" width="100%" />
 
-  val r2 = createOrUpdateUser(u)
+> We do test for idempotency by running the 'target' of every test through rustfmt as a 'source'.
+> Obviously, this only catches bugs if there is a relevant test.
 
-  r1 == r2
-}
-```
+???
 
 
+https://github.com/rust-lang-nursery/rustfmt/issues/1668
 
 
 
@@ -1727,85 +1767,6 @@ def genUser: Gen[String] =
 
 
 
-
-
-
-
-
-
----
-
-class: bottom, left, heading-white
-background-image: url(images/hunt.jpeg)
-
-## Bug hunting
-
----
-
-class: top, center
-
-> "Maybe you could test a relatively well known open source library and find a
-bug for something they have unit tests for" [@markhibberd](https://twitter.com/markhibberd)
-
----
-
-class: top, center
-
-> "Maybe you could test a relatively well known open source library and find a
-bug for something they have unit tests for" [@markhibberd](https://twitter.com/markhibberd)
-
-<img src="images/challenge.jpg" style="position: absolute; width: 600px; right: 0px; bottom: 0px;" />
-
----
-
-class: code
-
-```scala
-import org.joda.time._
-
-
-forAll(genDate) { dt =>
-
-  val formatter = DateTimeFormat.fullDateTime()
-
-  val s = formatter.print(dt)
-  formatter.parseDateTime(s) == dt
-}
-```
-
-???
-
-- Symmetrical
-
----
-
-class: code
-
-```scala
-import org.joda.time._
-
-
-forAll(genDate) { dt =>
-
-  val formatter = DateTimeFormat.fullDateTime()
-
-  val s = formatter.print(dt)
-  formatter.parseDateTime(s) == dt
-}
-```
-
-<pre><code class="warning">Invalid format:
-"Sunday, September 22, 2148 9:08:08 PM ART"
-is malformed at "ART"
-</code></pre>
-
----
-
-## Bug or Feature?
-
-- http://stackoverflow.com/questions/15642053/joda-time-parsing-string-throws-java-lang-illegalargumentexception
-- http://comments.gmane.org/gmane.comp.java.joda-time.user/1385
-- https://github.com/JodaOrg/joda-time/commit/14863a51230b3d44201646dbc1ce5d7f6bb97a33
 
 
 
