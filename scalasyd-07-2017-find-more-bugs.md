@@ -1142,7 +1142,7 @@ forAll(genList(genUser)) { users =>
     users.sortBy(_.name.toLowerCase)
 }
 ```
-<pre><code class="warning">List("a", "b" "A") != List("a", "A", "b")
+<pre><code class="warning">List("a", "b", "A") != List("a", "A", "b")
 </code></pre>
 
 ---
