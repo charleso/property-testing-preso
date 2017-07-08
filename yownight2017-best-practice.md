@@ -131,26 +131,28 @@ class: middle, center
 
 ---
 
-class: middle, center
+class: middle
 
-<img src="images/jh.png" />
-
----
-
-class: middle, center
-
-<img src="images/jh.png" />
-<img src="https://image.flaticon.com/icons/png/128/126/126157.png" />
+<img src="images/jh.png" style="position: relative; left: 230px;" />
 
 ---
 
-class: center
+class: middle
 
-<img src="images/volvo.jpg" width="100%" />
+<img src="images/jh.png" style="position: relative; left: 230px;" />
+<img src="https://image.flaticon.com/icons/png/128/126/126157.png" style="position: relative; left: 200px;" />
+
+---
+
+<img src="images/volvo.jpg" width="300px" />
 
 http://www.quviq.com/volvo-quickcheck/
 
 ---
+
+<img src="images/volvo.jpg" width="300px" />
+
+http://www.quviq.com/volvo-quickcheck/
 
 - 3,000 pages of specifications
 - 20,000 lines of QuickCheck
@@ -1276,7 +1278,13 @@ background-image: url(images/state-based.jpeg)
 1. Describe the possible states
 2. Describe what actions can take place in each state
 3. Describe how to tell if the state is correct
-4. Have the computer try lots of random actions – look for a breaking combination
+4. Generate and run random actions
+
+---
+
+class: middle, center
+
+<img src="images/state-model.png" width="100%" />
 
 ---
 
@@ -1317,7 +1325,7 @@ case class State(a: Int, b: Int)
 case class Transfer(i: Int) extends Commands {
 
   def nextState(st: State): State =
-    State(st.a - i, st.b + 1)
+    State(st.a - i, st.b + i)
 
   def run =
     transfer(accountA, accountB, i)
