@@ -29,7 +29,7 @@ background-image: url("images/chopsticks.jpg")
 ---
 
 class: bottom, left, heading-white
-background-image: url(https://images.unsplash.com/photo-1492515114975-b062d1a270ae)
+background-image: url(images/goal.jpeg)
 
 ## Motivation?
 
@@ -2173,7 +2173,7 @@ http://dl.acm.org/citation.cfm?id=1346323
 
 ---
 
-class: center, middle, heading-black
+class: bottom, left, heading-white
 background-image: url(images/goal.jpeg)
 
 ## Motivation
