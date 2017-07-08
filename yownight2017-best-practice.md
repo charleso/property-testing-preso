@@ -682,9 +682,7 @@ def toJson(user: User): Json
 
 def fromJson(json: Json): Option[User]
 
-
 forAll(genUser) { user =>
-
   val json = toJson(user)
   fromJson(json) == Some(user)
 }
@@ -699,17 +697,21 @@ def toJson(user: User): Json
 
 def fromJson(json: Json): Option[User]
 
-
 forAll(genUser) { user =>
-
   val json = toJson(user)
   fromJson(json) == Some(user)
 }
 ```
 
-<pre><code class="warning">TODO
+<pre><code class="warning">
+2015-01-01T12:57:39.123456
+  != 2015-01-01T12:57:39.123
 </code></pre>
 
+???
+
+- https://github.com/bos/aeson/issues/240
+- Output UTCTime to microsecond precision
 
 ---
 
