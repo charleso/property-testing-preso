@@ -930,7 +930,7 @@ forAll(genUser) { user =>
 ---
 
 class: center, middle, heading-white
-background-image: url(images/learning.jpeg)
+background-image: url(images/edges.jpeg)
 
 ???
 
@@ -1513,7 +1513,8 @@ forAll(genString) { s =>
 ! testLowerCase: Falsified after 89 passed tests.
 
 Expected 15 but got 14
-ARG_0: "()*@#%KFPSDlİDcx;lk1&(#"
+
+ARG_0:          "()*@#%KFPSDlİDcx;lk1&(#"
 </code></pre>
 
 ---
@@ -1529,7 +1530,7 @@ forAll(genString) { s =>
 <pre><code class="warning">
 ! testLowerCase: Falsified after 89 passed tests.
 
-Expected 2 but got 1
+Expected 15 but got 14
 ARG_0: "İ"
 ARG_0_ORIGINAL: "()*@#%KFPSDlİDcx;lk1&(#"
 </code></pre>
@@ -2383,13 +2384,6 @@ background-image: url(images/fuzzy.jpg)
 ---
 
 class: center, middle, heading-white
-background-image: url(images/learning.jpeg)
-
-## Learning
-
----
-
-class: center, middle, heading-white
 
 <img src="images/patterns.jpg" style="width: 70%;" />
 
@@ -2411,6 +2405,13 @@ class: top, center, heading-black
 background-image: url(images/rebuild.jpg)
 
 <h2 style="margin-top: 17px;">Rebuild</h2>
+
+---
+
+class: center, middle, heading-white
+background-image: url(images/edges.jpeg)
+
+## Edge Cases
 
 ---
 
@@ -2446,6 +2447,11 @@ class: middle, center
 - Call to arms
 - Can introduce gradually
   - Fuzzing
+- Not a framework
+- One test at a time
+- Property testing is not specific to one language
+- It's an idea
+- I would write my own if I had to
 
 ---
 
@@ -2489,6 +2495,11 @@ https://hypothesis.readthedocs.io/
 def test_substring(s1, s2):
   assert substring(s1 + s2, len(s1)) == s2
 ```
+
+???
+
+- Hypothesis is particularly good
+  - Good community
 
 ---
 
