@@ -115,7 +115,6 @@ def testSubstring = {
   substring("abc", -1) == "c"
 }
 ```
-
 ---
 
 class: middle, center
@@ -134,6 +133,12 @@ class: center, middle, heading-black
 background-image: url(images/example-based.jpeg)
 
 ## Example-based Testing
+
+
+???
+
+- Writing good examples means knowing about the internals of the functions
+- Doesn't help with other systems or libraries, or new edge cases
 
 ---
 
@@ -156,7 +161,15 @@ class: middle
 class: middle
 
 <img src="images/jh.png" style="position: relative; left: 230px;" />
-<img src="https://image.flaticon.com/icons/png/128/126/126157.png" style="position: relative; left: 200px;" />
+<img src="images/quviq.png" style="position: absolute; width: 150px; top: 472px; left: 371px" />
+
+---
+
+class: middle
+
+<img src="images/jh.png" style="position: relative; left: 230px;" />
+<img src="images/money.png" style="position: relative; left: 200px;" />
+<img src="images/quviq.png" style="position: absolute; width: 150px; top: 472px; left: 371px" />
 
 ---
 
@@ -538,6 +551,11 @@ def testSubstring =
 + HelloWorld.substring: OK, passed 100 tests.
 </code></pre>
 
+???
+
+- Same test found different edge cases (bugs?)
+- Learned about substring
+
 ---
 
 class: code
@@ -562,6 +580,40 @@ def testSubstring =
   }}
 ```
 
+???
+
+- This is where things get tricky
+- Know from personal experience
+- End up rewriting
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+
+    substring(s, i) == substringAgain(s, i)
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring =
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i >= 0 && i < s.length ==>
+    substring(s, i) == substringAgain(s, i)
+  }}
+```
+
+???
+
+- Frustrating
+- Actually not the idea!
 
 
 
