@@ -2253,6 +2253,9 @@ class: middle, center
 
 - No longer feels like you're writing tests for test sake
 - Enjoyable tot think about your system invariants
+- Live longer than other tests
+- File multiple bugs with one test
+- Less code
 
 ---
 
@@ -2262,7 +2265,5 @@ class: middle, center
   - http://fsharpforfunandprofit.com/posts/property-based-testing-2/
 - John Hughes - "Testing the Hard Stuff and Staying Sane"
   - https://www.youtube.com/watch?v=zi0rHwfiX1Q
-- Alex Chan - "Property-based Testing in Practice"
-  - https://www.infoq.com/presentations/hypothesis-afl-property-testing
 - [@charlesofarrell](https://twitter.com/charlesofarrell)
   - https://github.com/charleso/property-testing-preso
