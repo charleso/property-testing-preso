@@ -923,6 +923,74 @@ background-image: url(images/property-based.jpeg)
 class: code
 
 ```scala
+def createFile(file: File)
+def listFiles: List[File]
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+forAll(genList(genFile)) { files =>
+
+  files.foreach(f => createFile(f))
+
+  listFiles == files
+}
+</code></pre>
+
+```scala-bg
+def createFile(file: File)
+def listFiles: List[File]
+
+forAll(genList(genFile)) { files =>
+
+  files.foreach(f => createFile(f))
+
+  listFiles == files
+}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+forAll(genList(genFile)) { files =>
+
+  files.foreach(f => createFile(f))
+
+  listFiles == files
+}
+</code></pre>
+
+```scala-bg
+def createFile(file: File)
+def listFiles: List[File]
+
+forAll(genList(genFile)) { files =>
+
+  files.foreach(f => createFile(f))
+
+  listFiles == files
+}
+```
+
+<pre><code class="warning">
+List("a", "A") != List("a")
+> ARG_1: List("a", "A")
+</code></pre>
+
+---
+
+class: code
+
+```scala
 def listUsersSortByName: List[User] =
   "SELECT * FROM user ORDER BY name ASC"
 ```
@@ -931,17 +999,28 @@ def listUsersSortByName: List[User] =
 
 class: code
 
-```scala
-def listUsersSortByName: List[User]
+<pre><code class="scala scala-fg">&nbsp;
 
 
 forAll(genList(genUser)) { users =>
 
   users.foreach(u => insertUser(u))
 
-  val l = listUsersSortByName
+  listUsersSortByName ==
+    users.sortBy(_.name.toLowerCase)
+}
+</code></pre>
 
-  l == users.sortBy(_.name.toLowerCase)
+```scala-bg
+def listUsersSortByName: List[User] =
+  "SELECT * FROM user ORDER BY name ASC"
+
+forAll(genList(genUser)) { users =>
+
+  users.foreach(u => insertUser(u))
+
+  listUsersSortByName ==
+    users.sortBy(_.name.toLowerCase)
 }
 ```
 
@@ -949,34 +1028,39 @@ forAll(genList(genUser)) { users =>
 
 class: code
 
-```scala
-def findUsersByPostCode(code: Int): List[User] =
-  "SELECT * FROM user WHERE postcode = ?"
-```
+<pre><code class="scala scala-fg">&nbsp;
 
----
 
-class: code
-
-```scala
-def findUsersByPostCode(code: Int): List[User]
-
-forAll(genPostcode) { postcode =>
 forAll(genList(genUser)) { users =>
 
-  val has = users.filter(_.postcode == postcode)
+  users.foreach(u => insertUser(u))
 
-  users
-    .foreach(u => userDb.insert(u))
+  listUsersSortByName ==
+    users.sortBy(_.name.toLowerCase)
+}
+</code></pre>
 
-  userDb.findUsersByPostCode(postcode) == has
-}}
+```scala-bg
+def listUsersSortByName: List[User] =
+  "SELECT * FROM user ORDER BY name ASC"
+
+forAll(genList(genUser)) { users =>
+
+  users.foreach(u => insertUser(u))
+
+  listUsersSortByName ==
+    users.sortBy(_.name.toLowerCase)
+}
 ```
 
-???
+<pre><code class="warning">https://bugs.mysql.com/bug.php?id=51859
 
-- God forbid you're not using prepared statements
-  this would find a bug pretty quick
+Order (sort) by numbers are wrong
+</code></pre>
+
+
+
+
 
 
 
@@ -1009,18 +1093,38 @@ class: code
 ```scala
 forAll(genList(genInt)) { s =>
 
-  l.sorted.sorted == l.sorted
+  l.distinct.distinct == l.distinct
 }
 ```
 
 ---
 
-<img src="images/google-idempotent.png" width="100%" />
+<img src="images/github-idempotent.png" width="100%" />
 
 ---
 
 <img src="images/rust-bug.png" width="100%" />
 
+---
+
+<img src="images/rust-bug.png" width="100%" />
+
+```rust
+ fn foo() {
+      #[cfg(target_os = "freertos")]
+           match port_id {
+```
+
+---
+
+<img src="images/rust-bug.png" width="100%" />
+
+```rust
+ fn foo() {
+      #[cfg(target_os = "freertos")]
+      #[cfg(target_os = "freertos")]
+           match port_id {
+```
 ---
 
 <img src="images/rust-bug.png" width="100%" />
@@ -1035,52 +1139,18 @@ forAll(genList(genInt)) { s =>
 
 https://github.com/rust-lang-nursery/rustfmt/issues/1668
 
-
-
-
-
-
-
-
-
-
-
-
 ---
 
-class: center, middle, section-aqua, heading-white
+<img src="images/rust-bug.png" width="100%" />
 
-## Invariants
+<img src="images/rust-idempotent.png" width="100%" />
 
-???
+> We do test for idempotency by running the 'target' of every test through rustfmt as a 'source'.
+> Obviously, this only catches bugs if there is a relevant test.
 
-- Need to be combined with multiple properties
-  to test the entire function
+<img src="images/scalafmt-idempotent.png" width="100%" />
 
----
 
-class: code
-
-```scala
-forAll(genString) { s =>
-  s.toLowerCase.length == s.length
-}
-```
-
----
-
-class: code
-
-```scala
-forAll(genString) { s =>
-  s.toLowerCase.length == s.length
-}
-```
-
-<pre><code class="warning">
-Expected 2 but got 1
-ARG_0: "İ"
-</code></pre>
 
 
 
@@ -1131,6 +1201,65 @@ def testSubstring =
     substring(s + t, s.length) == t
   }}
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+class: center, middle, heading-black
+
+## Invariant
+
+<img src="images/invariant.png" />
+
+???
+
+- Need to be combined with multiple properties
+  to test the entire function
+
+---
+
+class: code
+
+```scala
+forAll(genString) { s =>
+  s.toLowerCase.length == s.length
+}
+```
+
+---
+
+class: code
+
+```scala
+forAll(genString) { s =>
+  s.toLowerCase.length == s.length
+}
+```
+
+<pre><code class="warning">
+Expected 2 but got 1
+ARG_0: "İ"
+</code></pre>
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1642,6 +1771,39 @@ def testInsertUser =
 > ARG_0: "a b"
 </code></pre>
 
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" && !user.contains(" ") ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" && !user.contains(" ") ==>
+    insert(user)
+  }
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" && !user.contains(" ") && ... ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" && !user.contains(" ") && ... ==>
+    insert(user)
+  }
+```
 ---
 
 class: code
