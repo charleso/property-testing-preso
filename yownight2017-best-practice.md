@@ -1448,7 +1448,8 @@ trait Commands {
 
 ---
 
-## Learning from mistakes: a comprehensive study on real world concurrency bug characteristics
+## Learning from mistakes
+### A comprehensive study on real world concurrency bug characteristics
 
 http://dl.acm.org/citation.cfm?id=1346323
 
