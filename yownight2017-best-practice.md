@@ -762,10 +762,6 @@ forAll(genUser) { user =>
 <pre><code class="warning">Some(User(\NULL)) != Some(User())
 </code></pre>
 
----
-
-background-image: url(images/learning.jpeg)
-
 
 
 
@@ -809,114 +805,6 @@ forAll(genList(genInt)) { l =>
   timSort(l) == bubbleSort(l)
 }
 ```
-
----
-
-class: code
-
-```scala
-def timSort(l: List[Int]): List[Int]
-
-
-forAll(genList(genInt)) { l =>
-
-  timSort(l) == bubbleSort(l)
-}
-```
-
-<pre><code class="warning">
-https://bugs.openjdk.java.net/browse/JDK-8072909
-
-TimSort fails with ArrayIndexOutOfBounds
-on worst case long arrays
-</code></pre>
-
----
-
-class: code
-
-```scala
-case class Date(value: Int)
-
-
-def toJoda(date: Date): JodaDate
-
-def fromJoda(date: JodaDate): Date
-```
-
----
-
-class: code
-
-```scala
-case class Date(value: Int)
-
-
-def toJoda(date: Date): JodaDate
-
-def fromJoda(date: JodaDate): Date
-
-
-forAll(genDate) { d =>
-
-  d.toJoda.fromJoda == d
-}
-```
-
----
-
-class: code
-
-```scala
-def dayPlus(d: Date, i: Int): Date = {
-  ...
-}
-```
-
----
-
-class: code
-
-```scala
-def dayPlus(d: Date, i: Int): Date = {
-  ...
-}
-
-forAll(genDate) { d =>
-forAll(genInt) { i =>
-
-  dayPlus(d, i) ==
-    d.toJoda.plusDays(i).fromJoda
-}}
-```
-
----
-
-class: code
-
-```scala
-def dayPlus(d: Date, i: Int): Date = {
-  ...
-}
-
-forAll(genDate) { d =>
-forAll(genInt) { i =>
-
-  dayPlus(d, i) ==
-    d.toJoda.plusDays(i).fromJoda
-}}
-```
-
-<pre><code class="warning">Date(2004,2,29) != Date(2004,3,1)
-
-ARG_0: Date(2004,2,28)
-ARG_1: 1
-</code></pre>
-
----
-
-class: center, middle, section-aqua, heading-white
-background-image: url(images/property-based.jpeg)
 
 ---
 
@@ -1389,6 +1277,364 @@ forAll(genInt) { i =>
 
 ---
 
+class: center, middle, heading-white
+background-image: url(images/generators.jpeg)
+
+## Generators
+
+???
+
+- Investment!
+
+
+---
+
+class: code
+
+```scala
+def testInsertUser =
+
+
+    insert("bob")
+
+
+def insert(user: String)
+```
+
+---
+
+class: code
+
+```scala
+def testInsertUser =
+  forAll(genString) { user =>
+
+    insert(user)
+  }
+```
+
+---
+
+class: code
+
+```scala
+def testInsertUser =
+  forAll(genString) { user =>
+
+    insert(user)
+  }
+```
+
+<pre><code class="warning">
+! testInsertUser:
+    Name cannot be blank
+> ARG_0: ""
+</code></pre>
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" ==>
+    insert(user)
+  }
+```
+
+---
+
+class: code
+
+```scala
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" ==>
+    insert(user)
+  }
+```
+
+<pre><code class="warning">
+! testInsertUser:
+    Name cannot contain spaces
+> ARG_0: "a b"
+</code></pre>
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" && !user.contains(" ") ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" && !user.contains(" ") ==>
+    insert(user)
+  }
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" && !user.contains(" ") && ... ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" && !user.contains(" ") && ... ==>
+    insert(user)
+  }
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+  user != "" && !user.contains(" ") && ... ==>
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genString) { user =>
+  user != "" && !user.contains(" ") && ... ==>
+    insert(user)
+  }
+```
+
+<pre><code class="warning">
+Gave up after only 15 passed tests.
+85 tests were discarded.
+</code></pre>
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+         genList1(choose('a', 'z')
+
+
+
+
+def choose(a: Char, b: Char): Gen[Char]
+
+def genList1[A](g: Gen[A]): Gen[List[A]]
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genList1(choose('a', 'z'))) { user =>
+
+    insert(user)
+  }
+
+def choose(a: Char, b: Char): Gen[Char]
+
+def genList1[A](g: Gen[A]): Gen[List[A]]
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+         genUser
+
+
+
+
+def genUser: Gen[String] =
+  genList1(choose('a', 'z'))
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genUser) { user =>
+
+    insert(user)
+  }
+
+def genUser: Gen[String] =
+  genList1(choose('a', 'z'))
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+         genUser
+
+
+
+
+def genUser: Gen[String] =
+  genList1(choose('a', 'z'))
+
+
+         genUser
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genUser) { user =>
+
+    insert(user)
+  }
+
+def genUser: Gen[String] =
+  genList1(choose('a', 'z'))
+
+def testDeleteUser =
+  forAll(genUser) { user =>
+    delete(user)
+  }
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+         genUser
+
+
+
+
+def genUser: Gen[User] =
+  for {
+    name <- genList1(choose('a', 'z'))
+    age  <- choose(0, 100)
+  } yield User(name, age)
+</code></pre>
+
+```scala-bg
+def testInsertUser =
+  forAll(genUser) { user =>
+
+    insert(user)
+  }
+
+def genUser: Gen[User] =
+  for {
+    name <- genList1(choose('a', 'z'))
+    age  <- choose(0, 100)
+  } yield User(name, age)
+```
+
+---
+
+class: middle, center
+
+<img src="images/exploits_of_a_mom.png" />
+
+???
+
+## True Story - "null" username
+
+---
+
+class: code
+
+
+```scala
+
+
+
+
+
+
+
+              "null"
+```
+
+---
+
+class: code
+
+```scala
+def testMigrateUser =
+
+
+    migrateUser("bob")
+
+
+def testNullUsername =
+  migrateUser("null")
+```
+
+???
+
+- Only tests one code-path
+
+---
+
+class: code
+
+```scala
+def testMigration =
+  forAll(genUser) { user =>
+
+    migrateUser(user)
+  }
+
+def genUser: Gen[String] =
+
+          genList1(choose('a', 'z'))
+```
+
+???
+
+- Ideally you don't have to add any more tests
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+
+
+  genFrequency(
+
+    1  -> genConst("null")
+  )
+</code></pre>
+
+```scala-bg
+def testMigration =
+  forAll(genUser) { user =>
+
+    migrateUser(user)
+  }
+
+def genUser: Gen[String] =
+  genFrequency(
+    19 -> genList1(choose('a', 'z'))
+  , 1  -> genConst("null")
+  )
+```
+---
+
 class: bottom, right, heading-white
 background-image: url(images/state-based.jpeg)
 
@@ -1624,419 +1870,6 @@ https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 
 
----
-
-class: center, middle, heading-white
-background-image: url(images/generators.jpeg)
-
-## Generators
-
-???
-
-- Investment!
-
-
----
-
-class: code
-
-```scala
-forAll(genString) { s =>
-forAll(genInt) { i =>
-
-
-    substring(s, i)
-}}
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-i >= 0 && i &lt; s.length ==>
-</code></pre>
-
-```scala-bg
-forAll(genString) { s =>
-forAll(genInt) { i =>
-i >= 0 && i < s.length ==>
-
-    substring(s, i)
-}}
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-       choose(0, s.length - 1)
-
-
-
-
-
-def choose(i: Int, b: Int): Gen[Int]
-</code></pre>
-
-```scala-bg
-forAll(genString) { s =>
-forAll(choose(0, s.length - 1)) { i =>
-
-
-    substring(s, i)
-}}
-
-def choose(i: Int, b: Int): Gen[Int]
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">       genStringWithOffset
-
-
-
-
-
-
-def genStringWithOffset: Gen[(String, Int)] =
-  for {
-    s <- genString
-    i <- choose(0, s.length - 1)
-  } yield (s, i)
-</code></pre>
-
-```scala-bg
-forAll(genStringWithOffset) { (s, i) =>
-
-
-
-    substring(s, i)
-}}
-
-def genStringWithOffset: Gen[(String, Int)] =
-  for {
-    s <- genString
-    i <- choose(0, s.length - 1)
-  } yield (s, i)
-```
-
----
-
-class: code
-
-```scala
-def testInsertUser =
-
-
-    insert("bob")
-
-
-def insert(user: String)
-```
-
----
-
-class: code
-
-```scala
-def testInsertUser =
-  forAll(genString) { user =>
-
-    insert(user)
-  }
-```
-
----
-
-class: code
-
-```scala
-def testInsertUser =
-  forAll(genString) { user =>
-
-    insert(user)
-  }
-```
-
-<pre><code class="warning">
-! testInsertUser:
-    Name cannot be blank
-> ARG_0: ""
-</code></pre>
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-  user != "" ==>
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genString) { user =>
-  user != "" ==>
-    insert(user)
-  }
-```
-
----
-
-class: code
-
-```scala
-def testInsertUser =
-  forAll(genString) { user =>
-  user != "" ==>
-    insert(user)
-  }
-```
-
-<pre><code class="warning">
-! testInsertUser:
-    Name cannot contain spaces
-> ARG_0: "a b"
-</code></pre>
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-  user != "" && !user.contains(" ") ==>
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genString) { user =>
-  user != "" && !user.contains(" ") ==>
-    insert(user)
-  }
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-  user != "" && !user.contains(" ") && ... ==>
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genString) { user =>
-  user != "" && !user.contains(" ") && ... ==>
-    insert(user)
-  }
-```
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-         genList1(choose('a', 'z')
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genList1(choose('a', 'z'))) { user =>
-
-    insert(user)
-  }
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-         genUser
-
-
-
-
-def genUser: Gen[String] =
-  genList1(choose('a', 'z'))
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genUser) { user =>
-
-    insert(user)
-  }
-
-def genUser: Gen[String] =
-  genList1(choose('a', 'z'))
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-         genUser
-
-
-
-
-def genUser: Gen[String] =
-  genList1(choose('a', 'z'))
-
-
-         genUser
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genUser) { user =>
-
-    insert(user)
-  }
-
-def genUser: Gen[String] =
-  genList1(choose('a', 'z'))
-
-def testDeleteUser =
-  forAll(genUser) { user =>
-    delete(user)
-  }
-```
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-         genUser
-
-
-
-
-def genUser: Gen[User] =
-  for {
-    name <- genList1(choose('a', 'z'))
-    age  <- choose(0, 100)
-  } yield User(name, age)
-</code></pre>
-
-```scala-bg
-def testInsertUser =
-  forAll(genUser) { user =>
-
-    insert(user)
-  }
-
-def genUser: Gen[User] =
-  for {
-    name <- genList1(choose('a', 'z'))
-    age  <- choose(0, 100)
-  } yield User(name, age)
-```
-
----
-
-class: middle, center
-
-<img src="images/exploits_of_a_mom.png" />
-
-???
-
-## True Story - "null" username
-
----
-
-class: code
-
-
-```scala
-
-
-
-
-
-
-
-              "null"
-```
-
----
-
-class: code
-
-```scala
-def testMigrateUser =
-
-
-    migrateUser("bob")
-
-
-def testNullUsername =
-  migrateUser("null")
-```
-
-???
-
-- Only tests one code-path
-
----
-
-class: code
-
-```scala
-def testMigration =
-  forAll(genUser) { user =>
-
-    migrateUser(user)
-  }
-
-def genUser: Gen[String] =
-
-          genList1(choose('a', 'z'))
-```
-
-???
-
-- Ideally you don't have to add any more tests
-
----
-
-class: code
-
-<pre><code class="scala scala-fg">&nbsp;
-
-
-
-
-
-
-  genFrequency(
-
-    1  -> genConst("null")
-  )
-</code></pre>
-
-```scala-bg
-def testMigration =
-  forAll(genUser) { user =>
-
-    migrateUser(user)
-  }
-
-def genUser: Gen[String] =
-  genFrequency(
-    19 -> genList1(choose('a', 'z'))
-  , 1  -> genConst("null")
-  )
-```
 
 
 
@@ -2124,17 +1957,17 @@ background-image: url(images/shrink.jpeg)
 
 ---
 
-class: bottom, right, heading-white
-background-image: url(images/state-based.jpeg)
-
-## State-based Test
-
----
-
 class: center, middle, heading-white
 background-image: url(images/generators.jpeg)
 
 ## Generators
+
+---
+
+class: bottom, right, heading-white
+background-image: url(images/state-based.jpeg)
+
+## State-based Test
 
 ---
 
