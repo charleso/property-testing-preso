@@ -1907,12 +1907,6 @@ class: middle, center
 
 ---
 
-class: middle, center
-
-<img src="images/state-model.png" width="100%" />
-
----
-
 class: code
 
 ```scala
@@ -1926,7 +1920,7 @@ class: code
 ```scala
 case class State(users: Map[UserId, User])
 
-case class Insert(user: User) extends Commands
+case class Insert(user: User) { .. }
 ```
 
 ---
@@ -1936,17 +1930,9 @@ class: code
 ```scala
 case class State(users: Map[UserId, User])
 
-case class Insert(user: User) extends Commands {
+case class Insert(user: User) { .. }
 
-  def nextState(st: State): State =
-    State(st.users + user)
-
-  def run: Unit =
-    insertUser(user)
-
-  def postCondition(st: State, r: Unit): Prop =
-    true
-}
+case class Get(id: UserId) { .. }
 ```
 
 ---
@@ -1956,43 +1942,9 @@ class: code
 ```scala
 case class State(users: Map[UserId, User])
 
-case class Insert(user: User) extends Commands
+case class Insert(user: User) { .. }
 
-case class Get(id: UserId) extends Commands
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(user: User) extends Commands
-
-case class Get(id: UserId) extends Commands {
-
-  def nextState(st: State): State =
-    st
-
-  def run: Option[User] =
-    getUser(id)
-
-  def postCondition(st: State, r: User): Prop =
-    st.get(id) == r
-}
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(user: User) extends Commands
-
-case class Get(id: UserId) extends Commands
+case class Get(id: UserId) { .. }
 
 def genCommand: Gen[Command] =
   oneOf(Insert(..), Get(..))
@@ -2005,9 +1957,9 @@ class: code
 ```scala
 case class State(users: Map[UserId, User])
 
-case class Insert(user: User) extends Commands
+case class Insert(user: User) { .. }
 
-case class Get(id: UserId) extends Commands
+case class Get(id: UserId) { .. }
 ```
 
 <pre><code class="warning">! Falsified after 11 passed tests.
@@ -2104,15 +2056,13 @@ Parallel:
 
 ---
 
-## Learning from mistakes
-### A comprehensive study on real world concurrency bug characteristics
+class: middle
 
-http://dl.acm.org/citation.cfm?id=1346323
+<img src="images/finding-race-conditions.png" width="100%" />
 
-- MySQL, Apache, Mozilla, OpenOffice
-- 105 concurrency bugs
+???
 
-> "96% of the bugs can be reproduced every time with a certain partial order between only two threads"
+## 2009
 
 
 
