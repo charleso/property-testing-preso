@@ -160,17 +160,17 @@ http://www.quviq.com/volvo-quickcheck/
 
 ---
 
-class: center, middle
+## https://jepsen.io/
 
-<img src="http://blog.trifork.com/wp-content/uploads/2013/06/Riak_product_logo.png" />
-
-> Poolboy had 85% test coverage (and most of the remaining 15% was irrelevant boilerplate) when I started QuickChecking it, and I felt pretty happy with its solidity, so I didn’t expect to find many bugs, if any. I was very wrong.
-
-http://basho.com/posts/technical/quickchecking-poolboy-for-fun-and-profit/
-
----
-
-https://jepsen.io/
+- MongoDB
+- Cassandra
+- RabbitMQ
+- Redis
+- Riak
+- Zookeeper
+- VoltDB
+- RethinkDB
+- Elasticsearch
 
 ---
 
@@ -406,11 +406,6 @@ def testSubstring = {
 
 ---
 
-class: center, middle, heading-white
-background-image: url(images/learning.jpeg)
-
----
-
 class: code
 
 
@@ -633,18 +628,13 @@ forAll(genString) { s =>
 
 ---
 
-class: center, middle, heading-white
-background-image: url(images/learning.jpeg)
-
----
-
 class: code
 
 ```scala
 import org.joda.time._
 
 
-forAll(genDate) { dt =>
+forAll(genDateTime) { dt =>
 
   val formatter = DateTimeFormat.fullDateTime()
 
@@ -665,7 +655,7 @@ class: code
 import org.joda.time._
 
 
-forAll(genDate) { dt =>
+forAll(genDateTime) { dt =>
 
   val formatter = DateTimeFormat.fullDateTime()
 
@@ -1021,6 +1011,10 @@ forAll(genList(genInt)) { s =>
   l.sorted.sorted == l.sorted
 }
 ```
+
+---
+
+<img src="images/google-idempotent.png" width="100%" />
 
 ---
 
