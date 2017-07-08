@@ -7,8 +7,8 @@ background-image: url(images/example-based.jpeg)
 
 ???
 
-- Property-based testing is our default
-- We have a majority of property-based tests
+- We basically write property-based tests exclusively
+- Property testing is a powerful tool for testing
 
 ---
 
@@ -35,8 +35,12 @@ background-image: url(images/goal.jpeg)
 
 ???
 
+- Why do we test code in the first place?
+- I believe we all want to write correct and reliable software
 - Safety
 - At Ambiata it costs $$$
+- But, it's very hard
+- Testing is one tool to achieve that
 
 ---
 
@@ -45,12 +49,21 @@ background-image: url(images/example-based.jpeg)
 
 ##  Testing
 
+???
+
+- Testing is first line of defence
+
 ---
 
 class: bottom, right, heading-black
 background-image: url(images/example-based.jpeg)
 
 ## Example-based Testing
+
+???
+
+- The hard part is coming up with the examples
+- I want to demonstrate now...
 
 ---
 
@@ -129,6 +142,11 @@ def testSubstring = {
   substring("abc", -1) == "c"
 }
 ```
+
+???
+
+- How many examples is enough?
+
 ---
 
 class: middle, center
@@ -139,8 +157,14 @@ class: middle, center
 
 - Writing good examples means knowing about the internals of the functions
 - Doesn't help with other systems or libraries, or new edge cases
-- Let's get the computer to generate them instead!
 
+---
+
+background-image: url(images/computer.jpeg)
+
+???
+
+- Let's get the computer to generate them instead!
 
 
 
@@ -236,6 +260,12 @@ class: middle, center
 ### https://en.wikipedia.org/wiki/QuickCheck
 
 > 31 Languages
+
+???
+
+- Using ScalaCheck, a derivitive of QuickCheck for Scala
+- I want to empaphasise, this is not about Scala
+- This talk is about property testing
 
 
 
@@ -621,6 +651,8 @@ withMinSuccessfulTests(1000)
 
 - Same test found different edge cases (bugs?)
 - Learned about substring
+- We might lower the number of tests for databases
+- Test doesn't change
 
 ---
 
@@ -2386,6 +2418,10 @@ background-image: url(images/example-based.jpeg)
 
 ---
 
+background-image: url(images/computer.jpeg)
+
+---
+
 class: top, left, heading-black
 background-image: url(images/fuzzy.jpg)
 
@@ -2506,13 +2542,6 @@ def test_substring(s1, s2):
 
 ---
 
-class: bottom, left, heading-white
-background-image: url(images/property-based.jpeg)
-
-## Find More Bugs
-
----
-
 class: bottom, right, heading-white
 background-image: url(images/edges.jpeg)
 
@@ -2526,6 +2555,13 @@ background-image: url(images/edges.jpeg)
 - Live longer than other tests
 - File multiple bugs with one test
 - Less code
+
+---
+
+class: bottom, left, heading-white
+background-image: url(images/property-based.jpeg)
+
+## Find More Bugs
 
 ---
 
