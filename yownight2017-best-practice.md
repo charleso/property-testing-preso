@@ -1227,6 +1227,17 @@ forAll(genInt) { i =>
 }
 ```
 
+---
+
+class: code
+
+```scala
+forAll(genInt) { i =>
+  println(i)
+  i % 2 == 0
+}
+```
+
 <pre><code class="warning">
 15936 -15936 23904 -23904 27888 -27888 29880
 -29880 30876 -30876 31374 -31374 31623 0 15812
@@ -1272,46 +1283,9 @@ background-image: url(images/state-based.jpeg)
 class: code
 
 ```scala
-def insertUser(u: User): UserId
-
-def getUser(i: UserId): Option[User]
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(u: User) extends Commands
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(u: User) extends Commands {
-
-  def nextState(state: State, id: UserId): State =
-    state + (id -> u)
-
-  def preCondition(state: State): Boolean =
-    true
-
-  def run: UserId =
-    insertUser(u)
+def transfer(a: Account, b: Account, i: Int) = {
+  a.total -= i
+  b.total += i
 }
 ```
 
@@ -1320,11 +1294,7 @@ case class Insert(u: User) extends Commands {
 class: code
 
 ```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(u: User) extends Commands
-
-case class Get(u: UserId) extends Commands
+case class State(a: Int, b: Int)
 ```
 
 ---
@@ -1332,14 +1302,9 @@ case class Get(u: UserId) extends Commands
 class: code
 
 ```scala
-case class State(users: Map[UserId, User])
+case class State(a: Int, b: Int)
 
-case class Insert(u: User) extends Commands
-
-case class Get(u: UserId) extends Commands
-
-def genCommand: Gen[Command] =
-  genOneOf(Insert, Get)
+case class Transfer(i: Int) extends Commands
 ```
 
 ---
@@ -1347,38 +1312,84 @@ def genCommand: Gen[Command] =
 class: code
 
 ```scala
-case class State(users: Map[UserId, User])
+case class State(a: Int, b: Int)
 
-case class Insert(u: User) extends Commands
+case class Transfer(i: Int) extends Commands {
 
-case class Get(u: UserId) extends Commands
+  def nextState(st: State): State =
+    State(st.a - i, st.b + 1)
 
-def genCommand: Gen[Command] =
-  genOneOf(Insert, Get)
+  def run =
+    transfer(accountA, accountB, i)
+
+  def postCondition(st: State, r: Int): Prop =
+    r == st.a + st.b
+}
 ```
 
-<pre><code class="warning">
-ARG_0: Actions(List(Insert, Insert, Get))
+---
+
+class: code
+
+```scala
+case class State(a: Int, b: Int)
+
+case class Transfer(i: Int) extends Commands
+
+def genCommand: Gen[Command] =
+  genInt.map(Transfer)
+```
+
+---
+
+class: code
+
+```scala
+case class State(a: Int, b: Int)
+
+case class Transfer(i: Int) extends Commands
+
+def genCommand: Gen[Command] =
+  genInt.map(Transfer)
+```
+
+<pre><code class="success">
+transfer: OK, passed 100 tests.
 </code></pre>
 
 ---
 
+class: middle, center
+
+<img src="images/threads-joke.png" />
+
+---
+
 class: code
 
 ```scala
-case class State(users: Map[UserId, User])
+def property(threadCount: Int): Prop
+```
 
-case class Insert(u: User) extends Commands
+---
 
-case class Get(u: UserId) extends Commands
+class: code
 
-def genCommand: Gen[Command] =
-  genOneOf(Insert, Get)
+```scala
+def property(threadCount: Int): Prop
 ```
 
 <pre><code class="warning">
-ARG_0: Actions(List(Insert, Insert, Get))
-ARG_0_ORIGINAL: Actions(List(Insert, Insert, Get, Get, Insert, Get))
+! transfer: Falsified after 0 passed tests.
+
+Expected Success(1) but got Success(0)
+
+Intital:
+  State(0,0)
+
+Parallel:
+  1. Deposit(1) => 1
+  2. Deposit(2) => 1
 </code></pre>
 
 ---
@@ -1428,23 +1439,6 @@ class: code, thinner
 https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 - Was in 2013
-
----
-
-class: middle, center
-
-<img src="images/threads-joke.png" />
-
----
-
-class: code
-
-```scala
-trait Commands {
-
-  def property(threadCount: Int): Prop
-}
-```
 
 ---
 
