@@ -28,8 +28,8 @@ background-image: url("images/chopsticks.jpg")
 
 ---
 
-class: center, middle, heading-black
-background-image: url(images/goal.jpeg)
+class: center, middle, heading-white
+background-image: url(https://images.unsplash.com/photo-1492515114975-b062d1a270ae)
 
 ## Motivation?
 
@@ -37,13 +37,6 @@ background-image: url(images/goal.jpeg)
 
 - Safety
 - At Ambiata it costs $$$
-
----
-
-class: center, middle, heading-black
-background-image: url(images/example-based.jpeg)
-
-## Example-based Testing
 
 ---
 
@@ -121,6 +114,13 @@ class: middle, center
 
 ---
 
+class: center, middle, heading-black
+background-image: url(images/example-based.jpeg)
+
+## Example-based Testing
+
+---
+
 class: middle, center
 
 <img src="images/quickcheck-paper.png" />
@@ -173,6 +173,14 @@ http://www.quviq.com/volvo-quickcheck/
 - VoltDB
 - RethinkDB
 - Elasticsearch
+
+???
+
+- "Call me maybe"
+- Distributed systems are hard
+- Documentation is usually wrong
+- If you're using one of these DBs go an read them
+- Has changed how people test DBs
 
 ---
 
@@ -2179,14 +2187,10 @@ background-image: url(images/example-based.jpeg)
 
 ---
 
-class: center, middle, section-aqua, heading-white
-background-image: url(images/property-based.jpeg)
+class: top, left, heading-black
+background-image: url(images/fuzzy.jpg)
 
-## Property-based Testing
-
-???
-
-## One Property / Many Bugs
+## Fuzzing
 
 ---
 
@@ -2248,6 +2252,11 @@ class: middle, center
 ### https://en.wikipedia.org/wiki/QuickCheck
 
 > 31 Languages
+
+---
+
+class: center, middle, section-aqua, heading-white
+background-image: url(images/property-based.jpeg)
 
 ???
 
