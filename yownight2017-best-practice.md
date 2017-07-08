@@ -2160,16 +2160,6 @@ class: code
 case class State(users: Map[UserId, User])
 
 case class Insert(user: User) { .. }
-```
-
----
-
-class: code
-
-```scala
-case class State(users: Map[UserId, User])
-
-case class Insert(user: User) { .. }
 
 case class Get(id: UserId) { .. }
 ```
