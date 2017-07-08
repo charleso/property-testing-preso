@@ -242,6 +242,11 @@ background-image: url(images/fuzzy.jpg)
 
 ## Fuzzing
 
+???
+
+- Throw random values at code/systems
+- Usually for security purposes
+
 ---
 
 class: code
@@ -918,6 +923,19 @@ forAll(genUser) { user =>
 <pre><code class="warning">Some(User(\NULL)) != Some(User())
 </code></pre>
 
+???
+
+- Date/Double precision
+
+---
+
+class: center, middle, heading-white
+background-image: url(images/learning.jpeg)
+
+???
+
+- Discovered edge cases in our libraries/systems
+- Only wrote one test
 
 
 
@@ -1215,6 +1233,9 @@ ARG_0: Date(2004,2,28)
 ARG_1: 1
 </code></pre>
 
+---
+
+background-image: url(images/property-based.jpeg)
 
 
 
