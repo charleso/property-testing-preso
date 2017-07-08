@@ -21,6 +21,8 @@ background-image: url("images/chopsticks.jpg")
 
 - Property-based testing is our default
 - We have a majority of property-based tests
+- Changed my life and the way I test
+- I write better code now
 
 
 
@@ -2061,7 +2063,7 @@ class: code
 forAll(genUser) { user =>
 
   val id = insertUser(user)
-  getUser(id) == Some(user)
+  val id2 = insertUser(user)
   getUser(id) == Some(user)
 }
 </code></pre>
@@ -2075,7 +2077,7 @@ def getUser(u: UserId): Option[User]
 forAll(genUser) { user =>
 
   val id = insertUser(user)
-  getUser(id) == Some(user)
+  val id2 = insertUser(user)
   getUser(id) == Some(user)
 }
 ```
