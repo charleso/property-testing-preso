@@ -81,7 +81,7 @@ def substring(s: String, i: Int): String
 def testSubstring = {
   substring("abc", 1) == "bc"
   substring("abc", 3) == ""
-  substring("abc", 4) == ???
+  substring("돪돪", 1) == "돪"
 }
 ```
 
@@ -95,8 +95,24 @@ def substring(s: String, i: Int): String
 def testSubstring = {
   substring("abc", 1) == "bc"
   substring("abc", 3) == ""
-  substring("abc", 4) == ???
-  substring("abc", -1) == ???
+  substring("돪돪", 1) == "돪"
+  substring("abc", 4) == ""
+}
+```
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  substring("abc", 1) == "bc"
+  substring("abc", 3) == ""
+  substring("돪돪", 1) == "돪"
+  substring("abc", 4) == ""
+  substring("abc", -1) == "c"
 }
 ```
 
@@ -176,11 +192,14 @@ http://www.quviq.com/volvo-quickcheck/
 
 ???
 
+- Kyle Kingsbury
 - "Call me maybe"
 - Distributed systems are hard
 - Documentation is usually wrong
 - If you're using one of these DBs go an read them
 - Has changed how people test DBs
+- Industry standard
+- Badge of honour
 
 ---
 
@@ -719,7 +738,6 @@ class: code
 ```scala
 import org.joda.time._
 
-
 forAll(genDateTime) { dt =>
 
   val formatter = DateTimeFormat.fullDateTime()
@@ -739,7 +757,6 @@ class: code
 
 ```scala
 import org.joda.time._
-
 
 forAll(genDateTime) { dt =>
 
@@ -1053,10 +1070,97 @@ forAll(genList(genUser)) { users =>
     users.sortBy(_.name.toLowerCase)
 }
 ```
+<pre><code class="warning">List("a", "b" "A") != List("a", "A", "b")
+</code></pre>
 
-<pre><code class="warning">https://bugs.mysql.com/bug.php?id=51859
+---
 
-Order (sort) by numbers are wrong
+class: code
+
+
+```scala
+case class Date(value: Int)
+```
+
+---
+
+class: code
+
+
+```scala
+case class Date(value: Int)
+
+
+def toJoda(date: Date): JodaDate
+
+def fromJoda(date: JodaDate): Date
+```
+
+---
+
+class: code
+
+```scala
+case class Date(value: Int)
+
+
+def toJoda(date: Date): JodaDate
+
+def fromJoda(date: JodaDate): Date
+
+
+forAll { d: Date =>
+
+  d.toJoda.fromJoda == d
+}
+```
+
+---
+
+class: code
+
+```scala
+def dayPlus(d: Date, i: Int): Date = {
+  ...
+}
+```
+
+---
+
+class: code
+
+```scala
+def dayPlus(d: Date, i: Int): Date = {
+  ...
+}
+
+forAll { (d: Date, i: Int) =>
+
+  dayPlus(d, i) ==
+    d.toJoda.plusDays(i).fromJoda
+}
+```
+
+---
+
+class: code
+
+```scala
+def dayPlus(d: Date, i: Int): Date = {
+  ...
+}
+
+forAll { (d: Date, i: Int) =>
+
+  dayPlus(d, i) ==
+    d.toJoda.plusDays(i).fromJoda
+}
+```
+
+<pre><code class="warning">Date(2004,2,29) != Date(2004,3,1)
+
+ARG_0: Date(2004,2,28)
+ARG_1: 1
 </code></pre>
 
 
