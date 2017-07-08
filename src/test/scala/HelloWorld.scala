@@ -11,13 +11,21 @@ object HelloWorld extends Properties("HelloWorld") {
     (b + a).reverse =? (a.reverse + b.reverse)
   }
 
+  /*
   property("substring") = forAll { (a: String, i: Int) =>
     (i >= 0 && i < a.length) ==> {
       a.substring(i)
       true
     }
   }
+  */
+
   property("substring2") = forAll { (a: String, b: String) =>
     (a + b).substring(a.length) ?= b
+  }
+
+  property("foo") = forAll { (i: Int) =>
+    println(i)
+    i % 2 == 0
   }
 }

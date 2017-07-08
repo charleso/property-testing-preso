@@ -1154,6 +1154,16 @@ forAll(genString) { s =>
 }
 ```
 
+---
+
+class: code
+
+```scala
+forAll(genString) { s =>
+  s.toLowerCase.length == s.length
+}
+```
+
 <pre><code class="warning">
 ! testLowerCase: Falsified after 89 passed tests.
 
@@ -1179,6 +1189,54 @@ ARG_0: "İ"
 ARG_0_ORIGINAL: "()*@#%KFPSDlİDcx;lk1&(#"
 </code></pre>
 
+---
+
+class: code
+
+```scala
+forAll(genInt) { i =>
+
+  i % 2 == 0
+}
+```
+
+---
+
+class: code
+
+```scala
+forAll(genInt) { i =>
+
+  i % 2 == 0
+}
+```
+
+<pre><code class="warning">
+ARG_0: 1
+ARG_0_ORIGINAL: 481771087
+</code></pre>
+
+---
+
+class: code
+
+```scala
+forAll(genInt) { i =>
+  println(i)
+  i % 2 == 0
+}
+```
+
+<pre><code class="warning">
+15936 -15936 23904 -23904 27888 -27888 29880
+-29880 30876 -30876 31374 -31374 31623 0 15812
+-15812 23718 -23718 27671 0 13836 -13836 20754
+-20754 24213 0 12107 0 6054 -6054 9081 0 4541
+0 2271 0 1136 -1136 1704 -1704 1988 -1988 2130
+-2130 2201 0 1101 0 551 0 276 -276 414 -414 483
+0 242 -242 363 0 182 -182 273 0 137 0 69 0 35
+0 18 -18 27 0 14 -14 21 0 11 0 6 -6 9 0 5 0 1
+</code></pre>
 
 
 
