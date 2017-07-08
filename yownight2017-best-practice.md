@@ -592,7 +592,18 @@ def fromBytes(b: Array[Bytes]): String
 
 class: code
 
-```scala
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+forAll(genString) { s =>
+  val b = toBytes(s)
+  fromBytes(b) == s
+}
+</code></pre>
+
+```scala-bg
 def toBytes(s: String): Array[Byte]
 
 def fromBytes(b: Array[Bytes]): String
@@ -608,7 +619,18 @@ forAll(genString) { s =>
 
 class: code
 
-```scala
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+forAll(genString) { s =>
+  val b = toBytes(s)
+  fromBytes(b) == s
+}
+</code></pre>
+
+```scala-bg
 def toBytes(s: String): Array[Byte]
 
 def fromBytes(b: Array[Bytes]): String
@@ -625,6 +647,63 @@ forAll(genString) { s =>
 > ARG_0: "돪"
 </code></pre>
 
+---
+
+class: code
+
+<pre><code class="scala scala-fg">                       c: Charset
+
+
+                    c: Charset
+
+
+       genCharset
+</code></pre>
+
+```scala-bg
+def toBytes(s: String, c: Charset): Array[Byte]
+
+def fromBytes
+  (b: Array[Bytes], c: Charset): String
+
+forAll(genString) { s =>
+forAll(genCharset) { c =>
+  val b = toBytes(s, c)
+  fromBytes(b, c) == s
+}}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">                       c: Charset
+
+
+                    c: Charset
+
+
+       genCharset
+</code></pre>
+
+```scala-bg
+def toBytes(s: String, c: Charset): Array[Byte]
+
+def fromBytes
+  (b: Array[Bytes], c: Charset): String
+
+forAll(genString) { s =>
+forAll(genCharset) { c =>
+  val b = toBytes(s, c)
+  fromBytes(b, c) == s
+}}
+```
+
+<pre><code class="warning">"돪" != "?"
+
+> ARG_0: "돪"
+> ARG_1: windows-1252
+</code></pre>
 ---
 
 class: code
@@ -811,7 +890,29 @@ forAll(genList(genInt)) { l =>
 class: code
 
 ```scala
-def createFile(file: File)
+def timSort(l: List[Int]): List[Int]
+
+
+forAll(genList(genInt)) { l =>
+
+  timSort(l) == bubbleSort(l)
+}
+```
+
+<pre><code class="warning">
+https://bugs.openjdk.java.net/browse/JDK-8072909
+
+TimSort fails with ArrayIndexOutOfBounds
+on worst case long arrays
+</code></pre>
+
+---
+
+class: code
+
+```scala
+def touchFile(file: File)
+
 def listFiles: List[File]
 ```
 
@@ -822,21 +923,23 @@ class: code
 <pre><code class="scala scala-fg">&nbsp;
 
 
+
 forAll(genList(genFile)) { files =>
 
-  files.foreach(f => createFile(f))
+  files.foreach(f => touchFile(f))
 
   listFiles == files
 }
 </code></pre>
 
 ```scala-bg
-def createFile(file: File)
+def touchFile(file: File)
+
 def listFiles: List[File]
 
 forAll(genList(genFile)) { files =>
 
-  files.foreach(f => createFile(f))
+  files.foreach(f => touchFile(f))
 
   listFiles == files
 }
@@ -849,21 +952,23 @@ class: code
 <pre><code class="scala scala-fg">&nbsp;
 
 
+
 forAll(genList(genFile)) { files =>
 
-  files.foreach(f => createFile(f))
+  files.foreach(f => touchFile(f))
 
   listFiles == files
 }
 </code></pre>
 
 ```scala-bg
-def createFile(file: File)
+def touchFile(file: File)
+
 def listFiles: List[File]
 
 forAll(genList(genFile)) { files =>
 
-  files.foreach(f => createFile(f))
+  files.foreach(f => touchFile(f))
 
   listFiles == files
 }
