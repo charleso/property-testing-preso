@@ -1107,12 +1107,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
 
     substring(s, i) == ???
-}}}
+  }}
 ```
 
 ---
@@ -1122,12 +1122,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genString) { t =>
 
     substring(s + t, s.length) == t
-}}}
+  }}
 ```
 
 
