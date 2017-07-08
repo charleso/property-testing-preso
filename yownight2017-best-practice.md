@@ -207,12 +207,11 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
 
 
 
     substring("abc", 1) == "bc"
-}
 ```
 
 ---
@@ -221,12 +220,11 @@ class: code
 
 <pre><code class="scala scala-fg">def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
 
 
 
     substring("abc", 1)
-}
 </code></pre>
 
 ```scala-bg
@@ -246,12 +244,11 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
 
 
 
     substring("abc", 1)
-}
 ```
 
 ---
@@ -271,12 +268,12 @@ class: code
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   generateString    { s =>
 
 
     substring(s, 1)
-}}
+  }
 ```
 
 ---
@@ -298,12 +295,12 @@ def forAll[A](Gen[A], A => Prop): Prop
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
 
 
     substring(s, 1)
-}}
+  }
 
 def forAll[A](Gen[A], A => Prop): Prop
 ```
@@ -329,12 +326,12 @@ def genString: Gen[String]
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
 
 
     substring(s, 1)
-}}
+  }
 
 def forAll[A](Gen[A], A => Prop): Prop
 
@@ -365,12 +362,12 @@ def genInt: Gen[Int]
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
 
     substring(s, i)
-}}}
+  }}
 
 def forAll[A](Gen[A], A => Prop): Prop
 
@@ -385,23 +382,23 @@ class: code
 
 <pre><code class="scala scala-fg">&nbsp;
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
 
     substring(s, i)
-}}}
+  }}
 </code></pre>
 
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
 
     substring(s, i)
-}}}
+  }}
 ```
 
 ---
@@ -412,12 +409,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
 
     substring(s, i)
-}}}
+  }}
 ```
 
 <pre><code class="warning">
@@ -446,12 +443,12 @@ def ==>(p: Boolean, Prop): Prop
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
   i < s.length ==>
     substring(s, i)
-}}}
+  }}
 
 def ==>(p: Boolean, Prop): Prop
 ```
@@ -463,12 +460,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
   i < s.length ==>
     substring(s, i)
-}}}
+  }}
 ```
 
 <pre><code class="warning">
@@ -485,12 +482,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
   i >= 0 && i < s.length ==>
     substring(s, i)
-}}}
+  }}
 ```
 
 ---
@@ -500,12 +497,12 @@ class: code
 ```scala
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
   i >= 0 && i < s.length ==>
     substring(s, i)
-}}}
+  }}
 ```
 
 <pre><code class="success">
@@ -528,12 +525,12 @@ class: code
 ```scala-bg
 def substring(s: String, i: Int): String
 
-def testSubstring = {
+def testSubstring =
   forAll(genString) { s =>
   forAll(genInt) { i =>
   i >= 0 && i < s.length ==>
     substring(s, i) == ???
-}}}
+  }}
 ```
 
 
