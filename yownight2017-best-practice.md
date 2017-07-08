@@ -1898,12 +1898,11 @@ class: middle, center
 
 ---
 
-## State-based Testing
+class: code
 
-1. Describe the possible states
-2. Describe what actions can take place in each state
-3. Describe how to tell if the state is correct
-4. Generate and run random actions
+```scala
+case class State(users: Map[UserId, User])
+```
 
 ---
 
@@ -1911,6 +1910,68 @@ class: code
 
 ```scala
 case class State(users: Map[UserId, User])
+
+case class Insert(user: User) { .. }
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extend Commands {
+
+  def run: Result =
+    ...
+
+
+
+
+
+
+}
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extend Commands {
+
+  def run: Result =
+    ...
+
+  def nextState(state: State): State =
+    ...
+
+
+
+}
+```
+
+---
+
+class: code
+
+```scala
+case class State(users: Map[UserId, User])
+
+case class Insert(user: User) extend Commands {
+
+  def run: Result =
+    ...
+
+  def nextState(state: State): State =
+    ...
+
+  def postCondition(s: State, r: Result): Prop =
+    ...
+}
 ```
 
 ---
