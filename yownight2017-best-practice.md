@@ -1,7 +1,19 @@
 class: center, bottom, heading-black
-background-image: url("images/chopsticks.jpg")
+background-image: url(images/example-based.jpeg)
 
 # Finding More Bugs With Less Effort
+
+## @charlesofarrell
+
+???
+
+- Property-based testing is our default
+- We have a majority of property-based tests
+
+---
+
+class: center, bottom, heading-black
+background-image: url("images/chopsticks.jpg")
 
 ## @charlesofarrell
 
@@ -108,6 +120,35 @@ class: middle, center
 ???
 
 - Year 2000!
+
+---
+
+class: middle, center
+
+<img src="images/jh.png" />
+
+---
+
+class: middle, center
+
+<img src="images/jh.png" />
+<img src="https://image.flaticon.com/icons/png/128/126/126157.png" />
+
+---
+
+class: center
+
+<img src="images/volvo.jpg" width="100%" />
+
+http://www.quviq.com/volvo-quickcheck/
+
+---
+
+- 3,000 pages of specifications
+- 20,000 lines of QuickCheck
+- 1,000,000 LOC, 6 suppliers
+- 200 problems
+- 100 problems in the standard
 
 ---
 
@@ -1065,39 +1106,6 @@ trait Commands {
   def property(threadCount: Int): Prop
 }
 ```
-
----
-
-class: middle, center
-
-<img src="images/jh.png" />
-
----
-
-class: middle, center
-
-<img src="images/jh.png" />
-<img src="https://image.flaticon.com/icons/png/128/126/126157.png" />
-
-???
-
-- John Hughes
-- Inventor of QuickCheck
-- Now makes money from testing other people's code
-
-- 3,000 pages of specifications
-- 20,000 lines of QuickCheck
-- 1,000,000 LOC, 6 suppliers
-- 200 problems
-- 100 problems in the standard
-
----
-
-class: center
-
-<img src="images/volvo.jpg" width="100%" />
-
-http://www.quviq.com/volvo-quickcheck/
 
 ---
 
