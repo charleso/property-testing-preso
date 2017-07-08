@@ -918,10 +918,7 @@ def findUsersByPostCode(code: Int): List[User]
 forAll(genPostcode) { postcode =>
 forAll(genList(genUser)) { users =>
 
-
   val has = users.filter(_.postcode == postcode)
-
-
 
   users
     .foreach(u => userDb.insert(u))
@@ -935,27 +932,6 @@ forAll(genList(genUser)) { users =>
 - God forbid you're not using prepared statements
   this would find a bug pretty quick
 
----
-
-class: code
-
-```scala
-def findByPostCode(postcode: Int): List[User]
-
-forAll(genPostcode) { postcode =>
-forAll(genList(genUser)) { u1 =>
-forAll(genList(genUser)) { u2 =>
-
-  val has = u1.map(_.copy(postcode = postcode))
-
-  val not = u2.filter(_.postcode != postcode)
-
-  (has ++ not)
-    .foreach(u => userDb.insert(u))
-
-  userDb.findByPostCode(postcode) == has
-}}}
-```
 
 
 
@@ -1056,6 +1032,77 @@ forAll(genString) { s =>
 Expected 2 but got 1
 ARG_0: "İ"
 </code></pre>
+
+
+
+
+
+
+
+
+
+
+---
+
+class: top, center, heading-black
+background-image: url(https://images.unsplash.com/4/madebyvadim.jpg)
+
+<h2 style="margin-top: 17px;">Rebuild</h2>
+
+???
+
+## Hard to prove, easy to verify
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i) == ???
+}}}
+```
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i) == ???
+}}}
+```
+
+<pre><code class="success">
+"abc" -> "a" + "bc"
+</code></pre>
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genString) { t =>
+
+    substring(s + t, s.length) == t
+}}}
+```
+
+
 
 
 

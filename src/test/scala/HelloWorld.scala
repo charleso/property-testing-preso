@@ -17,4 +17,7 @@ object HelloWorld extends Properties("HelloWorld") {
       true
     }
   }
+  property("substring2") = forAll { (a: String, b: String) =>
+    (a + b).substring(a.length) ?= b
+  }
 }
