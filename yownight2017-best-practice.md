@@ -2254,8 +2254,10 @@ def test_substring(s1, s2):
 
 ---
 
-class: center, middle, section-aqua, heading-white
+class: bottom, left, heading-white
 background-image: url(images/property-based.jpeg)
+
+## Find More Bugs
 
 ???
 
@@ -2264,6 +2266,17 @@ background-image: url(images/property-based.jpeg)
 - Live longer than other tests
 - File multiple bugs with one test
 - Less code
+
+---
+
+class: bottom, left, heading-white
+background-image: url(images/property-based.jpeg)
+
+## Find More Bugs <span class="yellow">with Less Effort</span>
+
+???
+
+- Find better bugs
 
 ---
 
