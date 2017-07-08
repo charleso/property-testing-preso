@@ -1045,7 +1045,7 @@ ARG_0: "İ"
 ---
 
 class: top, center, heading-black
-background-image: url(https://images.unsplash.com/4/madebyvadim.jpg)
+background-image: url(images/rebuild.jpg)
 
 <h2 style="margin-top: 17px;">Rebuild</h2>
 
@@ -1067,25 +1067,6 @@ def testSubstring = {
     substring(s, i) == ???
 }}}
 ```
-
----
-
-class: code
-
-```scala
-def substring(s: String, i: Int): String
-
-def testSubstring = {
-  forAll(genString) { s =>
-  forAll(genInt) { i =>
-
-    substring(s, i) == ???
-}}}
-```
-
-<pre><code class="success">
-"abc" -> "a" + "bc"
-</code></pre>
 
 ---
 
