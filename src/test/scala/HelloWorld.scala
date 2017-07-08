@@ -10,4 +10,11 @@ object HelloWorld extends Properties("HelloWorld") {
   property("list reverse 2") = forAll { (a: String, b: String) =>
     (b + a).reverse =? (a.reverse + b.reverse)
   }
+
+  property("substring") = forAll { (a: String, i: Int) =>
+    (i >= 0 && i < a.length) ==> {
+      a.substring(i)
+      true
+    }
+  }
 }

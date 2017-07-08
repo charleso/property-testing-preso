@@ -50,24 +50,18 @@ background-image: url(images/example-based.jpeg)
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 ```
-
-???
-
-- The "Hello World" of property based testing
 
 ---
 
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse = {
-  reverse(List(1, 2, 3)) == List(3, 2, 1)
-
-
+def testSubstring = {
+  substring("abc", 1) == "bc"
 }
 ```
 
@@ -76,12 +70,11 @@ def testReverse = {
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse = {
-  reverse(List(1, 2, 3)) == List(3, 2, 1)
-  reverse(List()) == List()
-
+def testSubstring = {
+  substring("abc", 1) == "bc"
+  substring("abc", 3) == ""
 }
 ```
 
@@ -90,12 +83,27 @@ def testReverse = {
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse = {
-  reverse(List(1, 2, 3)) == List(3, 2, 1)
-  reverse(List()) == List()
-  reverse(List(1, 1, 3)) == List(3, 1, 1)
+def testSubstring = {
+  substring("abc", 1) == "bc"
+  substring("abc", 3) == ""
+  substring("abc", 4) == ???
+}
+```
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  substring("abc", 1) == "bc"
+  substring("abc", 3) == ""
+  substring("abc", 4) == ???
+  substring("abc", -1) == ???
 }
 ```
 
@@ -158,12 +166,63 @@ class: middle, center
 
 > 31 Languages
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 ---
 
-class: code, middle, center
+class: top, left, heading-black
+background-image: url(images/fuzzy.jpg)
+
+## Fuzzing
+
+---
+
+class: code
 
 ```scala
-println("Hello World")
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+
+
+
+    substring("abc", 1) == "bc"
+}
+```
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">def substring(s: String, i: Int): String
+
+def testSubstring = {
+
+
+
+    substring("abc", 1)
+}
+</code></pre>
+
+```scala-bg
+
+
+
+
+
+
+    substring("abc", 1) == "bc"
 ```
 
 ---
@@ -171,11 +230,39 @@ println("Hello World")
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
+def testSubstring = {
 
-    reverse(?) == ???
+
+
+    substring("abc", 1)
+}
+```
+
+---
+
+class: code
+
+```scala-fg
+
+
+
+  generateString      s
+
+
+              s
+```
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  generateString    { s =>
+
+
+    substring(s, 1)
+}}
 ```
 
 ---
@@ -185,7 +272,9 @@ class: code
 <pre><code class="scala scala-fg">&nbsp;
 
 
-  forAll (???)
+  forAll(         )
+
+
 
 
 
@@ -193,12 +282,14 @@ def forAll[A](Gen[A], A => Prop): Prop
 </code></pre>
 
 ```scala-bg
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (???)             { l =>
-    reverse(l) == ???
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+
+
+    substring(s, 1)
+}}
 
 def forAll[A](Gen[A], A => Prop): Prop
 ```
@@ -210,37 +301,44 @@ class: code
 <pre><code class="scala scala-fg">&nbsp;
 
 
-          genList(???)
+         genString
 
 
 
 
 
-def genList[A](Gen[A]): Gen[List[A]]
+
+
+def genString: Gen[String]
 </code></pre>
 
 ```scala-bg
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (genList(???))    { l =>
-    reverse(l) == ???
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+
+
+    substring(s, 1)
+}}
 
 def forAll[A](Gen[A], A => Prop): Prop
 
-def genList[A](Gen[A]): Gen[List[A]]
+def genString: Gen[String]
 ```
 
 ---
 
 class: code
 
-<pre><code class="scala scala-fg">&nbsp;
+```scala-fg
 
 
-                  genInt
 
+
+         genInt    i
+
+                 i
 
 
 
@@ -248,19 +346,21 @@ class: code
 
 
 def genInt: Gen[Int]
-</code></pre>
+```
 
 ```scala-bg
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(l) == ???
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i)
+}}}
 
 def forAll[A](Gen[A], A => Prop): Prop
 
-def genList[A](Gen[A]): Gen[List[A]]
+def genString: Gen[String]
 
 def genInt: Gen[Int]
 ```
@@ -269,43 +369,104 @@ def genInt: Gen[Int]
 
 class: code
 
-```scala
-def reverse[A](l: List[A]): List[A]
+<pre><code class="scala scala-fg">&nbsp;
 
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(l) == ???
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i)
+}}}
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i)
+}}}
 ```
+
+---
+
+class: center, middle, heading-white
+background-image: url(images/learning.jpeg)
 
 ---
 
 class: code
 
-```scala
-def reverse[A](l: List[A]): List[A]
-
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
-```
-
----
-
-class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+
+    substring(s, i)
+}}}
 ```
 
 <pre><code class="warning">
-+ testReverse: OK, passed 100 tests.
+! testSubstring: StringIndexOutOfBoundsException
+    String index out of range: 0
+> ARG_0: ""
+> ARG_1: 0
+</code></pre>
+
+---
+
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+  i &lt; s.length ==>
+
+
+
+def ==>(p: Boolean, Prop): Prop
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i < s.length ==>
+    substring(s, i)
+}}}
+
+def ==>(p: Boolean, Prop): Prop
+```
+
+---
+
+class: code
+
+```scala
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i < s.length ==>
+    substring(s, i)
+}}}
+```
+
+<pre><code class="warning">
+! testSubstring: StringIndexOutOfBoundsException
+    String index out of range: -1
+> ARG_0: ""
+> ARG_1: -1
 </code></pre>
 
 ---
@@ -313,61 +474,58 @@ def testReverse =
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(reverse(l)) == l
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i >= 0 && i < s.length ==>
+    substring(s, i)
+}}}
 ```
-
-<pre><code class="warning">
-List()
-List(2147483647, 1)
-List(-2147483648, 1, -1094275287)
-List(6569, 2147, 14801, 0, 1852, -9217, 0)
-</code></pre>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ---
 
 class: code
 
 ```scala
-def reverse[A](l: List[A]): List[A]
+def substring(s: String, i: Int): String
 
-def testReverse =
-  forAll (genList(genInt)) { l =>
-    reverse(l) == ???
-  }
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i >= 0 && i < s.length ==>
+    substring(s, i)
+}}}
 ```
 
-<pre><code class="warning">
-1. Property Testing
-2. ???
-3. Profit
+<pre><code class="success">
++ HelloWorld.substring: OK, passed 100 tests.
 </code></pre>
 
 ---
 
-- TODO Show writing original function
+class: code
+
+<pre><code class="scala scala-fg">&nbsp;
+
+
+
+
+
+    substring(s, i) == ???
+</code></pre>
+
+```scala-bg
+def substring(s: String, i: Int): String
+
+def testSubstring = {
+  forAll(genString) { s =>
+  forAll(genInt) { i =>
+  i >= 0 && i < s.length ==>
+    substring(s, i) == ???
+}}}
+```
 
 
 
@@ -1198,65 +1356,6 @@ https://groups.google.com/forum/#!topic/leveldb/gnQEgMhxZAs
 
 
 
-
----
-
-class: center, middle, section-aqua, heading-white
-
-## Fuzzing
-
----
-
-class: code
-
-```scala
-def testUser = {
-
-
-
-    val user = User("bob", 2000)
-
-    insertUser(user)
-}
-```
-
----
-
-class: code
-
-```scala
-def testUser = {
-  forAll(genString) { name =>
-  forAll(genInt) { postcode =>
-
-    val user = User(name, postcode)
-
-    insertUser(user)
-}}}
-```
-
----
-
-class: code
-
-
-```scala
-def testUser = {
-  forAll(genString) { name =>
-  forAll(genInt) { postcode =>
-
-    val user = User(name, postcode)
-
-    insertUser(user)
-}}}
-```
-
-<pre><code class="warning">
-! testUser: Falsified after 21 passed tests.
-NullPointerException
-> ARG_0: ""
-> ARG_1: 0
-</code></pre>
 
 ---
 
